@@ -22,7 +22,7 @@ const DisplayContent = () => {
   useEffect(() => {
     setLoading(true);
     const usersQuery = query(
-      collection(db, "users"),
+      collection(db, "garage"),
       where("category", "==", cardId)
     );
     const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
@@ -46,7 +46,7 @@ const DisplayContent = () => {
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleItemPress(item.id)}>
       <View style={styles.card}>
-        <Text style={styles.mainText}>{item.username}</Text>
+        <Text style={styles.mainText}>{item.name}</Text>
         <Text>Kataragama , Tissamaharama</Text>
         <Image source={imageSource} style={styles.cardImage} />
         <View>

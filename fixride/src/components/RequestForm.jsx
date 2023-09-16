@@ -2,6 +2,7 @@ import { addDoc, collection } from "firebase/firestore";
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from "react-native";
 import { db } from "../config/firebase";
+import { router } from "expo-router";
 
 const RequestForm = () => {
   const [name, setName] = useState("");
@@ -10,12 +11,14 @@ const RequestForm = () => {
 
   const handleSave = () => {
     // Handle saving the user data here
-    const userDb = collection(db, "users");
-    addDoc(userDb, {
-      username:name,
-      email:email,
-      status:"Pending",
+    const requestDb = collection(db, "request");
+    addDoc(requestDb, {
+      username: name,
+      email: email,
+      status: "Pending",
     });
+
+     router.push(`/status/${name}`, { Id:name });
     // You can send this data to a server, store it in state, or perform any other action.
   };
 

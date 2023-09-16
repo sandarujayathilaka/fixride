@@ -23,7 +23,7 @@ const GarageInfo = () => {
   useEffect(() => {
     const fetchGarageData = async () => {
       try {
-        const garageDocRef = doc(db, "users", Id);
+        const garageDocRef = doc(db, "garage", Id);
         const garageDocSnapshot = await getDoc(garageDocRef);
 
         if (garageDocSnapshot.exists()) {
@@ -68,8 +68,8 @@ const GarageInfo = () => {
           </View>
           <View>
             {/* Conditionally render text based on the selected button */}
-            {selectedButton === "Sandaru" && <Text>{garageData.username}</Text>}
-            {selectedButton === "Primal" && <Text>{garageData.location}</Text>}
+            {selectedButton === "Sandaru" && <Text>{garageData.about}</Text>}
+            {selectedButton === "Primal" && <Text>{garageData.contact}</Text>}
           </View>
         </View>
       ) : (
