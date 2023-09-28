@@ -44,23 +44,26 @@ const DisplayContent = () => {
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleItemPress(item.id)}>
-      <View style={styles.card}>
-        <Text style={styles.mainText}>{item.name}</Text>
-        <Text>Kataragama , Tissamaharama</Text>
-        <Image source={imageSource} style={styles.cardImage} />
-        <View>
-          <TouchableOpacity style={styles.customButton}>
-            <Text style={styles.buttonText}>View Details</Text>
-          </TouchableOpacity>
-        </View>
+    <View style={styles.card}>
+      <Text style={styles.mainText}>{item.name}</Text>
+      <Text>
+        {item.address} | Rate: {item.rating}
+      </Text>
+      <Image source={imageSource} style={styles.cardImage} />
+      <View>
+        <TouchableOpacity
+          style={styles.customButton}
+          onPress={() => handleItemPress(item.id)}
+        >
+          <Text style={styles.buttonText}>View Details</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   return (
     <View>
-      <Text>Display Content {cardId}</Text>
+      <Text style={styles.topic}>Near by Garages</Text>
       {loading ? (
         <Text>Loading...</Text>
       ) : (
@@ -107,6 +110,12 @@ const styles = StyleSheet.create({
     marginLeft: 250,
     marginTop: -55,
     borderRadius: 8,
+  },
+  topic: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "left",
+    margin:15
   },
 });
 

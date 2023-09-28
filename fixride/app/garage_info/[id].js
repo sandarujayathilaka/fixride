@@ -6,6 +6,7 @@ import {
   Button,
   Image,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
@@ -18,7 +19,8 @@ const GarageInfo = () => {
   const imageSource = require("../../assets/Picture2.png");
 
   // State to track which button was clicked
-  const [selectedButton, setSelectedButton] = useState(null);
+  const [selectedButton, setSelectedButton] = useState("Services");
+  
 
   useEffect(() => {
     const fetchGarageData = async () => {
@@ -29,6 +31,7 @@ const GarageInfo = () => {
         if (garageDocSnapshot.exists()) {
           const data = garageDocSnapshot.data();
           setGarageData(data);
+          console.log(data);
         } else {
           setGarageData(null);
         }
@@ -46,45 +49,52 @@ const GarageInfo = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text>Garage Info</Text>
-      {garageData ? (
-        <View>
-          <Text style={styles.mainText}>{garageData.username}</Text>
-          <Image source={imageSource} style={styles.cardImage} />
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[styles.customButton, { marginLeft: 5, flex: 1 }]}
-              onPress={() => setSelectedButton("Sandaru")} // Set the selected button state
-            >
-              <Text style={styles.buttonText}>Sandaru</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.customButton, { marginLeft: 5, flex: 1 }]}
-              onPress={() => setSelectedButton("Primal")} // Set the selected button state
-            >
-              <Text style={styles.buttonText}>Primal</Text>
-            </TouchableOpacity>
-          </View>
+    <ScrollView>
+      <View style={styles.container}>
+        {garageData ? (
           <View>
-            {/* Conditionally render text based on the selected button */}
-            {selectedButton === "Sandaru" && <Text>{garageData.about}</Text>}
-            {selectedButton === "Primal" && <Text>{garageData.contact}</Text>}
-          </View>
-        </View>
-      ) : (
-        <Text>Loading...</Text>
-      )}
+            <View>
+              <Text style={styles.topic}>{garageData.name}</Text>
+            </View>
 
-      <View>
-        <TouchableOpacity
-          style={styles.macButton}
-          onPress={() => handleRequestMechanic()}
-        >
-          <Text>Request a Machenic</Text>
-        </TouchableOpacity>
+            <Text style={styles.mainText}>{garageData.username}</Text>
+            <Image source={imageSource} style={styles.cardImage} />
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.customButton, { marginLeft: 5, flex: 1 }]}
+                onPress={() => setSelectedButton("Services")} // Set the selected button state
+              >
+                <Text style={styles.buttonText}>Services</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.customButton, { marginLeft: 5, flex: 1 }]}
+                onPress={() => setSelectedButton("Contact")} // Set the selected button state
+              >
+                <Text style={styles.buttonText}>Contact Us</Text>
+              </TouchableOpacity>
+            </View>
+            <View>
+              {/* Conditionally render text based on the selected button */}
+              {selectedButton === "Services" && <Text>{garageData.about}</Text>}
+              {selectedButton === "Contact" && (
+                <Text>{garageData.contact}</Text>
+              )}
+            </View>
+          </View>
+        ) : (
+          <Text>Loading...</Text>
+        )}
+
+        <View>
+          <TouchableOpacity
+            style={styles.macButton}
+            onPress={() => handleRequestMechanic()}
+          >
+            <Text>Request a Machenic</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -128,8 +138,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 325,
+    marginTop: 250,
     height: 45,
+  },
+  topic: {
+    fontSize: 25,
+    fontWeight: "bold",
+    textAlign: "left",
+    marginBottom: 20,
   },
 });
 

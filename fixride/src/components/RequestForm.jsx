@@ -18,7 +18,7 @@ const RequestForm = () => {
       status: "Pending",
     });
 
-     router.push(`/status/${name}`, { Id:name });
+     router.push(`/req_details/${name}`, { Id:name });
     // You can send this data to a server, store it in state, or perform any other action.
   };
 
