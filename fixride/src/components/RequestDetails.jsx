@@ -1,7 +1,15 @@
-import { View, Text, TouchableOpacity, StyleSheet,Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+import { router, useGlobalSearchParams } from "expo-router";
 import React from 'react'
 
 export default function RequestDetails() {
+
 
  const imageSource = require("../../assets/Picture2.png");
 
@@ -10,7 +18,7 @@ export default function RequestDetails() {
       <Text style={styles.topic}>Activity Details</Text>
       <View style={styles.serviceColumn}>
         <View>
-          <Text style={styles.mainLable}>DK CAR SERVISE</Text>
+          <Text style={styles.mainLable}>ddk</Text>
           <Text style={{ fontSize: 16 }}>0771347786</Text>
         </View>
         <View style={styles.datetime}>

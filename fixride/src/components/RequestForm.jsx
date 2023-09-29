@@ -1,5 +1,5 @@
 import { addDoc, collection } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,50 +8,107 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { db } from "../config/firebase";
 import { router } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
+import * as ImagePicker from "expo-image-picker";
 
 const RequestForm = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [veheNum, setVeheNum] = useState("");
   const [model, setModel] = useState("");
   const [payment, setPayment] = useState("Cash");
   const [matter, setMatter] = useState("");
   const [selectedItem, setSelectedItem] = useState("Hybrid");
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [reqDate, setDateTime] = useState("");
 
-  const handleSave = () => {
-    // Handle saving the user data here
+  useEffect(() => {
+    // Get the current date and time when the component mounts
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString();
+    setDateTime(formattedDate);
+  }, []); //
+
+  const handleSave = async () => {
     const requestDb = collection(db, "request");
-    addDoc(requestDb, {
-      username: name,
-      email: email,
-      status: "Pending",
-    });
 
-    router.push(`/req_details/${name}`, { Id: name });
-    // You can send this data to a server, store it in state, or perform any other action.
+    // Check if an image is selected
+    if (selectedImage) {
+      try {
+        // Convert the selected image to a base64 encoded string
+        const response = await fetch(selectedImage);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const base64data = reader.result.split(",")[1]; // Extract the base64 string
+
+          // Add the data to Firestore
+          await addDoc(requestDb, {
+            vehicleNo: veheNum,
+            vehicleModel: model,
+            matter: matter,
+            paymentMethod: payment,
+            powerSource: selectedItem,
+            imageUrl: `data:image/jpeg;base64,${base64data}`, // Store as base64 URL
+            status: "Pending",
+            dateTime: reqDate,
+          });
+          console.log(veheNum)
+
+          handleItemPress(veheNum);
+        };
+        reader.readAsDataURL(blob);
+      } catch (error) {
+        console.error("Error converting image to base64:", error);
+      }
+    } else {
+      // No image selected, add other data to Firestore
+      await addDoc(requestDb, {
+        vehicleNo: veheNum,
+        vehicleModel: model,
+        matter: matter,
+        paymentMethod: payment,
+        powerSource: selectedItem,
+        status: "Pending",
+        dateTime: reqDate,
+      });
+        console.log(veheNum);
+     handleItemPress(veheNum);
+    }
   };
+
+  const handleImagePicker = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync();
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
+
+   const handleItemPress = (id) => {
+     router.push({ pathname: `/req_details/${id}`, params: { date: reqDate } }); //when need to pass multiple value with link use this method
+     console.log(`Clicked with form ${id}`);
+   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.label}>Name:</Text>
+      <Text style={styles.label}>Vehicle No:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={(text) => setName(text)}
-        value={name}
-        placeholder="Enter your name"
-      />
-
-      <Text style={styles.label}>Email:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setEmail(text)}
-        value={email}
-        placeholder="Enter your email"
-        keyboardType="email-address"
+        onChangeText={(text) => setVeheNum(text)}
+        value={veheNum}
+        placeholder="Enter your Vehicle No"
       />
 
       <Text style={styles.label}>Vehicle Model:</Text>
@@ -111,6 +168,18 @@ const RequestForm = () => {
         <Picker.Item label="Fuel" value="Fuel" />
       </Picker>
 
+      <View style={styles.imageContainer}>
+        {selectedImage && (
+          <Image source={{ uri: selectedImage }} style={styles.image} />
+        )}
+        <TouchableOpacity
+          style={styles.imagePickerButton}
+          onPress={handleImagePicker}
+        >
+          <Text style={styles.imagePickerText}>Select an Image</Text>
+        </TouchableOpacity>
+      </View>
+
       <TouchableOpacity style={styles.customButton} onPress={handleSave}>
         <Text style={styles.buttonText}>Send Request</Text>
       </TouchableOpacity>
@@ -166,6 +235,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  image: {
+    width: 150,
+    height: 150,
+    borderRadius: 75, // Make it circular if desired
+    marginBottom: 10,
+  },
+  imagePickerButton: {
+    backgroundColor: "orange",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "left",
+  },
+  imagePickerText: {
     color: "white",
     fontWeight: "bold",
   },
