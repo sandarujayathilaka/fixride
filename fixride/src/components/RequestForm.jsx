@@ -24,12 +24,14 @@ const RequestForm = () => {
   const [selectedItem, setSelectedItem] = useState("Hybrid");
   const [selectedImage, setSelectedImage] = useState(null);
   const [reqDate, setDateTime] = useState("");
+  const [currentUser, setUser] = useState("");
 
   useEffect(() => {
     // Get the current date and time when the component mounts
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString();
     setDateTime(formattedDate);
+    setUser("Sandaru")
   }, []); //
 
   const handleSave = async () => {
@@ -54,7 +56,9 @@ const RequestForm = () => {
             powerSource: selectedItem,
             imageUrl: `data:image/jpeg;base64,${base64data}`, // Store as base64 URL
             status: "Pending",
+            mainstatus: "Ongoing",
             dateTime: reqDate,
+            username: currentUser,
           });
           console.log(veheNum)
 
@@ -74,6 +78,8 @@ const RequestForm = () => {
         powerSource: selectedItem,
         status: "Pending",
         dateTime: reqDate,
+        mainstatus: "Ongoing",
+        username: currentUser,
       });
         console.log(veheNum);
      handleItemPress(veheNum);
@@ -97,7 +103,18 @@ const RequestForm = () => {
   };
 
    const handleItemPress = (id) => {
-     router.push({ pathname: `/req_details/${id}`, params: { date: reqDate } }); //when need to pass multiple value with link use this method
+     router.push({
+       pathname: `/req_details/${id}`,
+       params: {
+         date: reqDate,
+         Num: veheNum,
+         vehemodel: model,
+         paymentmethod: payment,
+         vehematter: matter,
+         power: selectedItem,
+         user: currentUser,
+       },
+     }); //when need to pass multiple value with link use this method
      console.log(`Clicked with form ${id}`);
    };
 
