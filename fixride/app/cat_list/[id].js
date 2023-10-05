@@ -12,7 +12,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 
 const DisplayContent = () => {
-  const [people, setPeople] = useState([]);
+  const [garages, setGarages] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const params = useGlobalSearchParams();
@@ -30,7 +30,7 @@ const DisplayContent = () => {
       snapshot.forEach((doc) => {
         usersList.push({ ...doc.data(), id: doc.id });
       });
-      setPeople(usersList);
+      setGarages(usersList);
       setLoading(false);
     });
 
@@ -68,7 +68,7 @@ const DisplayContent = () => {
         <Text>Loading...</Text>
       ) : (
         <FlatList
-          data={people}
+          data={garages}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />
