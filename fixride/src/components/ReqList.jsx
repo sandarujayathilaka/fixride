@@ -89,37 +89,43 @@ const ReqList = () => {
           {/* Display the details from selectedItem */}
           {selectedItem && (
             <View>
-              <Text>Contact Information</Text>
-               <Text>User Name: {selectedItem.username}</Text>
-              <Text>Mobile Number: {selectedItem.contact}</Text>
+              <Text style={styles.requestHead}>Request</Text>
+              <Text style={styles.subTopic}>Contact Information</Text>
+              <View style={styles.modelCard}>
+               <Text>Name: <Text style={styles.subTitle}>{selectedItem.username}</Text></Text>
+               <Text>Mobile Number: <Text style={styles.subTitle}>{selectedItem.contact}</Text></Text>
+              </View>
              
-              <Text>Vehicle Information</Text>
-              <Text>Vehicle Number: {selectedItem.vehicleNo}</Text>
-              <Text>Vehicle Model: {selectedItem.vehicleModel}</Text>
-              <Text>Power Source: {selectedItem.powerSource}</Text>
+              <Text style={styles.subTopic}>Vehicle Information</Text>
+              <View style={styles.modelCard}>
+              <Text>Vehicle Number: <Text style={styles.subTitle}>{selectedItem.vehicleNo}</Text></Text>
+              <Text>Vehicle Model: <Text style={styles.subTitle}>{selectedItem.vehicleModel}</Text></Text>
+              <Text>Power Source: <Text style={styles.subTitle}>{selectedItem.powerSource}</Text></Text>
+              </View>
 
-              <Text>Breakdown Description</Text>
-              <Text>Matter: {selectedItem.matter}</Text>
-             
-              <Text>Location</Text>
+              <Text style={styles.subTopic}>Breakdown Description</Text>
+              <View style={styles.modelCard}>
+              <Text>{selectedItem.matter}</Text>
+              </View>
+
+              <Text style={styles.subTopic}>Location</Text>
               <Text>Map Comes Here</Text>
             </View>
           )}
           
-          <TouchableOpacity onPress={() => setModalVisible(false)}>
-            <Text>Close</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => {
-                // Navigate to another screen here
-                // You can use the 'navigation' prop to navigate to the desired screen
-                // navigation.navigate("AnotherScreen");
-              }}
-            >
-              <Text>Go to Another Screen</Text>
-            </TouchableOpacity>
-            
+          <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.addButton} >
+          <Text style={styles.buttonText2}>Assign Mechanic</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => setModalVisible(false)}
+          // onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.buttonText2}>Reject</Text>
+        </TouchableOpacity>
+      </View>
+
         </View>
       </Modal>
     </ScrollView>
@@ -214,5 +220,75 @@ const styles = StyleSheet.create({
     marginLeft: 13,
     marginRight: 13,
     marginTop: 40,
+  },
+
+  requestHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 13,
+    marginRight: 13,
+    marginTop: 30,
+    fontSize: 24, 
+    fontWeight: "bold",  
+  },
+
+  subTopic:{
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 13,
+    marginRight: 13,
+    marginTop: 30,
+    fontSize: 20, 
+    fontWeight: "bold",  
+    color: "#5A5A5A",
+  },
+  modelCard: {
+    marginTop: 20,
+    backgroundColor: "#fff4e0",
+    marginHorizontal: 13,
+    borderRadius: 10,
+    justifyContent: "space-between",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#FFAC1C",
+  },
+  subTitle:{
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 13,
+    marginRight: 13,
+    marginTop: 30,
+    fontSize: 15, 
+    fontWeight: "bold",  
+  },
+
+
+  addButton: {
+    backgroundColor: "#EDAE10",
+    borderRadius: 8,
+    padding: 12,
+    alignItems: "center",
+    flex: 1,
+    marginRight: 8,
+  },
+  cancelButton: {
+    backgroundColor: "#ccc",
+    borderRadius: 8,
+    padding: 12,
+    alignItems: "center",
+    flex: 1,
+    marginLeft: 8,
+  },
+  buttonText2: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginLeft:8,
+    marginRight:8,
+    marginTop:70
   },
 });
