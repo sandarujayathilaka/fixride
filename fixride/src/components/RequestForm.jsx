@@ -70,13 +70,13 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   customButton: {
-    backgroundColor: "orange", // Change the button color here
+    backgroundColor: "orange", 
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
   },
   buttonText: {
-    color: "white", // Change the text color here
+    color: "white", 
     fontWeight: "bold",
   },
 });

@@ -3,6 +3,14 @@ import { Text,SafeAreaView, ScrollView, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import CateCard from "../src/components/CateCard";
 import Test from "../src/components/text";
+import GarageMngrDash from "../src/components/GarageMngrDash";
+import AddMechanic from "../src/components/AddMechanic";
+import GarageMngrDash2 from "../src/components/GarageMngrDash2";
+import ReqList from "../src/components/ReqList";
+import Ongoings from "../src/components/Ongoings";
+
+
+
 
 function index() {
 
@@ -25,9 +33,12 @@ function index() {
           }}
         >
             <CateCard/>
-            <Test/>
-
-
+            <GarageMngrDash/>  
+         
+            <AddMechanic/>
+            <Ongoings/>   
+            <ReqList/>
+            
         </View>
       </ScrollView>
     </SafeAreaView>
