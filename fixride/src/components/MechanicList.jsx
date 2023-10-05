@@ -107,7 +107,7 @@ const handleSearch = () => {
             <View style={styles.cardContent}>
               <View style={{ flexDirection: "column" }}>
                 <Text style={styles.cardText}>{item.name}</Text>
-                <Text>{item.specializations.join("   |   ")}</Text>
+                <Text style={styles.cardText2}>{item.specializations.join("   |   ")}</Text>
               </View>
             </View>
             <TouchableOpacity
@@ -200,6 +200,10 @@ const styles = StyleSheet.create({
   },
   cardText: {
     fontSize: 18,
+    fontWeight: "bold",
+  },
+  cardText2: {
+    fontSize: 15,
     fontWeight: "bold",
   },
   button: {

@@ -25,15 +25,13 @@ function AddMechanic({ navigation }) {
     }
 
     try {
-      // Create a new mechanic object with default availability
       const newMechanic = {
         name,
         phoneNumber,
         specializations,
-        availability: "available", // Set the default availability
+        availability: "available", 
       };
 
-      // Add the new mechanic document to the Firestore collection
       const docRef = await addDoc(mechanicsCollection, newMechanic);
 
       console.log("Mechanic added successfully!");
@@ -48,7 +46,7 @@ function AddMechanic({ navigation }) {
     }
   };
 
-  // Function to update a specialization field by index
+
   const updateSpecialization = (index, text) => {
     const updatedSpecializations = [...specializations];
     updatedSpecializations[index] = text;

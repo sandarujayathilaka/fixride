@@ -30,7 +30,9 @@ const ReqList = () => {
       const querySnapshot = await getDocs(statusQuery);
       const requestData = [];
       querySnapshot.forEach((doc) => {
-        requestData.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        const imageUrl = data.imageUrl; 
+        requestData.push({ id: doc.id, ...data, imageUrl }); 
       });
       setData(requestData);
     };
@@ -39,7 +41,6 @@ const ReqList = () => {
   }, []);
 
   const handleViewDetailsClick = async (itemId) => {
-    // Fetch additional details based on the itemId from the database
     const requestRef = doc(db, "request", itemId);
     const docSnap = await getDoc(requestRef);
     if (docSnap.exists()) {
@@ -66,7 +67,8 @@ const ReqList = () => {
                 <Text style={styles.cardText}>{item.vehicleModel}</Text>
                 <Text style={styles.cardText}>{item.powerSource}</Text>
               </View>
-              <Image source={require("./bg.png")} style={styles.cardImage} />
+              {/* Display the image using the Image component */}
+             
             </View>
             <TouchableOpacity
               style={styles.button}
@@ -78,56 +80,78 @@ const ReqList = () => {
         ))}
       </View>
 
-      {/* Modal to display additional details */}
       <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View>
-          {/* Display the details from selectedItem */}
-          {selectedItem && (
-            <View>
-              <Text style={styles.requestHead}>Request</Text>
-              <Text style={styles.subTopic}>Contact Information</Text>
-              <View style={styles.modelCard}>
-               <Text>Name: <Text style={styles.subTitle}>{selectedItem.username}</Text></Text>
-               <Text>Mobile Number: <Text style={styles.subTitle}>{selectedItem.contact}</Text></Text>
-              </View>
-             
-              <Text style={styles.subTopic}>Vehicle Information</Text>
-              <View style={styles.modelCard}>
-              <Text>Vehicle Number: <Text style={styles.subTitle}>{selectedItem.vehicleNo}</Text></Text>
-              <Text>Vehicle Model: <Text style={styles.subTitle}>{selectedItem.vehicleModel}</Text></Text>
-              <Text>Power Source: <Text style={styles.subTitle}>{selectedItem.powerSource}</Text></Text>
-              </View>
+  animationType="slide"
+  transparent={false}
+  visible={modalVisible}
+  onRequestClose={() => setModalVisible(false)}
+>
+<ScrollView>
+  <View>
+    {/* Display the details from selectedItem */}
+    {selectedItem && (
+      <View>
+        <Text style={styles.requestHead}>Request</Text>
 
-              <Text style={styles.subTopic}>Breakdown Description</Text>
-              <View style={styles.modelCard}>
-              <Text>{selectedItem.matter}</Text>
-              </View>
-
-              <Text style={styles.subTopic}>Location</Text>
-              <Text>Map Comes Here</Text>
-            </View>
-          )}
-          
-          <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.addButton} >
-          <Text style={styles.buttonText2}>Assign Mechanic</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => setModalVisible(false)}
-          // onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.buttonText2}>Reject</Text>
-        </TouchableOpacity>
-      </View>
-
+        <Text style={styles.subTopic}>Contact Information</Text>
+        <View style={styles.modelCard}>
+          <Text>
+            Name: <Text style={styles.subTitle}>{selectedItem.username}</Text>
+          </Text>
+          <Text>
+            Mobile Number:{" "}
+            <Text style={styles.subTitle}>{selectedItem.contact}</Text>
+          </Text>
         </View>
-      </Modal>
+
+        <Text style={styles.subTopic}>Vehicle Information</Text>
+        <View style={styles.modelCard}>
+          <Text>
+            Vehicle Number:{" "}
+            <Text style={styles.subTitle}>{selectedItem.vehicleNo}</Text>
+          </Text>
+          <Text>
+            Vehicle Model:{" "}
+            <Text style={styles.subTitle}>{selectedItem.vehicleModel}</Text>
+          </Text>
+          <Text>
+            Power Source:{" "}
+            <Text style={styles.subTitle}>{selectedItem.powerSource}</Text>
+          </Text>
+        </View>
+
+        <Text style={styles.subTopic}>Breakdown Description</Text>
+        <View style={styles.modelCard}>
+          <Text>{selectedItem.matter}</Text>
+        </View>
+
+        
+        <View style={{ alignItems: "center" ,marginTop:13}}>
+          <Image
+            source={{ uri: selectedItem.imageUrl }}
+            style={{ width: 370, height: 200 }} // Adjust the width and height as needed
+          />
+        </View>
+
+        <Text style={styles.subTopic}>Location</Text>
+        <Text>Map Comes Here</Text>
+      </View>
+    )}
+
+    <View style={styles.buttonContainer}>
+      <TouchableOpacity style={styles.addButton}>
+        <Text style={styles.buttonText2}>Assign Mechanic</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.cancelButton}
+        onPress={() => setModalVisible(false)}
+      >
+        <Text style={styles.buttonText2}>Reject</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+  </ScrollView>
+</Modal>
     </ScrollView>
   );
 };
@@ -289,6 +313,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginLeft:8,
     marginRight:8,
-    marginTop:70
+    marginTop:70,
+    marginBottom:30
   },
 });
