@@ -14,13 +14,10 @@ import { db } from "../../src/config/firebase";
 
 const GarageInfo = () => {
   const [garageData, setGarageData] = useState(null);
+  const [selectedButton, setSelectedButton] = useState("Services");
   const params = useGlobalSearchParams();
   const Id = params.id;
   const imageSource = require("../../assets/Picture2.png");
-
-  // State to track which button was clicked
-  const [selectedButton, setSelectedButton] = useState("Services");
-  
 
   useEffect(() => {
     const fetchGarageData = async () => {
@@ -49,100 +46,100 @@ const GarageInfo = () => {
   };
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        {garageData ? (
-          <View>
-            <View>
-              <Text style={styles.topic}>{garageData.name}</Text>
-            </View>
-
-            <Text style={styles.mainText}>{garageData.username}</Text>
-            <Image source={imageSource} style={styles.cardImage} />
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.customButton, { marginLeft: 5, flex: 1 }]}
-                onPress={() => setSelectedButton("Services")} // Set the selected button state
-              >
-                <Text style={styles.buttonText}>Services</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.customButton, { marginLeft: 5, flex: 1 }]}
-                onPress={() => setSelectedButton("Contact")} // Set the selected button state
-              >
-                <Text style={styles.buttonText}>Contact Us</Text>
-              </TouchableOpacity>
-            </View>
-            <View>
-              {/* Conditionally render text based on the selected button */}
-              {selectedButton === "Services" && <Text>{garageData.about}</Text>}
-              {selectedButton === "Contact" && (
-                <Text>{garageData.contact}</Text>
-              )}
-            </View>
-          </View>
-        ) : (
-          <Text>Loading...</Text>
-        )}
-
+    <ScrollView contentContainerStyle={styles.container}>
+      {garageData ? (
         <View>
-          <TouchableOpacity
-            style={styles.macButton}
-            onPress={() => handleRequestMechanic()}
-          >
-            <Text>Request a Machenic</Text>
-          </TouchableOpacity>
+          <Text style={styles.topic}>{garageData.name}</Text>
+          <Text style={styles.mainText}>{garageData.username}</Text>
+          <Image source={imageSource} style={styles.cardImage} />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[
+                styles.customButton,
+                selectedButton === "Services" && styles.selectedButton,
+              ]}
+              onPress={() => setSelectedButton("Services")}
+            >
+              <Text style={styles.buttonText}>Services</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.customButton,
+                selectedButton === "Contact" && styles.selectedButton,
+              ]}
+              onPress={() => setSelectedButton("Contact")}
+            >
+              <Text style={styles.buttonText}>Contact Us</Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            {selectedButton === "Services" && <Text>{garageData.about}</Text>}
+            {selectedButton === "Contact" && <Text>{garageData.contact}</Text>}
+          </View>
         </View>
-      </View>
+      ) : (
+        <Text>Loading...</Text>
+      )}
+      <TouchableOpacity
+        style={styles.macButton}
+        onPress={() => handleRequestMechanic()}
+      >
+        <Text style={styles.buttonText}>Request a Mechanic</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    margin: 10,
+    flexGrow: 1,
+    padding: 16,
+    backgroundColor: "white",
   },
   buttonContainer: {
     flexDirection: "row",
-    marginTop: 10,
+    marginTop: 20,
   },
   customButton: {
+    flex: 1,
     backgroundColor: "orange",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 25,
-    height: 45,
-    flex: 1, // Expand button width equally
+    marginTop: 20,
+    margin:2
+  },
+  selectedButton: {
+    backgroundColor: "brown", 
   },
   buttonText: {
-    color: "black",
+    color: "white",
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: 16,
   },
   mainText: {
     color: "black",
     fontWeight: "600",
-    fontSize: 30,
-    marginLeft: 10,
+    fontSize: 24,
+    marginVertical: 10,
   },
   cardImage: {
     width: 150,
     height: 150,
-    marginLeft: 120,
-    marginTop: 45,
+    alignSelf: "center",
     borderRadius: 8,
+    marginTop: 20,
+    
   },
   macButton: {
     backgroundColor: "orange",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 250,
-    height: 45,
+    marginTop: 30,
   },
   topic: {
-    fontSize: 25,
+    fontSize: 28,
     fontWeight: "bold",
     textAlign: "left",
     marginBottom: 20,

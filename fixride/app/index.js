@@ -26,11 +26,6 @@ function index() {
           }}
         >
             <CateCard/>
-            <Test/> 
-
-            {/* <RequestDetails/> */}
-
-
         </View>
       </ScrollView>
     </SafeAreaView>

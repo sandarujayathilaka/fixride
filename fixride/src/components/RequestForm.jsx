@@ -59,6 +59,11 @@ const RequestForm = () => {
             mainstatus: "Ongoing",
             dateTime: reqDate,
             username: currentUser,
+            startStatus: "",
+            reachStatus: "",
+            assignStatus: "",
+            doneStatus: "",
+            payStatus: "",
           });
           console.log(veheNum)
 
@@ -80,27 +85,52 @@ const RequestForm = () => {
         dateTime: reqDate,
         mainstatus: "Ongoing",
         username: currentUser,
+        startStatus:"",
+        reachStatus:"",
+        assignStatus:"",
+        doneStatus:"",
+        payStatus:"",
       });
         console.log(veheNum);
      handleItemPress(veheNum);
     }
   };
 
-  const handleImagePicker = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+ const handleImagePicker = async () => {
+   const permissionResult =
+     await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
+   if (permissionResult.granted === false) {
+     alert("Permission to access camera roll is required!");
+     return;
+   }
+
+   const result = await ImagePicker.launchImageLibraryAsync();
+
+   if (!result.canceled) {
+     setSelectedImage(result.uri);
+   }
+ };
+  const handleCameraCapture = async () => {
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (cameraPermission.granted === false) {
+      alert("Permission to access the camera is required!");
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync();
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: false, // You can enable editing if needed
+    });
 
     if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
+      // Save the captured image to the device's media library
+      await MediaLibrary.saveToLibraryAsync(result.uri);
+
+      setSelectedImage(result.uri);
     }
   };
+
 
    const handleItemPress = (id) => {
      router.push({
@@ -193,7 +223,13 @@ const RequestForm = () => {
           style={styles.imagePickerButton}
           onPress={handleImagePicker}
         >
-          <Text style={styles.imagePickerText}>Select an Image</Text>
+          <Text style={styles.imagePickerText}>Select from Gallery</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.imagePickerButton}
+          onPress={handleCameraCapture}
+        >
+          <Text style={styles.imagePickerText}>Take a Photo</Text>
         </TouchableOpacity>
       </View>
 

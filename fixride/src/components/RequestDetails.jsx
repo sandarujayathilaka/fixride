@@ -7,11 +7,13 @@ import {
   ScrollView,
   RefreshControl,
   ImageBackground,
+  Modal,
+  Button
 } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import React, { useEffect, useState } from 'react'
 import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
-import { db } from "../config/firebase";
+import { db,doc } from "../config/firebase";
 import { ActivityIndicator } from "react-native-paper";
 
 
@@ -23,6 +25,7 @@ export default function RequestDetails(props) {
 
    const[requestDetails,setRequest] = useState({})
    const [loading, setLoading] = useState(false);
+   const [RequestId, setRequestId] = useState("");
    const [cTime, setCorrectTime] = useState("");
    const [cDate, setCorrectDate] = useState("");
   const [showBusyMessage, setShowBusyMessage] = useState(false);
@@ -33,6 +36,7 @@ export default function RequestDetails(props) {
      // Add more messages here
    ]);
    const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+    const [isModalVisible, setModalVisible] = useState(true);
 
    
  const imageSource = require("../../assets/Picture2.png");
@@ -53,6 +57,7 @@ export default function RequestDetails(props) {
            if (!snapshot.empty) {
              const doc = snapshot.docs[0];
              setRequest(doc.data());
+             setRequestId(doc.id)
            }
            setLoading(false);
          });
@@ -65,29 +70,27 @@ export default function RequestDetails(props) {
      };
 
      fetchData();
-   }, [date, user]);
+   }, []);
 
  useEffect(() => {
 
    const correctDateTime = async () => {
+     if (date) {
+       // Check if date is defined
+       const timestamp = date;
+       const dateTime = new Date(timestamp);
+       const correctDate = dateTime.toDateString();
+       const correctTime = dateTime.toLocaleTimeString();
 
-    const timestamp = date;
+       setCorrectDate(correctDate);
+       setCorrectTime(correctTime);
 
-    const dateTime = new Date(timestamp);
-
-    const correctDate = dateTime.toDateString(); // Extracts the date portion
-    const correctTime = dateTime.toLocaleTimeString(); // Extracts the time portion
-
-    setCorrectDate(correctDate)
-    setCorrectTime(correctTime)
-
-    console.log("Date:", correctDate); // Output: Date: Sun Oct 02 2023
-    console.log("Time:", correctTime);
-     
+       console.log("Date:", correctDate);
+       console.log("Time:", correctTime);
+     }
    };
-
    correctDateTime();
- }, [date, user]);
+ }, []);
 
  useEffect(() => {
    // Use a timeout to change the displayed message every 10 seconds
@@ -100,7 +103,31 @@ export default function RequestDetails(props) {
    }; // Cleanup the timeout when the component unmounts
  }, [messages, currentMessageIndex]);
 
-console.log(requestDetails.status)
+const handleOKPress = async () => {
+  
+  // Close the modal
+  setModalVisible(false);
+
+  // Redirect to the home page (you should replace '/home' with your actual home page route)
+  router.push(`/cat_list/All`, { cardId: 'All' });
+
+  // Update the request status to "Busy" in Firestore
+  
+};
+
+  const handleTrackStatus = () => {
+    if (RequestId) {
+      router.push({
+        pathname: `/status/${RequestId}`,
+        params: {
+          Id: RequestId,
+        },
+      });
+    } else {
+      console.error("Invalid or missing RequestId");
+    }
+  };
+
   
 
   return (
@@ -117,6 +144,31 @@ console.log(requestDetails.status)
             <Text>{messages[currentMessageIndex]}</Text>
             <Image source={gifimage} style={styles.waitingImage} />
           </View>
+        ) : requestDetails.status === "Reject" ? (
+          // Display the modal when the request is rejected
+          <>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={isModalVisible}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Garage is Busy</Text>
+                  <Text style={styles.modalMessage}>
+                    Sorry, the garage is currently busy and cannot accept your
+                    request at the moment.
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.modalButton}
+                    onPress={handleOKPress}
+                  >
+                    <Text style={styles.modalButtonText}>OK</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </>
         ) : (
           <>
             <Text style={styles.topic}>Activity Details</Text>
@@ -153,6 +205,7 @@ console.log(requestDetails.status)
                 <Text style={{ fontSize: 16 }}>{requestDetails.status}</Text>
                 <TouchableOpacity
                   style={{ textAlign: "right", fontSize: 16, marginTop: 5 }}
+                  onPress={handleTrackStatus}
                 >
                   <Text>Track Status</Text>
                 </TouchableOpacity>
@@ -258,7 +311,7 @@ console.log(requestDetails.status)
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    backgroundColor:'white'
+    backgroundColor: "white",
   },
   topic: {
     textAlign: "center",
@@ -324,10 +377,44 @@ const styles = StyleSheet.create({
     marginTop: 40,
     height: 45,
   },
-  loadingContainer:{
-    backgroundColor:'white'
+  loadingContainer: {
+    backgroundColor: "white",
   },
-  waitingImage:{
-    width:'100%',
-  }
+  waitingImage: {
+    width: "100%",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalButton: {
+    backgroundColor: "orange",
+    padding: 10,
+    borderRadius: 5,
+    width: "50%",
+    alignItems: "center",
+  },
+  modalButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
 });
