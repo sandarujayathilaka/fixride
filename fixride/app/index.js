@@ -8,6 +8,7 @@ import AddMechanic from "../src/components/AddMechanic";
 import GarageMngrDash2 from "../src/components/GarageMngrDash2";
 import ReqList from "../src/components/ReqList";
 import Ongoings from "../src/components/Ongoings";
+import MechanicList from "../src/components/MechanicList";
 
 
 
@@ -38,6 +39,7 @@ function index() {
             <AddMechanic/>
             <Ongoings/>   
             <ReqList/>
+            <MechanicList/>
             
         </View>
       </ScrollView>

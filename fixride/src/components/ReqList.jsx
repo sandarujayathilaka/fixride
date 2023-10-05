@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   card: {
     height: 140,
     marginTop: 20,
-    backgroundColor: "#fff4e0",
+    backgroundColor: "#FFFDF3",
     marginHorizontal: 13,
     borderRadius: 10,
     justifyContent: "space-between",
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   },
   modelCard: {
     marginTop: 20,
-    backgroundColor: "#fff4e0",
+    backgroundColor: "#FFFDF3",
     marginHorizontal: 13,
     borderRadius: 10,
     justifyContent: "space-between",
