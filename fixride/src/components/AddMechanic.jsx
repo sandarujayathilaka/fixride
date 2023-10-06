@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import React, { useState } from 'react';
+import { collection, addDoc } from 'firebase/firestore';
 import {
   View,
   Text,
@@ -7,51 +7,59 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-} from "react-native";
-import { db } from "../config/firebase"; // Import your Firebase database instance here
+  Image,
+} from 'react-native';
+import { db } from '../config/firebase'; // Import your Firebase database instance here
+
 
 function AddMechanic({ navigation }) {
   // State variables to store mechanic details
-  const [name, setName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [specializations, setSpecializations] = useState(["", ""]);
+  const [name, setName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [specializations, setSpecializations] = useState(['', '']);
+ 
 
-  const mechanicsCollection = collection(db, "mechanic");
+  const mechanicsCollection = collection(db, 'mechanic');
 
   const handleAddMechanic = async () => {
     if (!name || !phoneNumber) {
-      Alert.alert("Error", "Please fill out all fields");
+      Alert.alert('Error', 'Please fill out all fields');
       return;
     }
 
     try {
+     
       const newMechanic = {
         name,
         phoneNumber,
         specializations,
-        availability: "available", 
+        availability: 'available',
       };
 
       const docRef = await addDoc(mechanicsCollection, newMechanic);
 
-      console.log("Mechanic added successfully!");
-      Alert.alert("Success", "Mechanic added successfully.");
+      console.log('Mechanic added successfully!');
+      Alert.alert('Success', 'Mechanic added successfully.');
 
       // Navigate back to the previous screen or perform any desired navigation
       // You can customize the navigation behavior here
       // navigation.goBack();
     } catch (error) {
-      console.error("Error adding mechanic: ", error);
-      Alert.alert("Error", "Failed to add mechanic. Please try again later.");
+      console.error('Error adding mechanic: ', error);
+      Alert.alert(
+        'Error',
+        'Failed to add mechanic. Please try again later.'
+      );
     }
   };
-
 
   const updateSpecialization = (index, text) => {
     const updatedSpecializations = [...specializations];
     updatedSpecializations[index] = text;
     setSpecializations(updatedSpecializations);
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -85,6 +93,8 @@ function AddMechanic({ navigation }) {
         value={specializations[1]}
       />
 
+      
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.addButton} onPress={handleAddMechanic}>
           <Text style={styles.buttonText}>Add Mechanic</Text>
@@ -104,50 +114,51 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   heading: {
     fontSize: 24,
     marginBottom: 16,
-    textAlign: "center",
+    textAlign: 'center',
   },
   input: {
     borderWidth: 1,
-    borderColor: "#FEC400",
+    borderColor: '#FEC400',
     borderRadius: 8,
     padding: 8,
     marginBottom: 16,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   addButton: {
-    backgroundColor: "#EDAE10",
+    backgroundColor: '#EDAE10',
     borderRadius: 8,
     padding: 12,
-    alignItems: "center",
+    alignItems: 'center',
     flex: 1,
     marginRight: 8,
   },
   cancelButton: {
-    backgroundColor: "#ccc",
+    backgroundColor: '#ccc',
     borderRadius: 8,
     padding: 12,
-    alignItems: "center",
+    alignItems: 'center',
     flex: 1,
     marginLeft: 8,
   },
   buttonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   label: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 5,
   },
+  
 });
 
 export default AddMechanic;

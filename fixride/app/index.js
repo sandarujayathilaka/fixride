@@ -35,7 +35,6 @@ function index() {
         >
             <CateCard/>
             <GarageMngrDash/>  
-         
             <AddMechanic/>
             <Ongoings/>   
             <ReqList/>
