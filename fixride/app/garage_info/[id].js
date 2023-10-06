@@ -7,94 +7,281 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
+  Linking,
+  Modal,
 } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
+import { Feather } from "@expo/vector-icons";// Add this line
 
 const GarageInfo = () => {
   const [garageData, setGarageData] = useState(null);
   const [selectedButton, setSelectedButton] = useState("Services");
+  const [isGarageClosed, setIsGarageClosed] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [garageClosingTime, setGarageClosingTime] = useState("");
+
+
   const params = useGlobalSearchParams();
   const Id = params.id;
-  const imageSource = require("../../assets/Picture2.png");
+  const imageSource = require("../../assets/logo.webp");
 
-  useEffect(() => {
-    const fetchGarageData = async () => {
-      try {
-        const garageDocRef = doc(db, "garage", Id);
-        const garageDocSnapshot = await getDoc(garageDocRef);
+  const [loading, setLoading] = useState(true);
 
-        if (garageDocSnapshot.exists()) {
-          const data = garageDocSnapshot.data();
-          setGarageData(data);
-          console.log(data);
-        } else {
-          setGarageData(null);
-        }
-      } catch (error) {
-        console.error("Error fetching garage data:", error);
-      }
-    };
+ useEffect(() => {
+   const fetchGarageData = async () => {
+     try {
+       const garageDocRef = doc(db, "garage", Id);
+       const garageDocSnapshot = await getDoc(garageDocRef);
 
-    fetchGarageData();
-  }, [Id]);
+       if (garageDocSnapshot.exists()) {
+         const data = garageDocSnapshot.data();
+         setGarageData(data);
+         setLoading(false);
 
-  const handleRequestMechanic = (id) => {
-    router.push(`/form/${id}`, { Id: id });
-    console.log(`Clicked on card with ID ${id}`);
+         // Check if the garage is closed
+         const currentTime = new Date();
+         const closedTimeParts = data.closedTime.split("."); // Split "17.30" into ["17", "30"]
+         const closedHour = parseInt(closedTimeParts[0], 10);
+         const closedMinute = parseInt(closedTimeParts[1], 10);
+
+         // Set the garage's closing time based on the date of the current time
+         const garageClosingTime = new Date(
+           currentTime.getFullYear(),
+           currentTime.getMonth(),
+           currentTime.getDate(),
+           closedHour,
+           closedMinute
+         );
+
+         if (currentTime > garageClosingTime) {
+           setIsGarageClosed(true);
+           setGarageClosingTime(""); // Clear the garageClosingTime state
+         } else {
+           setIsGarageClosed(false);
+           setGarageClosingTime(data.closedTime); // Set the garageClosingTime state
+         }
+       } else {
+         // Handle the case when the garage document does not exist
+         setGarageData(null);
+         setLoading(false);
+       }
+     } catch (error) {
+       console.error("Error fetching garage data:", error);
+       setLoading(false);
+     }
+   };
+
+   fetchGarageData();
+ }, [Id]);
+
+
+ const handleRequestMechanic = (id) => {
+   if (isGarageClosed) {
+     // Show the modal if the garage is closed
+     toggleModal();
+   } else {
+     router.push(`/form/${id}`, { Id: id });
+     console.log(`Clicked on card with ID ${id}`);
+   }
+ };
+
+  const handleContactUs = () => {
+    if (garageData && garageData.contact) {
+      const phoneNumber = garageData.contact;
+      const url = `tel:${phoneNumber}`;
+
+      // Open the phone dialer with the provided phone number
+      Linking.openURL(url)
+        .then(() => {
+          console.log(`Calling ${phoneNumber}`);
+        })
+        .catch((error) => {
+          console.error("Error opening phone dialer:", error);
+        });
+    }
   };
 
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {garageData ? (
-        <View>
-          <Text style={styles.topic}>{garageData.name}</Text>
-          <Text style={styles.mainText}>{garageData.username}</Text>
-          <Image source={imageSource} style={styles.cardImage} />
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={[
-                styles.customButton,
-                selectedButton === "Services" && styles.selectedButton,
-              ]}
-              onPress={() => setSelectedButton("Services")}
-            >
-              <Text style={styles.buttonText}>Services</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.customButton,
-                selectedButton === "Contact" && styles.selectedButton,
-              ]}
-              onPress={() => setSelectedButton("Contact")}
-            >
-              <Text style={styles.buttonText}>Contact Us</Text>
-            </TouchableOpacity>
-          </View>
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {loading ? (
+          <ActivityIndicator size="large" color="orange" />
+        ) : garageData ? (
           <View>
-            {selectedButton === "Services" && <Text>{garageData.about}</Text>}
-            {selectedButton === "Contact" && <Text>{garageData.contact}</Text>}
+            <View style={styles.imageContainer}>
+              <Image source={imageSource} style={styles.cardImage} />
+            </View>
+            <View style={styles.contentContainer}>
+              <Text style={styles.topic}>{garageData.name}</Text>
+              <Text style={styles.rating}>
+                <Feather name="star" size={20} color="orange" />
+                {"  "}
+                {garageData.rating} Ratings
+                {isGarageClosed ? (
+                  <Text style={{ color: "red", fontWeight: "bold" }}>
+                    {" "}
+                    | Closed
+                  </Text>
+                ) : (
+                  <Text style={{ color: "green", fontWeight: "bold" }}>
+                    {" "}
+                    | Open
+                  </Text>
+                )}
+              </Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.customButton,
+                    selectedButton === "Services" && styles.selectedButton,
+                  ]}
+                  onPress={() => setSelectedButton("Services")}
+                >
+                  <View style={styles.buttonWithIcon}>
+                    <Feather name="tool" size={20} color="white" />
+                    <Text style={styles.buttonText}>{"  "}Services</Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.customButton,
+                    selectedButton === "About" && styles.selectedButton,
+                  ]}
+                  onPress={() => setSelectedButton("About")}
+                >
+                  <View style={styles.buttonWithIcon}>
+                    <Feather name="info" size={20} color="white" />
+                    <Text style={styles.buttonText}>{"  "}About Us</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <ScrollView
+                style={styles.descriptionContainer}
+                showsVerticalScrollIndicator={false}
+              >
+                {selectedButton === "Services" && (
+                  <Text style={styles.descriptionText}>{garageData.about}</Text>
+                )}
+                {selectedButton === "About" && (
+                  <TouchableOpacity onPress={handleContactUs}>
+                    <View style={[styles.contactContainer]}>
+                      <Text
+                        style={[styles.contactText, { textAlign: "justify" }]}
+                      >
+                        <Text style={styles.phoneNumber}>
+                          {garageData.about}
+                        </Text>{" "}
+                      </Text>
+                    </View>
+
+                    <View style={[styles.contactContainer, { marginTop: 20 }]}>
+                      <Feather name="phone" size={20} color="black" />
+                      <Text style={styles.contactText}>
+                        <Text style={styles.phoneNumber}>
+                          {"  "}0774 333 450
+                        </Text>{" "}
+                      </Text>
+                    </View>
+
+                    <View style={[styles.contactContainer, { marginTop: 20 }]}>
+                      <Feather name="map-pin" size={20} color="black" />
+                      <Text style={styles.contactText}>
+                        <Text style={styles.phoneNumber}>
+                          {"  "}
+                          {garageData.address}
+                        </Text>{" "}
+                      </Text>
+                    </View>
+
+                    <View style={[styles.contactContainer, { marginTop: 20 }]}>
+                      <Feather name="clock" size={20} color="black" />
+                      <Text style={styles.contactText}>
+                        <Text style={styles.phoneNumber}>
+                          {"  "}Open : 9.00 AM - 10.00 PM
+                        </Text>{" "}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+              </ScrollView>
+            </View>
           </View>
-        </View>
-      ) : (
-        <Text>Loading...</Text>
-      )}
+        ) : (
+          <Text style={styles.errorText}>
+            Error fetching data. Please try again later.
+          </Text>
+        )}
+      </ScrollView>
       <TouchableOpacity
-        style={styles.macButton}
-        onPress={() => handleRequestMechanic()}
+        style={styles.requestButton}
+        onPress={() => handleRequestMechanic(Id)}
       >
         <Text style={styles.buttonText}>Request a Mechanic</Text>
       </TouchableOpacity>
-    </ScrollView>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={toggleModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Garage Closed</Text>
+            <Text style={styles.modalText}>
+              Sorry, the garage is closed at this Time.
+            </Text>
+            <TouchableOpacity onPress={toggleModal}>
+              <Text style={styles.modalButton}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 16,
+    flex: 1,
     backgroundColor: "white",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  contentContainer: {
+    backgroundColor: "white",
+    padding: 10,
+  },
+  rating: {
+    color: "gray",
+    fontSize: 16,
+  },
+  username: {
+    color: "black",
+    fontWeight: "600",
+    fontSize: 24,
+    marginVertical: 10,
+  },
+  imageContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cardImage: {
+    width: "100%",
+    height: 250,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -106,43 +293,94 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 20,
-    margin:2
+    margin: 2,
   },
   selectedButton: {
-    backgroundColor: "brown", 
+    backgroundColor: "brown",
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
     fontSize: 16,
   },
-  mainText: {
-    color: "black",
-    fontWeight: "600",
-    fontSize: 24,
-    marginVertical: 10,
-  },
-  cardImage: {
-    width: 150,
-    height: 150,
-    alignSelf: "center",
-    borderRadius: 8,
+  descriptionContainer: {
+    maxHeight: 330, // Set a maximum height for the description
     marginTop: 20,
-    
   },
-  macButton: {
+  descriptionText: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: "black",
+    marginBottom: 20,
+    textAlign: "justify",
+    margin: 10,
+    marginTop: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  requestButton: {
     backgroundColor: "orange",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 30,
+    marginBottom: 15,
+    marginLeft: 10,
+    marginRight: 10,
+    marginTop: 20,
   },
   topic: {
     fontSize: 28,
     fontWeight: "bold",
     textAlign: "left",
+  },
+  buttonWithIcon: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  contactContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 5,
+  },
+  phoneNumber: {
+    color: "black",
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
     marginBottom: 20,
+  },
+  // Inside the styles object
+  modalButton: {
+    fontSize: 16,
+    color: "white",
+    backgroundColor: "orange", // Background color for the button
+    padding: 5, // Add some padding to make it look like a button
+    borderRadius: 5, // Add rounded corners
+    textAlign: "center", // Center the text horizontally
+    width: 70, // Set a fixed width for the button
   },
 });
 

@@ -8,7 +8,8 @@ import {
   RefreshControl,
   ImageBackground,
   Modal,
-  Button
+  Button,
+  Linking
 } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import React, { useEffect, useState } from 'react'
@@ -30,47 +31,55 @@ export default function RequestDetails(props) {
    const [cDate, setCorrectDate] = useState("");
   const [showBusyMessage, setShowBusyMessage] = useState(false);
    const [messages, setMessages] = useState([
-     "Waiting for approval...",
-     "Garage seems busy",
-     "You can use below button to choose another garage",
+     "Waiting for approval ...",
+     "Garage seems busy ...",
+     "Please Wait 2-3 Minutes ...",
+     "Thanks for Your Patience ...",
      // Add more messages here
    ]);
    const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
     const [isModalVisible, setModalVisible] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+
 
    
- const imageSource = require("../../assets/Picture2.png");
- const gifimage = require("../../assets/wait.jpg");
+ const imageSource = require("../../assets/men.png");
+ const gifimage = require("../../assets/garage.gif");
+  const callImage = require("../../assets/call.png");
 
 
 
    useEffect(() => {
-     const fetchData = async () => {
-       try {
-         const requestQuery = query(
-           collection(db, "request"),
-           where("dateTime", "==", date),
-           where("username", "==", user)
-         );
+  const fetchData = async () => {
+    try {
+      // Create a Firestore query based on the provided conditions
+      const requestQuery = query(
+        collection(db, "request"),
+        where("dateTime", "==", date),
+        where("username", "==", user)
+      );
 
-         const unsubscribe = onSnapshot(requestQuery, (snapshot) => {
-           if (!snapshot.empty) {
-             const doc = snapshot.docs[0];
-             setRequest(doc.data());
-             setRequestId(doc.id)
-           }
-           setLoading(false);
-         });
+      // Subscribe to real-time updates using onSnapshot
+      const unsubscribe = onSnapshot(requestQuery, (snapshot) => {
+        if (!snapshot.empty) {
+          // If there are documents in the result, update the component state
+          const doc = snapshot.docs[0];
+          setRequest(doc.data());
+          setRequestId(doc.id);
+        }
+        setLoading(false);
+      });
 
-         return () => unsubscribe(); // Unsubscribe when the component unmounts
-       } catch (error) {
-         console.error("Error retrieving documents: ", error);
-         setLoading(false);
-       }
-     };
+      return () => unsubscribe(); // Unsubscribe when the component unmounts
+    } catch (error) {
+      console.error("Error retrieving documents: ", error);
+      setLoading(false);
+    }
+  };
 
-     fetchData();
-   }, []);
+  fetchData();
+}, []); // Add date and user to the dependency array
+
 
  useEffect(() => {
 
@@ -96,7 +105,7 @@ export default function RequestDetails(props) {
    // Use a timeout to change the displayed message every 10 seconds
    const timeoutId = setTimeout(() => {
      setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % messages.length);
-   }, 10000); // 10000 milliseconds = 10 seconds
+   }, 5000); // 10000 milliseconds = 10 seconds
 
    return () => {
      clearTimeout(timeoutId);
@@ -128,10 +137,43 @@ const handleOKPress = async () => {
     }
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+
+    // Implement your refresh logic here, for example, refetch data from Firestore
+
+    // After the refresh is complete, set refreshing back to false
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000); // Simulate a delay (replace with your actual refresh logic)
+  };
+
+  const handleContactUs = () => {
+    if (requestDetails && requestDetails.macContact) {
+      const phoneNumber = requestDetails.macContact;
+      const url = `tel:${phoneNumber}`;
+
+      // Open the phone dialer with the provided phone number
+      Linking.openURL(url)
+        .then(() => {
+          console.log(`Calling ${phoneNumber}`);
+        })
+        .catch((error) => {
+          console.error("Error opening phone dialer:", error);
+        });
+    }
+  };
+
+
   
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+    >
       <View style={styles.container}>
         {loading ? (
           <View style={styles.loadingContainer}>
@@ -140,8 +182,10 @@ const handleOKPress = async () => {
           </View>
         ) : requestDetails.status === "Pending" ? (
           // Display the current message based on the currentMessageIndex
-          <View>
-            <Text>{messages[currentMessageIndex]}</Text>
+          <View style={styles.containerImage}>
+            <Text style={styles.messageText}>
+              {messages[currentMessageIndex]}
+            </Text>
             <Image source={gifimage} style={styles.waitingImage} />
           </View>
         ) : requestDetails.status === "Reject" ? (
@@ -197,17 +241,19 @@ const handleOKPress = async () => {
 
             <View style={styles.serviceColumn}>
               <View>
-                <Text style={styles.mainLable}>
+                <Text style={[styles.mainLable, { marginTop: 10 }]}>
                   {requestDetails.mainstatus}
                 </Text>
               </View>
               <View style={styles.datetime}>
-                <Text style={{ fontSize: 16 }}>{requestDetails.status}</Text>
+                <Text style={{ fontSize: 16, marginTop: 10,textAlign:"right" }}>
+                  {requestDetails.status}
+                </Text>
                 <TouchableOpacity
-                  style={{ textAlign: "right", fontSize: 16, marginTop: 5 }}
+                  style={styles.trackStatusButton}
                   onPress={handleTrackStatus}
                 >
-                  <Text>Track Status</Text>
+                  <Text style={styles.trackStatusButtonText}>Track Status</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -219,24 +265,55 @@ const handleOKPress = async () => {
                 marginTop: 10,
               }}
             />
-            <View style={{ backgroundColor: "yellow", marginTop: 10 }}>
+            <View
+              style={{
+                backgroundColor: "white",
+                marginTop: 10,
+                borderRadius: 10,
+                shadowColor: "black",
+                shadowOffset: {
+                  width: 0,
+                  height: 3,
+                },
+                shadowOpacity: 0.8,
+                shadowRadius: 4,
+                elevation: 6, // For Android shadow
+                marginTop: 15,
+                marginBottom: 10,
+              }}
+            >
               <View style={styles.serviceColumn}>
                 <View style={{ margin: 10 }}>
                   <Text style={styles.mainLable}>Mechanic Details</Text>
-                  <TouchableOpacity style={{ fontSize: 16, marginTop: 5 }}>
-                    <Text>Live Track</Text>
+                  <TouchableOpacity
+                    style={styles.trackStatusButton}
+                  >
+                    <Text style={styles.trackStatusButtonText}>
+                     Live Track
+                    </Text>
                   </TouchableOpacity>
-                  <Text style={{ fontSize: 16 }}>Vehicle NO :</Text>
-                  <Text style={{ fontSize: 16 }}>
-                    {requestDetails.vehecleNo}
+                  <Text
+                    style={{ fontSize: 25, marginTop: 10, fontWeight: "500" }}
+                  >
+                    {requestDetails.macContact}
                   </Text>
+                  <TouchableOpacity onPress={handleContactUs}>
+                    <Image source={callImage} style={styles.callImage} />
+                  </TouchableOpacity>
                 </View>
                 <View style={styles.datetime}>
                   <Image source={imageSource} style={styles.cardImage} />
                   <Text
-                    style={{ fontSize: 16, textAlign: "right", margin: 15 }}
+                    style={{
+                      fontSize: 18,
+                      textAlign: "right",
+                      marginRight: 25,
+                      marginTop: 10,
+                      marginBottom: 10,
+                      fontWeight: "500",
+                    }}
                   >
-                    Mechanic Name
+                    {requestDetails.macName}
                   </Text>
                 </View>
               </View>
@@ -251,11 +328,7 @@ const handleOKPress = async () => {
             />
 
             <View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Matter :</Text>
-                <Text style={styles.detail}>{requestDetails.matter}</Text>
-              </View>
-              <View style={styles.row}>
+              <View style={[styles.row, { marginTop: 20 }]}>
                 <Text style={styles.label}>Vehicle No</Text>
                 <Text style={styles.detail}>{requestDetails.vehicleNo}</Text>
               </View>
@@ -288,12 +361,23 @@ const handleOKPress = async () => {
             />
 
             <View>
-              <View style={styles.row}>
+              <View style={[styles.row, { marginTop: 10 }]}>
                 <Text style={styles.label}>Service Fee</Text>
-                <Text style={styles.detail}>Rs.5000.00</Text>
+                <Text style={[styles.detail, { fontSize: 15 }]}>
+                  {requestDetails.payment}
+                </Text>
               </View>
               <View style={styles.row}>
-                <Text style={styles.detail}>Unpaid</Text>
+                <Text
+                  style={[
+                    styles.detail,
+                    requestDetails.payStatus === "Unpaid"
+                      ? styles.unpaidStatus
+                      : styles.paidStatus,
+                  ]}
+                >
+                  {requestDetails.payStatus}
+                </Text>
               </View>
             </View>
             <View>
@@ -312,12 +396,14 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     backgroundColor: "white",
+    height: "100%",
   },
   topic: {
     textAlign: "center",
     fontWeight: "bold",
     marginBottom: 30,
     marginTop: 0,
+    fontSize:15
   },
   mainLable: {
     fontSize: 18,
@@ -374,14 +460,21 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 10,
     height: 45,
   },
   loadingContainer: {
     backgroundColor: "white",
   },
+  containerImage: {
+    flex: 1,
+    justifyContent: "center", // Center vertically
+    alignItems: "center",
+    marginTop: 100, // Center horizontally
+  },
   waitingImage: {
-    width: "100%",
+    width: 425, // Set the desired width
+    height: 425,
   },
   modalContainer: {
     flex: 1,
@@ -417,4 +510,38 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
+  messageText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginVertical: 20,
+    color: "black", // Change the color to your liking
+  },
+  trackStatusButton: {
+    backgroundColor: "black", // Button background color
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 5, // Adjust the margin as needed
+    // Add any other button styles here
+  },
+  trackStatusButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  unpaidStatus: {
+    color: "red",
+    fontWeight: "500", // Change to your desired color for unpaid status
+  },
+
+  paidStatus: {
+    color: "green",
+    fontWeight: "500", // Change to your desired color for paid status
+  },
+  callImage:{
+    width:60,
+    height:60,
+    marginTop:10,
+    marginLeft:50
+  }
 });

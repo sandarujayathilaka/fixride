@@ -67,7 +67,10 @@ const RequestForm = () => {
             reachStatus: "",
             assignStatus: "",
             doneStatus: "",
-            payStatus: "",
+            payStatus: "Unpaid",
+            payment: "Not Calculated",
+            macContact: "",
+            macName: "",
           });
           console.log(veheNum);
 
@@ -85,7 +88,7 @@ const RequestForm = () => {
         matter: matter,
         paymentMethod: payment,
         powerSource: selectedItem,
-        status: "Pending",
+        status: "Approved",
         dateTime: reqDate,
         mainstatus: "Ongoing",
         username: currentUser,
@@ -93,7 +96,10 @@ const RequestForm = () => {
         reachStatus: "",
         assignStatus: "",
         doneStatus: "",
-        payStatus: "",
+        payStatus: "Unpaid",
+        payment: "Not Calculated",
+        macContact:"",
+        macName:""
       });
       console.log(veheNum);
       handleItemPress(veheNum);

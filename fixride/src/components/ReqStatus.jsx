@@ -17,6 +17,7 @@ export default function ReqStatus(props) {
 
   const bwcorrect = require("../../assets/bwcorrect.png");
   const colorCorrect = require("../../assets/correctcol.png");
+   const statusImg = require("../../assets/status.webp");
 
   useEffect(() => {
     setRequestId(props.RequestId);
@@ -61,58 +62,63 @@ export default function ReqStatus(props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.statusContainer}>
-        {currentStatus === "Approved" ? (
-          <Image source={colorCorrect} style={styles.statusImage} />
-        ) : (
-          <Image source={bwcorrect} style={styles.statusImage} />
-        )}
-        <Text style={styles.statusText}>Approved</Text>
+      <View style={styles.containerImage}>
+        <Image source={statusImg} style={styles.statusTopicImage} />
       </View>
-      <VerticalLine isGreen={currentStatus === "Approved"} />
-      <View style={styles.statusContainer}>
-        {assignStatus === "Assigned" ? (
-          <Image source={colorCorrect} style={styles.statusImage} />
-        ) : (
-          <Image source={bwcorrect} style={styles.statusImage} />
-        )}
-        <Text style={styles.statusText}>Assigned</Text>
-      </View>
-      <VerticalLine isGreen={assignStatus === "Assigned"} />
-      <View style={styles.statusContainer}>
-        {startStatus === "Started" ? (
-          <Image source={colorCorrect} style={styles.statusImage} />
-        ) : (
-          <Image source={bwcorrect} style={styles.statusImage} />
-        )}
-        <Text style={styles.statusText}>Started</Text>
-      </View>
-      <VerticalLine isGreen={startStatus === "Started"} />
-      <View style={styles.statusContainer}>
-        {reachStatus === "Reached" ? (
-          <Image source={colorCorrect} style={styles.statusImage} />
-        ) : (
-          <Image source={bwcorrect} style={styles.statusImage} />
-        )}
-        <Text style={styles.statusText}>Reached</Text>
-      </View>
-      <VerticalLine isGreen={reachStatus === "Reached"} />
-      <View style={styles.statusContainer}>
-        {doneStatus === "Done" ? (
-          <Image source={colorCorrect} style={styles.statusImage} />
-        ) : (
-          <Image source={bwcorrect} style={styles.statusImage} />
-        )}
-        <Text style={styles.statusText}>Done</Text>
-      </View>
-      <VerticalLine isGreen={doneStatus === "Done"} />
-      <View style={styles.statusContainer}>
-        {payStatus === "Paid" ? (
-          <Image source={colorCorrect} style={styles.statusImage} />
-        ) : (
-          <Image source={bwcorrect} style={styles.statusImage} />
-        )}
-        <Text style={styles.statusText}>Paid</Text>
+      <View style={styles.allStatusContainer}>
+        <View style={styles.statusContainer}>
+          {currentStatus === "Approved" ? (
+            <Image source={colorCorrect} style={styles.statusImage} />
+          ) : (
+            <Image source={bwcorrect} style={styles.statusImage} />
+          )}
+          <Text style={styles.statusText}>Approved</Text>
+        </View>
+        <VerticalLine isGreen={currentStatus === "Approved"} />
+        <View style={styles.statusContainer}>
+          {assignStatus === "Assigned" ? (
+            <Image source={colorCorrect} style={styles.statusImage} />
+          ) : (
+            <Image source={bwcorrect} style={styles.statusImage} />
+          )}
+          <Text style={styles.statusText}>Assigned</Text>
+        </View>
+        <VerticalLine isGreen={assignStatus === "Assigned"} />
+        <View style={styles.statusContainer}>
+          {startStatus === "Started" ? (
+            <Image source={colorCorrect} style={styles.statusImage} />
+          ) : (
+            <Image source={bwcorrect} style={styles.statusImage} />
+          )}
+          <Text style={styles.statusText}>Started</Text>
+        </View>
+        <VerticalLine isGreen={startStatus === "Started"} />
+        <View style={styles.statusContainer}>
+          {reachStatus === "Reached" ? (
+            <Image source={colorCorrect} style={styles.statusImage} />
+          ) : (
+            <Image source={bwcorrect} style={styles.statusImage} />
+          )}
+          <Text style={styles.statusText}>Reached</Text>
+        </View>
+        <VerticalLine isGreen={reachStatus === "Reached"} />
+        <View style={styles.statusContainer}>
+          {doneStatus === "Done" ? (
+            <Image source={colorCorrect} style={styles.statusImage} />
+          ) : (
+            <Image source={bwcorrect} style={styles.statusImage} />
+          )}
+          <Text style={styles.statusText}>Done</Text>
+        </View>
+        <VerticalLine isGreen={doneStatus === "Done"} />
+        <View style={styles.statusContainer}>
+          {payStatus === "Paid" ? (
+            <Image source={colorCorrect} style={styles.statusImage} />
+          ) : (
+            <Image source={bwcorrect} style={styles.statusImage} />
+          )}
+          <Text style={styles.statusText}>Paid</Text>
+        </View>
       </View>
     </View>
   );
@@ -127,23 +133,39 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 5,
+    marginLeft: 120,
   },
   statusImage: {
-    width: 24, // Adjust the width as needed
-    height: 24, // Adjust the height as needed
+    width: 35, // Adjust the width as needed
+    height: 35, // Adjust the height as needed
     marginRight: 10,
   },
   statusText: {
-    fontSize: 16,
+    fontSize: 20,
+    fontWeight:"500"
   },
   verticalLine: {
-    width: 1,
-    height: "10%",
+    width: 3,
+    height: "8%",
     backgroundColor: "gray", // Adjust the color as needed
-    marginLeft: 10,
     marginRight: 10,
+    marginLeft: 133,
   },
   greenVerticalLine: {
     backgroundColor: "green", // Change the color to green
+  },
+  statusTopicImage: {
+    width: 500, // Adjust the width as needed
+    height: 250, // Adjust the height as needed
+    marginRight: 10,
+  },
+  containerImage: {
+    flex: 1,
+    justifyContent: "center", // Center vertically
+    alignItems: "center",
+    marginTop: 100, // Center horizontally
+  },
+  allStatusContainer: {
+    marginTop: 150, // Center horizontally
   },
 });
