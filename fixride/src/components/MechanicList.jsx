@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { router } from "expo-router";
 import { db } from "../config/firebase";
 import {
   collection,
@@ -100,6 +101,15 @@ const handleSearch = () => {
           <Text style={styles.searchButtonText}>Search</Text>
         </TouchableOpacity>
       </View>
+
+
+      <TouchableOpacity
+              style={styles.button}
+     
+            >
+              <Text style={styles.buttonText2}>Reject</Text>
+            </TouchableOpacity>
+      
 
       <View style={styles.cardContainer}>
         {(searchResults.length > 0 ? searchResults : data).map((item, index) => (

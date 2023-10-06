@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import { db } from "../config/firebase";
 import {
   collection,
@@ -19,6 +20,9 @@ import {
 } from "react-native";
 
 const ReqList = () => {
+
+  const router= useRouter();
+  
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);

@@ -33,12 +33,12 @@ function index() {
             padding:5,
           }}
         >
-            <CateCard/>
+            {/* <CateCard/> */}
             <GarageMngrDash/>  
-            <AddMechanic/>
-            <Ongoings/>   
+            {/* <AddMechanic/> */}
+            {/* <Ongoings/>   
             <ReqList/>
-            <MechanicList/>
+            <MechanicList/> */}
             
         </View>
       </ScrollView>

@@ -1,5 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React from "react";
+import { router } from "expo-router";
+
 import {
   Image,
   ScrollView,
@@ -23,11 +25,21 @@ const cardData = [
 ];
 
 function GarageMngrDash() {
-const navigation = useNavigation(); // Initialize the navigation hook
+const navigation = useNavigation(); 
 
-  const handleNavigateToAddMechanic = () => {
-    // Navigate to the AddMechanic screen
-    navigation.navigate("AddMechanic"); // "AddMechanic" should match the name of your screen in your navigator
+  
+
+  const handleCardClick = (id) => {
+    switch (id) {
+      case 'addMechanic':
+        router.push(`/add-mechanic/add`);
+        break;
+      case 'ReqList':
+        router.push(`/req-list/reqlist`);
+        break;
+      default:
+        break;
+    }
   };
 
   return (

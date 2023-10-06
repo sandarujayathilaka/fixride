@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -9,11 +10,13 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import { db } from '../config/firebase'; // Import your Firebase database instance here
+import { db } from '../config/firebase'; 
 
 
-function AddMechanic({ navigation }) {
-  // State variables to store mechanic details
+function AddMechanic() {
+
+  const router= useRouter();
+
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [specializations, setSpecializations] = useState(['', '']);
@@ -41,9 +44,6 @@ function AddMechanic({ navigation }) {
       console.log('Mechanic added successfully!');
       Alert.alert('Success', 'Mechanic added successfully.');
 
-      // Navigate back to the previous screen or perform any desired navigation
-      // You can customize the navigation behavior here
-      // navigation.goBack();
     } catch (error) {
       console.error('Error adding mechanic: ', error);
       Alert.alert(
@@ -101,7 +101,6 @@ function AddMechanic({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
         >
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
