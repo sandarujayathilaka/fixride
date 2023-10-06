@@ -53,6 +53,11 @@ function AddMechanic() {
     }
   };
 
+
+  const handleCancel = () => {
+    router.push(`/garageMngr-dash/grgMngrDash`);
+  };
+
   const updateSpecialization = (index, text) => {
     const updatedSpecializations = [...specializations];
     updatedSpecializations[index] = text;
@@ -101,6 +106,7 @@ function AddMechanic() {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.cancelButton}
+          onPress={handleCancel}
         >
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>

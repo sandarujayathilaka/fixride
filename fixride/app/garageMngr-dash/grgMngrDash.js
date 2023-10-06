@@ -1,9 +1,9 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import AddMechanic from '../../src/components/AddMechanic'
+import GarageMngrDash from '../../src/components/GarageMngrDash'
 
 export default function form() {
   return (
-     <AddMechanic/>
+    <GarageMngrDash/>  
   )
 }
