@@ -73,6 +73,22 @@ const ReqList = () => {
     }
   };
 
+
+
+  const handleClickAssign = () => {
+    console.log(data[selectedItemIndex].id);
+    if (data[selectedItemIndex].id) {
+      router.push({
+        pathname: `/mac-list/${data[selectedItemIndex].id}`,
+        params: {
+          Id: data[selectedItemIndex].id,
+        },
+      });
+    } else {
+      console.error("Invalid or missing RequestId");
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -168,9 +184,12 @@ const ReqList = () => {
             )}
 
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.addButton}>
+
+              <TouchableOpacity style={styles.addButton}    onPress={handleClickAssign}>
                 <Text style={styles.buttonText2}>Assign Mechanic</Text>
               </TouchableOpacity>
+
+
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={() => handleRejectClick(data[selectedItemIndex].id)}
