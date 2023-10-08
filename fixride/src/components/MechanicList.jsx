@@ -8,6 +8,7 @@ import {
   getDocs,
   doc,
   getDoc,
+  updateDoc,
 } from "firebase/firestore";
 import {
   StyleSheet,
@@ -26,6 +27,7 @@ const MechanicList = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [selectedItemIndex, setSelectedItemIndex] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,14 +47,35 @@ const MechanicList = () => {
     fetchData();
   }, []);
 
-  const handleViewDetailsClick = async (itemId) => {
-    const requestRef = doc(db, "mechanic", itemId);
-    const docSnap = await getDoc(requestRef);
-    if (docSnap.exists()) {
-      setSelectedItem(docSnap.data());
-      setModalVisible(true);
+
+
+  const handleReqStates = (reqId)=>{
+
+      
+
+
+
+  };
+
+
+  const handleMechanicStates = async (macId) => {
+    try {
+      // Reference to the mechanic's document
+      const mechanicDocRef = doc(db, "mechanic", macId);
+  
+      // Update the availability field to "unavailable"
+      await updateDoc(mechanicDocRef, {
+        availability: "unavailable",
+      });
+  
+    } catch (error) {
+      console.error("Error updating mechanic's availability:", error);
     }
   };
+  
+
+
+
 
 
 const handleSearch = () => {
@@ -122,7 +145,7 @@ const handleSearch = () => {
             </View>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => handleViewDetailsClick(item.id)}
+              onPress={() => handleMechanicStates(data[index].id)}
             >
               <Text style={styles.buttonText2}>Assign</Text>
             </TouchableOpacity>
