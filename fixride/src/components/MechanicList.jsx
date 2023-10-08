@@ -21,13 +21,12 @@ import {
   TextInput,
 } from "react-native";
 
-const MechanicList = () => {
+const MechanicList = ({ RequestId }) => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedItemIndex, setSelectedItemIndex] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,36 +48,41 @@ const MechanicList = () => {
 
 
 
-  const handleReqStates = (reqId)=>{
+  const handleReqStates = async (RequestId) => {
+    try {
+      const reqDocRef = doc(db, "request", RequestId);
 
-      
+      await updateDoc(reqDocRef, {
+        status:"Approved",
+        mainStatus:"Ongoing",
+        assignStatus:"Assigned"
+      });
 
-
-
+    } catch (error) {
+      console.error("Error updating request statuses:", error);
+    }
   };
 
 
   const handleMechanicStates = async (macId) => {
     try {
-      // Reference to the mechanic's document
       const mechanicDocRef = doc(db, "mechanic", macId);
-  
-      // Update the availability field to "unavailable"
+
       await updateDoc(mechanicDocRef, {
         availability: "unavailable",
       });
-  
+
     } catch (error) {
       console.error("Error updating mechanic's availability:", error);
     }
   };
-  
 
 
 
 
 
-const handleSearch = () => {
+
+  const handleSearch = () => {
     const trimmedSearchInput = searchInput.trim();
     if (trimmedSearchInput === "") {
       setSearchResults([]);
@@ -91,11 +95,11 @@ const handleSearch = () => {
           )
         );
       });
-  
+
       setSearchResults(filteredData);
     }
   };
-  
+
 
   return (
     <ScrollView style={styles.container}>
@@ -105,17 +109,17 @@ const handleSearch = () => {
       <Text style={styles.text2}>18 Mechanics found</Text>
 
       <View style={styles.searchContainer}>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search by specialization or name"
-        onChangeText={(text) => {
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by specialization or name"
+          onChangeText={(text) => {
             setSearchInput(text);
             if (!text) {
-            setSearchResults([]);
+              setSearchResults([]);
             }
-        }}
-            value={searchInput}
-            />
+          }}
+          value={searchInput}
+        />
 
         <TouchableOpacity
           style={styles.searchButton}
@@ -127,12 +131,12 @@ const handleSearch = () => {
 
 
       <TouchableOpacity
-              style={styles.button}
-     
-            >
-              <Text style={styles.buttonText2}>Reject</Text>
-            </TouchableOpacity>
-      
+        style={styles.button}
+
+      >
+        <Text style={styles.buttonText2}>Reject</Text>
+      </TouchableOpacity>
+
 
       <View style={styles.cardContainer}>
         {(searchResults.length > 0 ? searchResults : data).map((item, index) => (
@@ -144,9 +148,12 @@ const handleSearch = () => {
               </View>
             </View>
             <TouchableOpacity
-              style={styles.button}
-              onPress={() => handleMechanicStates(data[index].id)}
-            >
+        style={styles.button}
+        onPress={() => {
+          handleMechanicStates(data[index].id); 
+          handleReqStates(RequestId); 
+        }}
+      >
               <Text style={styles.buttonText2}>Assign</Text>
             </TouchableOpacity>
           </View>
