@@ -48,14 +48,16 @@ const MechanicList = ({ RequestId }) => {
 
 
 
-  const handleReqStates = async (RequestId) => {
+  const handleReqStates = async (RequestId,mechanicName,macId) => {
     try {
       const reqDocRef = doc(db, "request", RequestId);
 
       await updateDoc(reqDocRef, {
         status:"Approved",
         mainStatus:"Ongoing",
-        assignStatus:"Assigned"
+        assignStatus:"Assigned",
+        macName: mechanicName,
+        macId:macId,
       });
 
     } catch (error) {
@@ -151,7 +153,7 @@ const MechanicList = ({ RequestId }) => {
         style={styles.button}
         onPress={() => {
           handleMechanicStates(data[index].id); 
-          handleReqStates(RequestId); 
+          handleReqStates(RequestId, data[index].name,data[index].id); 
         }}
       >
               <Text style={styles.buttonText2}>Assign</Text>
