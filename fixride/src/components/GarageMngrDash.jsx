@@ -15,12 +15,12 @@ const cardData = [
   {
     id: "addMechanic",
     title: "Add New Mechanics",
-    imageSource: require("../../assets/Picture2.png"),
+    imageSource: require("../../assets/addMac.png"),
   },
   {
     id: "ReqList",
     title: "New Requests",
-    imageSource: require("../../assets/Picture2.png"),
+    imageSource: require("../../assets/repReq.png"),
   },
 ];
 
@@ -97,9 +97,9 @@ const styles = StyleSheet.create({
     marginRight:6,
   },
   cardImage: {
-    width: "100%",
-    height: 90,
-    borderRadius: 8,
+    marginLeft:45,
+    alignItems: "center", 
+    justifyContent: "center", 
   },
   cardTitle: {
     marginTop: 8,
