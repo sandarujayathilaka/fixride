@@ -47,38 +47,89 @@ const MechanicList = ({ RequestId }) => {
   }, []);
 
 
+  const handleRejectClick = async (RequestId) => {
+   
+    if (RequestId) {
+      const requestRef = doc(db, "request", RequestId);
 
-  const handleReqStates = async (RequestId,mechanicName,macId) => {
+      try {
+        await updateDoc(requestRef, {
+          status: "Rejected",
+        });
+      } catch (error) {
+        console.error("Error updating status:", error);
+      }
+    }
+  };
+
+
+
+  // const handleReqStates = async (RequestId,mechanicName,macId) => {
+  //   try {
+  //     const reqDocRef = doc(db, "request", RequestId);
+
+  //     await updateDoc(reqDocRef, {
+  //       status:"Approved",
+  //       mainStatus:"Ongoing",
+  //       assignStatus:"Assigned",
+  //       macName: mechanicName,
+  //       macId:macId,
+  //     });
+
+  //   } catch (error) {
+  //     console.error("Error updating request statuses:", error);
+  //   }
+  // };
+
+
+  // const handleMechanicStates = async (macId) => {
+  //   try {
+  //     const mechanicDocRef = doc(db, "mechanic", macId);
+
+  //     await updateDoc(mechanicDocRef, {
+  //       availability: "unavailable",
+  //     });
+
+  //   } catch (error) {
+  //     console.error("Error updating mechanic's availability:", error);
+  //   }
+  // };
+
+
+  const handleAssignMechanic = async (RequestId, mechanicName, macId, macPhone) => {
     try {
       const reqDocRef = doc(db, "request", RequestId);
-
-      await updateDoc(reqDocRef, {
-        status:"Approved",
-        mainStatus:"Ongoing",
-        assignStatus:"Assigned",
-        macName: mechanicName,
-        macId:macId,
-      });
-
-    } catch (error) {
-      console.error("Error updating request statuses:", error);
-    }
-  };
-
-
-  const handleMechanicStates = async (macId) => {
-    try {
       const mechanicDocRef = doc(db, "mechanic", macId);
-
-      await updateDoc(mechanicDocRef, {
-        availability: "unavailable",
-      });
-
+  
+      // Update request status and assigned mechanic's availability simultaneously
+      await Promise.all([
+        updateDoc(reqDocRef, {
+          status: "Approved",
+          mainStatus: "Ongoing",
+          assignStatus: "Assigned",
+          macName: mechanicName,
+          macId: macId,
+          macContact:macPhone,
+        }),
+        updateDoc(mechanicDocRef, {
+          availability: "unavailable",
+        }),
+      ]);
     } catch (error) {
-      console.error("Error updating mechanic's availability:", error);
+      console.error("Error updating request and mechanic statuses:", error);
     }
   };
-
+  
+  // Usage in your component
+  <TouchableOpacity
+    style={styles.button}
+    onPress={() => {
+      handleAssignMechanic(RequestId, data[index].name, data[index].id,data[index].phoneNumber);
+    }}
+  >
+    <Text style={styles.buttonText2}>Assign</Text>
+  </TouchableOpacity>
+  
 
 
 
@@ -134,7 +185,8 @@ const MechanicList = ({ RequestId }) => {
 
       <TouchableOpacity
         style={styles.button}
-
+        onPress={() => {
+          handleRejectClick(RequestId);}}
       >
         <Text style={styles.buttonText2}>Reject</Text>
       </TouchableOpacity>
@@ -151,10 +203,15 @@ const MechanicList = ({ RequestId }) => {
             </View>
             <TouchableOpacity
         style={styles.button}
+        // onPress={() => {
+        //   handleMechanicStates(data[index].id); 
+        //   handleReqStates(RequestId, data[index].name,data[index].id); 
+        // }}
+        
         onPress={() => {
-          handleMechanicStates(data[index].id); 
-          handleReqStates(RequestId, data[index].name,data[index].id); 
-        }}
+          handleAssignMechanic(RequestId, data[index].name, data[index].id , data[index].phoneNumber);}}
+
+
       >
               <Text style={styles.buttonText2}>Assign</Text>
             </TouchableOpacity>

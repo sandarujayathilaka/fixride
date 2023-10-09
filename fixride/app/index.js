@@ -39,6 +39,7 @@ function index() {
             {/* <Ongoings/>   
             <ReqList/>
             <MechanicList/> */}
+            {/* <Ongoings/>  */}
             
         </View>
       </ScrollView>

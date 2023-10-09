@@ -25,9 +25,6 @@ const cardData = [
 ];
 
 function GarageMngrDash() {
-const navigation = useNavigation(); 
-
-  
 
   const handleCardClick = (id) => {
     switch (id) {

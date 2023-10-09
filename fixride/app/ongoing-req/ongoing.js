@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import ReqList from '../../src/components/ReqList'
+import Ongoings from '../../src/components/Ongoings'
 
 export default function form() {
   return (

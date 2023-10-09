@@ -8,7 +8,7 @@ import {
   getDocs,
   doc,
   getDoc,
-  updateDoc, // Make sure to import updateDoc
+  updateDoc, 
 } from "firebase/firestore";
 import {
   StyleSheet,
@@ -89,11 +89,17 @@ const ReqList = () => {
     }
   };
 
+
+  const handleOngoingClick = () => {
+    router.push(`/ongoing-req/ongoing`);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.text}>Repair requests</Text>
-        <TouchableOpacity style={styles.button2}>
+        <TouchableOpacity style={styles.button2}
+          onPress={handleOngoingClick}>
           <Text style={styles.buttonText2}>Ongoing</Text>
         </TouchableOpacity>
       </View>
@@ -211,7 +217,6 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     height: "100%",
-    marginTop: 60,
   },
   cardTextsec: {
     fontSize: 13,
@@ -291,7 +296,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginLeft: 13,
     marginRight: 13,
-    marginTop: 40,
+    
   },
 
   requestHead: {
