@@ -22,44 +22,44 @@ const DisplayContent = () => {
   const cardId = params.id;
   imageSource = require("../../assets/Picture2.png");
 
-    useEffect(() => {
-      setLoading(true);
+  useEffect(() => {
+    setLoading(true);
 
-      // Fetch user location if it's null
-      if (!userLocation) {
-        getUserLocation();
-      } else {
-        // User location is available, fetch nearby garages
-        const usersQuery = query(
-          collection(db, "garage"),
-          where("category", "==", cardId)
-        );
-        const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
-          let usersList = [];
+    // Fetch user location if it's null
+    if (!userLocation) {
+      getUserLocation();
+    } else {
+      // User location is available, fetch nearby garages
+      const usersQuery = query(
+        collection(db, "garage"),
+        where("category", "==", cardId)
+      );
+      const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
+        let usersList = [];
 
-          snapshot.forEach((doc) => {
-            const garageData = doc.data();
-            const garageLocation = {
-              latitude: garageData.latitude,
-              longitude: garageData.longitude,
-            };
+        snapshot.forEach((doc) => {
+          const garageData = doc.data();
+          const garageLocation = {
+            latitude: garageData.latitude,
+            longitude: garageData.longitude,
+          };
 
-            if (userLocation) {
-              const distance = calculateDistance(userLocation, garageLocation);
+          if (userLocation) {
+            const distance = calculateDistance(userLocation, garageLocation);
 
-              if (distance <= MAX_DISTANCE_KM) {
-                usersList.push({ ...garageData, id: doc.id });
-              }
+            if (distance <= MAX_DISTANCE_KM) {
+              usersList.push({ ...garageData, id: doc.id });
             }
-          });
-
-          setGarages(usersList);
-          setLoading(false);
+          }
         });
 
-        return () => unsubscribe();
-      }
-    }, [userLocation, cardId]); 
+        setGarages(usersList);
+        setLoading(false);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [userLocation, cardId]);
 
   const handleItemPress = (id) => {
     router.push(`/garage_info/${id}`, { Id: id });
@@ -76,11 +76,10 @@ const DisplayContent = () => {
         return;
       }
 
-  console.log("Before location retrieval");
-  const location = await Location.getCurrentPositionAsync({});
-  console.log("After location retrieval");
-  console.log("Location data:", location);
-
+      console.log("Before location retrieval");
+      const location = await Location.getCurrentPositionAsync({});
+      console.log("After location retrieval");
+      console.log("Location data:", location);
 
       const userLocationData = {
         latitude: location.coords.latitude,
@@ -120,28 +119,42 @@ const DisplayContent = () => {
     return distance;
   };
 
+  const renderItem = ({ item }) => {
+    // Assuming 'closedTime' is in the format 'hh.mm'
+    const [closedHour, closedMinute] = item.closedTime.split(".").map(Number);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.mainText}>{item.name}</Text>
-      <Text>
-        {item.address} | Rate: {item.rating}
-      </Text>
-      <Image source={imageSource} style={styles.cardImage} />
-      <View>
-        <TouchableOpacity
-          style={styles.customButton}
-          onPress={() => handleItemPress(item.id)}
-        >
-          <Text style={styles.buttonText}>View Details</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    // Get the current time
+    const currentDate = new Date();
+    const currentHour = currentDate.getHours();
+    const currentMinute = currentDate.getMinutes();
+
+    // Convert both times to minutes for easier comparison
+    const closedTimeInMinutes = closedHour * 60 + closedMinute;
+    const currentTimeInMinutes = currentHour * 60 + currentMinute;
+
+    // Determine if the garage is closed based on the comparison
+    const isClosed = currentTimeInMinutes >= closedTimeInMinutes;
+
+    return (
+      <TouchableOpacity onPress={() => handleItemPress(item.id)}>
+        <View style={styles.card}>
+          <Text style={styles.mainText}>{item.name}</Text>
+          <Text>
+            {item.address} | Rate: {item.rating}
+          </Text>
+          <Text>
+           Status:{" "}
+            {isClosed ? "Closed" : "Opened"}
+          </Text>
+          <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View>
-      <Text style={styles.topic}>Near by Garages</Text>
+      <Text style={styles.topic}>Nearby Garages</Text>
       {loading ? (
         <Text>Loading...</Text>
       ) : (
@@ -193,7 +206,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "left",
-    margin:15
+    margin: 15,
   },
 });
 
