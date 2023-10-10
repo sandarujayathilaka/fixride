@@ -41,10 +41,15 @@ const TrackLive = () => {
         isReached: false,
 
     })
-
+    const initialCoordinate = {
+      latitude: 8.7542,
+      longitude: 80.4982,
+      latitudeDelta: LATITUDE_DELTA,
+      longitudeDelta: LONGITUDE_DELTA,
+    };
     const { curLoc, time, distance, destinationCords, isLoading, coordinate,heading, isReached } = state
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
-
+    const markerCoordinate = coordinate || initialCoordinate;
       
       const checkReached = () => {
         console.log("rgfeached");
@@ -96,7 +101,7 @@ const TrackLive = () => {
            
             const docRef = collection(db, "tracking");
             const doc = await getDocs(docRef);
-            console.log(doc);
+            console.log("ddd",doc);
             let foundDocumentRef = null;
 
             doc.forEach((doc1) => {
@@ -118,6 +123,7 @@ const TrackLive = () => {
                     const longitude = mehanicLocation.longitude;
                     const latitude1 = userLocation.latitude;
                     const longitude1 = userLocation.longitude;
+
                     animate(latitude, longitude);
             updateState({
                 curLoc: { latitude, longitude },
@@ -127,7 +133,8 @@ const TrackLive = () => {
                     latitudeDelta: LATITUDE_DELTA,
                     longitudeDelta: LONGITUDE_DELTA
                 }),
-                destinationCords:{latitude1,longitude1}
+                destinationCords:{latitude1,longitude1},
+                heading:heading,
             });
            
         } else {
@@ -196,10 +203,10 @@ const TrackLive = () => {
           </View>
         </Modal>
       )}
-            {/* {distance !== 0 && time !== 0 && (<View style={{ alignItems: 'center', marginVertical: 16 }}>
+            {distance !== 0 && time !== 0 && (<View style={{ alignItems: 'center', marginVertical: 16 }}>
                 <Text>Time left: {time.toFixed(0)} min</Text>
                 <Text>Distance left: {distance.toFixed(0)} km</Text>
-            </View>)} */}
+            </View>)}
             <View style={{ flex: 1 }}>
                 <MapView
                     ref={mapRef}
@@ -213,14 +220,14 @@ const TrackLive = () => {
 
                     <Marker.Animated
                         ref={markerRef}
-                        coordinate={coordinate}
+                        coordinate={markerCoordinate}
                     >
                         <Image
                             source={imagePath.icBike}
                             style={{
                                 width: 40,
                                 height: 40,
-                                // transform: [{rotate: `${heading}deg`}]
+                                 transform: [{rotate: `${heading}deg`}]
                             }}
                             resizeMode="contain"
                         />
@@ -245,19 +252,19 @@ const TrackLive = () => {
                               onStart={(params) => {
                                 console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
                               }}
-                              // onReady={result => {
-                        //     console.log(`Distance: ${result.distance*1000} km`)
-                        //     console.log(`Duration: ${result.duration} min.`)
-                        //     fetchTime(result.distance, result.duration),
-                        //         mapRef.current.fitToCoordinates(result.coordinates, {
-                        //             edgePadding: {
-                        //                 // right: 30,
-                        //                 // bottom: 300,
-                        //                 // left: 30,
-                        //                 // top: 100,
-                        //             },
-                        //         });
-                        // }}
+                              onReady={result => {
+                            console.log(`Distance: ${result.distance*1000} km`)
+                            console.log(`Duration: ${result.duration} min.`)
+                            fetchTime(result.distance, result.duration),
+                                mapRef.current.fitToCoordinates(result.coordinates, {
+                                    edgePadding: {
+                                        // right: 30,
+                                        // bottom: 300,
+                                        // left: 30,
+                                        // top: 100,
+                                    },
+                                });
+                        }}
                               onError={(errorMessage) => {
                                 console.log('GOT AN ERROR');
                               }}

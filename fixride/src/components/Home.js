@@ -149,6 +149,7 @@ const Home = ({ navigation }) => {
               requestId: id,
               userLocation: destination,
               mehanicLocation: curLoc,
+              heading:heading,
             });
       
             console.log({
@@ -253,6 +254,7 @@ const updateCurrentLocationInDatabase = async (requestId, latitude, longitude) =
               latitude,
               longitude,
             },
+            heading:heading,
           });
           console.log('Current location updated in the database');
         } else {

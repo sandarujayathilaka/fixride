@@ -27,9 +27,12 @@ const ChooseLocation = (props) => {
       const doc = await getDocs(docRef);
   
       let foundDocumentRef = null; // Initialize to null
-  
+      console.log("did",doc);
       doc.forEach((doc1) => {
+        console.log("id",id);
         const id = doc1.id;
+        console.log("id",id);
+                console.log("eid",documentId);
         if (id === documentId) {
           console.log("Document found:", id);
           foundDocumentRef = doc1.ref; // Store the found DocumentReference
@@ -53,7 +56,7 @@ const ChooseLocation = (props) => {
           console.log('Document not found'); // Handle if the document does not exist
         }
       } else {
-        console.log('Document not found'); // Handle if the document does not exist
+        console.log('Reference not found'); // Handle if the document does not exist
       }
   
       console.log("latitude4");
