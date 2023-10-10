@@ -9,81 +9,35 @@ import {
   StyleSheet,
   Alert,
   Image,
+  ScrollView,
+  CheckBox
 } from 'react-native';
 import { db } from '../config/firebase';
 
-function AddMechanic() {
+function AddGarage() {
   const router = useRouter();
 
-  const [name, setName] = useState('');
+  const[about,setAbout]=useState('');
+  const[address,setAddress]=useState('');
+  const[category,setCategory]=useState('');
+  const[closedTime,setClosedTime]=useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [name, setName] = useState('');
+  const [rating, setRating] = useState('');
+  const [services, setServices] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState([]);
+ 
   const [specializations, setSpecializations] = useState(['', '']);
 
-  const mechanicsCollection = collection(db, 'mechanic');
+  const mechanicsCollection = collection(db, 'garage');
 
-  const isPhoneNumberUnique = async (phoneNumber) => {
-    const q = query(mechanicsCollection, where('phoneNumber', '==', phoneNumber));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.empty;
-  };
-
-  const handleAddMechanic = async () => {
-    if (!name || !phoneNumber) {
-      Alert.alert('Error', 'Please fill out all fields');
-      return;
-    }
-
-    if (phoneNumber.length !== 10) {
-      Alert.alert('Error', 'Phone number must be 10 digits');
-      return;
-    }
-
-    try {
-      const isUnique = await isPhoneNumberUnique(phoneNumber);
-
-      if (!isUnique) {
-        Alert.alert('Error', 'Phone number is already in use.Please give an other phone number');
-        return;
-      }
-
-      const newMechanic = {
-        name,
-        phoneNumber,
-        specializations,
-        availability: 'available',
-      };
-
-      const docRef = await addDoc(mechanicsCollection, newMechanic);
-
-      console.log('Mechanic added successfully!');
-      Alert.alert('Success', 'Mechanic added successfully.');
-
-    setName('');
-    setPhoneNumber('');
-    setSpecializations(['', '']);
-
-    } catch (error) {
-      console.error('Error adding mechanic: ', error);
-      Alert.alert('Error', 'Failed to add mechanic. Please try again later.');
-    }
-  };
-
-
-  const handleCancel = () => {
-    router.push(`/garageMngr-dash/grgMngrDash`);
-  };
-
-  const updateSpecialization = (index, text) => {
-    const updatedSpecializations = [...specializations];
-    updatedSpecializations[index] = text;
-    setSpecializations(updatedSpecializations);
-  };
 
 
 
   return (
+    <ScrollView>
     <View style={styles.container}>
-      <Text style={styles.heading}>Add New Mechanic</Text>
+      <Text style={styles.heading}>Register Your Garage</Text>
       <Text style={styles.label}>Name:</Text>
       <TextInput
         style={styles.input}
@@ -99,34 +53,72 @@ function AddMechanic() {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Specializations:</Text>
+      <Text style={styles.label}>Address:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Specialization 1"
-        onChangeText={(text) => updateSpecialization(0, text)}
-        value={specializations[0]}
+        onChangeText={(text) => setPhoneNumber(text)}
+        value={phoneNumber}
+        keyboardType="numeric"
       />
+
+      <Text style={styles.label}>About:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Specialization 2"
-        onChangeText={(text) => updateSpecialization(1, text)}
-        value={specializations[1]}
+        onChangeText={(text) => setPhoneNumber(text)}
+        value={phoneNumber}
+        keyboardType="numeric"
       />
+
+    <Text style={styles.label}>Category:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => setPhoneNumber(text)}
+        value={phoneNumber}
+        keyboardType="numeric"
+      /> 
+
+      <Text style={styles.label}>Close Time:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => setPhoneNumber(text)}
+        value={phoneNumber}
+        keyboardType="numeric"
+      /> 
+
+      <Text style={styles.label}>Services:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => setPhoneNumber(text)}
+        value={phoneNumber}
+        keyboardType="numeric"
+      /> 
+
+      <Text style={styles.label}>Location:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => setPhoneNumber(text)}
+        value={phoneNumber}
+        keyboardType="numeric"
+      /> 
+
+   
+     
 
       
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddMechanic}>
+        <TouchableOpacity style={styles.addButton} >
           <Text style={styles.buttonText}>Add Mechanic</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.cancelButton}
-          onPress={handleCancel}
+         
         >
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
       </View>
     </View>
+    </ScrollView>
   );
 }
 
@@ -181,4 +173,4 @@ const styles = StyleSheet.create({
   
 });
 
-export default AddMechanic;
+export default AddGarage;

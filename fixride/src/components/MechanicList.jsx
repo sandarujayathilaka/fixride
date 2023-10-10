@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { router } from "expo-router";
 import { db } from "../config/firebase";
+import { useRouter } from "expo-router";
 import {
   collection,
   query,
   where,
   getDocs,
   doc,
-  getDoc,
   updateDoc,
 } from "firebase/firestore";
 import {
@@ -20,13 +19,20 @@ import {
   Modal,
   TextInput,
 } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 
 const MechanicList = ({ RequestId }) => {
+
+  const router= useRouter();
+
   const [data, setData] = useState([]);
+  const [mName,setMechanicName]= useState("");
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [isAssigned, setIsAssigned] = useState(false);
+  const [modalClosed, setModalClosed] = useState(true); // New state to track modal status
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,64 +50,13 @@ const MechanicList = ({ RequestId }) => {
     };
 
     fetchData();
-  }, []);
-
-
-  const handleRejectClick = async (RequestId) => {
-   
-    if (RequestId) {
-      const requestRef = doc(db, "request", RequestId);
-
-      try {
-        await updateDoc(requestRef, {
-          status: "Rejected",
-        });
-      } catch (error) {
-        console.error("Error updating status:", error);
-      }
-    }
-  };
-
-
-
-  // const handleReqStates = async (RequestId,mechanicName,macId) => {
-  //   try {
-  //     const reqDocRef = doc(db, "request", RequestId);
-
-  //     await updateDoc(reqDocRef, {
-  //       status:"Approved",
-  //       mainStatus:"Ongoing",
-  //       assignStatus:"Assigned",
-  //       macName: mechanicName,
-  //       macId:macId,
-  //     });
-
-  //   } catch (error) {
-  //     console.error("Error updating request statuses:", error);
-  //   }
-  // };
-
-
-  // const handleMechanicStates = async (macId) => {
-  //   try {
-  //     const mechanicDocRef = doc(db, "mechanic", macId);
-
-  //     await updateDoc(mechanicDocRef, {
-  //       availability: "unavailable",
-  //     });
-
-  //   } catch (error) {
-  //     console.error("Error updating mechanic's availability:", error);
-  //   }
-  // };
-
+  }, [modalClosed]); // Include modalClosed as a dependency
 
   const handleAssignMechanic = async (RequestId, mechanicName, macId, macPhone) => {
     try {
       const reqDocRef = doc(db, "request", RequestId);
       const mechanicDocRef = doc(db, "mechanic", macId);
-  
-      // Update request status and assigned mechanic's availability simultaneously
+
       await Promise.all([
         updateDoc(reqDocRef, {
           status: "Approved",
@@ -109,31 +64,31 @@ const MechanicList = ({ RequestId }) => {
           assignStatus: "Assigned",
           macName: mechanicName,
           macId: macId,
-          macContact:macPhone,
+          macContact: macPhone,
         }),
         updateDoc(mechanicDocRef, {
           availability: "unavailable",
         }),
       ]);
+
+      // Update the state with the updated data
+      const updatedData = data.map((item) => {
+        if (item.id === macId) {
+          return {
+            ...item,
+            availability: "unavailable",
+          };
+        }
+        return item;
+      });
+
+      setData(updatedData);
+      setIsAssigned(true);
+      setModalVisible(true);
     } catch (error) {
       console.error("Error updating request and mechanic statuses:", error);
     }
   };
-  
-  // Usage in your component
-  <TouchableOpacity
-    style={styles.button}
-    onPress={() => {
-      handleAssignMechanic(RequestId, data[index].name, data[index].id,data[index].phoneNumber);
-    }}
-  >
-    <Text style={styles.buttonText2}>Assign</Text>
-  </TouchableOpacity>
-  
-
-
-
-
 
   const handleSearch = () => {
     const trimmedSearchInput = searchInput.trim();
@@ -153,6 +108,24 @@ const MechanicList = ({ RequestId }) => {
     }
   };
 
+  const handleRejectClick = async (RequestId) => {
+   
+    if (RequestId) {
+      const requestRef = doc(db, "request", RequestId);
+
+      try {
+        await updateDoc(requestRef, {
+          status: "Rejected",
+        });
+      } catch (error) {
+        console.error("Error updating status:", error);
+      }
+    }
+  };
+
+  const handleDoneClick = () => {
+    router.push(`/req-list/reqlist`);
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -182,15 +155,14 @@ const MechanicList = ({ RequestId }) => {
         </TouchableOpacity>
       </View>
 
-
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          handleRejectClick(RequestId);}}
+          handleRejectClick(RequestId);
+        }}
       >
         <Text style={styles.buttonText2}>Reject</Text>
       </TouchableOpacity>
-
 
       <View style={styles.cardContainer}>
         {(searchResults.length > 0 ? searchResults : data).map((item, index) => (
@@ -198,21 +170,23 @@ const MechanicList = ({ RequestId }) => {
             <View style={styles.cardContent}>
               <View style={{ flexDirection: "column" }}>
                 <Text style={styles.cardText}>{item.name}</Text>
-                <Text style={styles.cardText2}>{item.specializations.join("   |   ")}</Text>
+                <Text style={styles.cardText2}>
+                  {item.specializations.join("   |   ")}
+                </Text>
               </View>
             </View>
             <TouchableOpacity
-        style={styles.button}
-        // onPress={() => {
-        //   handleMechanicStates(data[index].id); 
-        //   handleReqStates(RequestId, data[index].name,data[index].id); 
-        // }}
-        
-        onPress={() => {
-          handleAssignMechanic(RequestId, data[index].name, data[index].id , data[index].phoneNumber);}}
-
-
-      >
+              style={styles.button}
+              onPress={() => {
+                handleAssignMechanic(
+                  RequestId,
+                  item.name,
+                  item.id,
+                  item.phoneNumber
+                );
+                setMechanicName(item.name);
+              }}
+            >
               <Text style={styles.buttonText2}>Assign</Text>
             </TouchableOpacity>
           </View>
@@ -226,13 +200,33 @@ const MechanicList = ({ RequestId }) => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View>
-          {/* Display the details from selectedItem */}
-          {selectedItem && (
+        <View style={styles.modelHeader}>
+          {isAssigned ? (
             <View>
-              {/* Render the details here */}
+              <Text style={styles.cardText1}>{mName}</Text>
+              <Text style={styles.cardText3}>has assigned to the job</Text>
+
+              {/* <Image
+                  source={require("../../assets/done.png")} 
+                  style={styles.image}
+               /> */}
+              <Ionicons name="checkmark-done-circle" size={200} color="#C8E6C9"   style={styles.image}/>
+
+              <TouchableOpacity
+                
+                // onPress={() => {
+                //   handleDoneClick;
+                //   setIsAssigned(false); 
+                //   setModalVisible(false); 
+                //   setModalClosed(!modalClosed);
+                  
+                // }}
+                onPress={handleDoneClick}
+              >
+                <Text  style={styles.cardText4}>DONE</Text>
+              </TouchableOpacity>
             </View>
-          )}
+          ) : null}
         </View>
       </Modal>
     </ScrollView>
@@ -332,5 +326,38 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  modelHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginLeft: 30,
+    marginRight: 13,
+    marginTop:250,
+  },
+
+  cardText1: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginLeft:100,
+  },
+  cardText3: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign:"center"
+  },
+  image: {
+    marginLeft:78,
+    marginTop: 65,
+   
+  },
+  cardText4: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign:"center",
+    textDecorationLine: 'underline', 
+    textDecorationStyle: 'solid', 
+    textDecorationColor: 'black',
+    
   },
 });

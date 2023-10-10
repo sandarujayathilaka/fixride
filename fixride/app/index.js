@@ -9,6 +9,7 @@ import GarageMngrDash2 from "../src/components/GarageMngrDash2";
 import ReqList from "../src/components/ReqList";
 import Ongoings from "../src/components/Ongoings";
 import MechanicList from "../src/components/MechanicList";
+import AddGarage from "../src/components/AddGarage";
 
 
 
@@ -34,12 +35,13 @@ function index() {
           }}
         >
             {/* <CateCard/> */}
-            <GarageMngrDash/>  
+            {/* <GarageMngrDash/>   */}
             {/* <AddMechanic/> */}
             {/* <Ongoings/>   
             <ReqList/>
             <MechanicList/> */}
             {/* <Ongoings/>  */}
+            <AddGarage/>
             
         </View>
       </ScrollView>
