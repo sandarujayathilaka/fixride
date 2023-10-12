@@ -14,6 +14,7 @@ import AddGarage from "../src/components/AddGarage";
 
 
 
+
 function index() {
 
     const router = useRouter();
@@ -40,8 +41,11 @@ function index() {
             {/* <Ongoings/>   
             <ReqList/>
             <MechanicList/> */}
-            {/* <Ongoings/>  */}
-            <AddGarage/>
+            <Ongoings/> 
+            {/* <AddGarage/> */}
+            {/* <ReqList/> */}
+            {/* <MechanicList/> */}
+         
             
         </View>
       </ScrollView>
