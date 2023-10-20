@@ -3,6 +3,7 @@ import { Text,SafeAreaView, ScrollView, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import CateCard from "../src/components/CateCard";
 import Test from "../src/components/text";
+import RequestDetails from "../src/components/RequestDetails";
 
 function index() {
 
@@ -25,9 +26,6 @@ function index() {
           }}
         >
             <CateCard/>
-            <Test/>
-
-
         </View>
       </ScrollView>
     </SafeAreaView>

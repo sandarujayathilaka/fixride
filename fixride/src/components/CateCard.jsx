@@ -12,33 +12,33 @@ import {
 const cardData = [
   {
     id: "Car",
-    title: "Card 1",
-    imageSource: require("../../assets/Picture2.png"), // Replace with your image path
+    title: "Car",
+    imageSource: require("../../assets/RedCar.png"), // Replace with your image path
   },
   {
     id: "ThreeWeel",
-    title: "Card 2",
-    imageSource: require("../../assets/Picture2.png"), // Replace with your image path
+    title: "Tuk-Tuk",
+    imageSource: require("../../assets/tuktuk.png"), // Replace with your image path
   },
   {
     id: "Bicycle",
-    title: "Card 3",
-    imageSource: require("../../assets/Picture2.png"), // Replace with your image path
+    title: "Bike",
+    imageSource: require("../../assets/bike.png"), // Replace with your image path
   },
   {
     id: "Truck",
     title: "Truck",
-    imageSource: require("../../assets/Picture2.png"), // Replace with your image path
+    imageSource: require("../../assets/truck.png"), // Replace with your image path
   },
   {
     id: "Bus",
     title: "Bus",
-    imageSource: require("../../assets/Picture2.png"), // Replace with your image path
+    imageSource: require("../../assets/bus.png"), // Replace with your image path
   },
   {
     id: "All",
-    title: "All",
-    imageSource: require("../../assets/Picture2.png"), // Replace with your image path
+    title: "Any",
+    imageSource: require("../../assets/All.png"), // Replace with your image path
   },
 ];
 
@@ -54,6 +54,9 @@ const handleCardClick = (id) => {
 
   return (
     <ScrollView>
+      <View>
+        <Text style={styles.topic}>Select Vehicle Category</Text>
+      </View>
       <View style={styles.gridContainer}>
         {cardData.map((item) => (
           <TouchableOpacity
@@ -83,19 +86,27 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 16,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
+    borderWidth: 2,
+    borderColor: "#FEC400",
     marginVertical: 8,
+    backgroundColor: "#FFFBE7",
   },
   cardImage: {
-    width: "100%",
+    width: "90%",
     height: 90, // Adjust this value to control the image height
     borderRadius: 8,
   },
   cardTitle: {
     marginTop: 8,
     textAlign: "center",
-    fontSize: 30,
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  topic: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
   },
 });
 
