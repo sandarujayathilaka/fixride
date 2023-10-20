@@ -12,7 +12,7 @@ import {
   Modal,
 } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
-import { doc, getDoc } from "firebase/firestore";
+import { collection,where, getDocs, query } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 import { Feather } from "@expo/vector-icons";// Add this line
 
@@ -26,6 +26,9 @@ const GarageInfo = () => {
 
   const params = useGlobalSearchParams();
   const Id = params.id;
+  const userLatitude = params.userLatitude
+  const userLongitude =params.userLongitude
+  console.log("called",Id)
   const imageSource = require("../../assets/logo.webp");
 
   const [loading, setLoading] = useState(true);
@@ -33,11 +36,22 @@ const GarageInfo = () => {
  useEffect(() => {
    const fetchGarageData = async () => {
      try {
-       const garageDocRef = doc(db, "garage", Id);
-       const garageDocSnapshot = await getDoc(garageDocRef);
+       // Create a reference to the "garage" collection
+       const garageCollectionRef = collection(db, "garage");
+console.log(garageCollectionRef);
+       // Create a query to filter documents based on the garageId field
+       const garageQuery = query(
+         garageCollectionRef,
+         where("garageId", "==", Id)
+       );
 
-       if (garageDocSnapshot.exists()) {
-         const data = garageDocSnapshot.data();
+       // Fetch documents that match the query
+       const querySnapshot = await getDocs(garageQuery);
+
+       if (!querySnapshot.empty) {
+         // Get the first document from the result set (assuming garageId is unique)
+         const doc = querySnapshot.docs[0];
+         const data = doc.data();
          setGarageData(data);
          setLoading(false);
 
@@ -83,8 +97,14 @@ const GarageInfo = () => {
      // Show the modal if the garage is closed
      toggleModal();
    } else {
-     router.push(`/form/${id}`, { Id: id });
-     console.log(`Clicked on card with ID ${id}`);
+     router.push({
+       pathname: `/form/${id}`,
+       params: {
+         Id: id,
+         userLatitude: userLatitude,
+         userLongitude: userLongitude,
+       },
+     });
    }
  };
 

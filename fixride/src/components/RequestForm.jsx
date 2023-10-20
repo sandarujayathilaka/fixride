@@ -20,7 +20,10 @@ import { Feather } from "@expo/vector-icons";// Add this line
 
 
 
-const RequestForm = () => {
+const RequestForm = (props) => {
+  const garageId = props.garageId
+  const userLatitude = props.userLatitude
+  const userLongitude = props.userLongitude
   const [veheNum, setVeheNum] = useState("");
   const [model, setModel] = useState("");
   const [payment, setPayment] = useState("Cash");
@@ -39,6 +42,7 @@ const RequestForm = () => {
   }, []); //
 
   const handleSave = async () => {
+    console.log("lll789")
     const requestDb = collection(db, "request");
 
     // Check if an image is selected
@@ -71,6 +75,9 @@ const RequestForm = () => {
             payment: "Not Calculated",
             macContact: "",
             macName: "",
+            garageId: garageId,
+            latitude: userLatitude,
+            logitude:userLongitude
           });
           console.log(veheNum);
 
@@ -98,8 +105,11 @@ const RequestForm = () => {
         doneStatus: "",
         payStatus: "Unpaid",
         payment: "Not Calculated",
-        macContact:"",
-        macName:""
+        macContact: "",
+        macName: "",
+        garageId: garageId,
+        latitude: userLatitude,
+        logitude: userLongitude,
       });
       console.log(veheNum);
       handleItemPress(veheNum);
@@ -156,6 +166,7 @@ const RequestForm = () => {
     router.push({
       pathname: `/req_details/${id}`,
       params: {
+        Id:id,
         date: reqDate,
         Num: veheNum,
         vehemodel: model,

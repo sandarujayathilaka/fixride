@@ -16,6 +16,9 @@ const DisplayContent = () => {
   const [garages, setGarages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
+  const [latitude,setlatitude] = useState("")
+  const [longitude,setlongitude] = useState("")
+
   const MAX_DISTANCE_KM = 10;
 
   const params = useGlobalSearchParams();
@@ -36,6 +39,7 @@ const DisplayContent = () => {
       );
       const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
         let usersList = [];
+        console.log("location:",userLocation)
 
         snapshot.forEach((doc) => {
           const garageData = doc.data();
@@ -62,7 +66,15 @@ const DisplayContent = () => {
   }, [userLocation, cardId]);
 
   const handleItemPress = (id) => {
-    router.push(`/garage_info/${id}`, { Id: id });
+    console.log(id)
+      router.push({
+        pathname: `/garage_info/${id}`,
+        params: {
+          Id: id,
+          userLatitude: userLocation.latitude,
+          userLongitude: userLocation.longitude,
+        },
+      });
   };
 
   const getUserLocation = async () => {
@@ -136,7 +148,7 @@ const DisplayContent = () => {
     const isClosed = currentTimeInMinutes >= closedTimeInMinutes;
 
     return (
-      <TouchableOpacity onPress={() => handleItemPress(item.id)}>
+      <TouchableOpacity onPress={() => handleItemPress(item.garageId)}>
         <View style={styles.card}>
           <Text style={styles.mainText}>{item.name}</Text>
           <Text>

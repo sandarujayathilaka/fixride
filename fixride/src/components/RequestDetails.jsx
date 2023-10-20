@@ -24,6 +24,7 @@ export default function RequestDetails(props) {
   const user = props.username
 
 
+
    const[requestDetails,setRequest] = useState({})
    const [loading, setLoading] = useState(false);
    const [RequestId, setRequestId] = useState("");
@@ -128,6 +129,21 @@ const handleOKPress = async () => {
     if (RequestId) {
       router.push({
         pathname: `/status/${RequestId}`,
+        params: {
+          Id: RequestId,
+        },
+      });
+    } else {
+      console.error("Invalid or missing RequestId");
+    }
+  };
+
+  
+  const handlePayment = () => {
+    if (RequestId) {
+      console.log("hhhhh",RequestId)
+      router.push({
+        pathname: `/payment/${RequestId}`,
         params: {
           Id: RequestId,
         },
@@ -246,7 +262,9 @@ const handleOKPress = async () => {
                 </Text>
               </View>
               <View style={styles.datetime}>
-                <Text style={{ fontSize: 16, marginTop: 10,textAlign:"right" }}>
+                <Text
+                  style={{ fontSize: 16, marginTop: 10, textAlign: "right" }}
+                >
                   {requestDetails.status}
                 </Text>
                 <TouchableOpacity
@@ -285,12 +303,8 @@ const handleOKPress = async () => {
               <View style={styles.serviceColumn}>
                 <View style={{ margin: 10 }}>
                   <Text style={styles.mainLable}>Mechanic Details</Text>
-                  <TouchableOpacity
-                    style={styles.trackStatusButton}
-                  >
-                    <Text style={styles.trackStatusButtonText}>
-                     Live Track
-                    </Text>
+                  <TouchableOpacity style={styles.trackStatusButton}>
+                    <Text style={styles.trackStatusButtonText}>Live Track</Text>
                   </TouchableOpacity>
                   <Text
                     style={{ fontSize: 25, marginTop: 10, fontWeight: "500" }}
@@ -381,7 +395,10 @@ const handleOKPress = async () => {
               </View>
             </View>
             <View>
-              <TouchableOpacity style={styles.payButton}>
+              <TouchableOpacity
+                style={styles.payButton}
+                onPress={handlePayment}
+              >
                 <Text>Card Payment</Text>
               </TouchableOpacity>
             </View>

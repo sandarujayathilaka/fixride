@@ -10,12 +10,13 @@ const MecRequestDetails = () => {
 
  const date =param.date;
  const username = param.user
+const RequestId = param.Id;
+console.log("Req",RequestId)
 
- 
 
   return (
     <View>
-      <RequestDetails date={date} username={username}/>
+      <RequestDetails date={date} RequestId={RequestId} username={username} />
     </View>
   );
 }
