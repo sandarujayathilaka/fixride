@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 
-export default function ReqStatus(props) {
+export default function ReqStatusGMside(props) {
   const [currentStatus, setCurrentStatus] = useState("Pending");
   const [RequestId, setRequestId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -66,14 +66,7 @@ export default function ReqStatus(props) {
         <Image source={statusImg} style={styles.statusTopicImage} />
       </View>
       <View style={styles.allStatusContainer}>
-        <View style={styles.statusContainer}>
-          {currentStatus === "Approved" ? (
-            <Image source={colorCorrect} style={styles.statusImage} />
-          ) : (
-            <Image source={bwcorrect} style={styles.statusImage} />
-          )}
-          <Text style={styles.statusText}>Approved</Text>
-        </View>
+
         <VerticalLine isGreen={currentStatus === "Approved"} />
         <View style={styles.statusContainer}>
           {assignStatus === "Assigned" ? (

@@ -7,7 +7,7 @@ import {
   Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "expo-router";
+import { useRouter ,router,useGlobalSearchParams} from "expo-router";
 import { db } from "../config/firebase";
 import {
   collection,
@@ -18,6 +18,8 @@ import {
   getDoc,
   updateDoc, 
 } from "firebase/firestore";
+import { ActivityIndicator } from "react-native-paper";
+
 
 
 const Ongoings = () => {
@@ -25,6 +27,7 @@ const Ongoings = () => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedItemIndex, setSelectedItemIndex] = useState("");
+  const [RequestId, setRequestId] = useState("");
 
 
   useEffect(() => {
@@ -38,13 +41,30 @@ const Ongoings = () => {
         requestData.push({ id: doc.id, ...data});
       });
       setData(requestData);
-      console.log(data[0].id);
+     
+      
     };
 
     fetchData();
   }, []);
   
   const router = useRouter();
+
+
+  const handleTrackStatus = (card) => {
+    const { id } = card; 
+    if (id) {
+      setRequestId(id); 
+      router.push({
+        pathname: `/status/${id}`,
+        params: {
+          Id: id, 
+        },
+      });
+    } else {
+      console.error("Invalid or missing RequestId");
+    }
+  };
 
 
   return (
@@ -77,7 +97,8 @@ const Ongoings = () => {
             </View>
             <View style={styles.separator} />
 
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} 
+            onPress={() => handleTrackStatus(card)}>
               <Text style={styles.buttonText}>Track status</Text>
             </TouchableOpacity>
           </View>

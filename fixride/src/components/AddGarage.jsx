@@ -1,35 +1,82 @@
-import React, { useState } from 'react';
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
-import { useRouter } from 'expo-router';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Image,
-  ScrollView,
-  CheckBox
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import * as Location from 'expo-location';
+import { collection, addDoc } from 'firebase/firestore';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import { db } from '../config/firebase';
 
 function AddGarage() {
-  const router = useRouter();
-
-  const[about,setAbout]=useState('');
-  const[address,setAddress]=useState('');
-  const[category,setCategory]=useState('');
-  const[closedTime,setClosedTime]=useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [about, setAbout] = useState('');
+  const [address, setAddress] = useState('');
+  const [closedTime, setClosedTime] = useState('');
+  const [contact, setContact] = useState('');
   const [name, setName] = useState('');
-  const [rating, setRating] = useState('');
-  const [services, setServices] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState([]);
- 
-  const [specializations, setSpecializations] = useState(['', '']);
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [services,setServices] = useState('');
+  const [rating, setRating] = useState('3.5');
 
-  const mechanicsCollection = collection(db, 'garage');
+  const gatageCollection = collection(db, 'garage');
+
+  const categories = [
+    'Category 1',
+    'Category 2',
+    'Category 3',
+    'Category 4',
+  ];
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      setLatitude(location.coords.latitude.toString());
+      setLongitude(location.coords.longitude.toString());
+    })();
+  }, []);
+
+  const handleRegister = async () => {
+    
+    const docData = {
+      about,
+      address,
+      category: selectedCategory,
+      closedTime,
+      contact,
+      name,
+      latitude,
+      longitude,
+      services,
+      rating
+    };
+
+    try {
+      // Add the document to the 'garage' collection
+      const docRef = await addDoc(gatageCollection, docData);
+      const garageId = docRef.id;
+      console.log('Garage added with ID: ', garageId);
+
+     
+      setAbout('');
+      setAddress('');
+      setSelectedCategory('');
+      setClosedTime('');
+      setContact('');
+      setName('');
+      setLatitude('');
+      setLongitude('');
+      setServices('');
+    } catch (error) {
+      console.error('Error adding document: ', error);
+
+    }
+  };
 
 
 
@@ -48,67 +95,60 @@ function AddGarage() {
       <Text style={styles.label}>Phone Number:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={(text) => setPhoneNumber(text)}
-        value={phoneNumber}
+        onChangeText={(text) => setContact(text)}
+        value={contact}
         keyboardType="numeric"
       />
 
       <Text style={styles.label}>Address:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={(text) => setPhoneNumber(text)}
-        value={phoneNumber}
-        keyboardType="numeric"
+        onChangeText={(text) => setAddress(text)}
+        value={address}
+        
       />
 
       <Text style={styles.label}>About:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={(text) => setPhoneNumber(text)}
-        value={phoneNumber}
-        keyboardType="numeric"
+        onChangeText={(text) => setAbout(text)}
+        value={about}
+      
       />
 
-    <Text style={styles.label}>Category:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setPhoneNumber(text)}
-        value={phoneNumber}
-        keyboardType="numeric"
-      /> 
+        <Text style={styles.label}>Category:</Text>
+        <Picker
+          selectedValue={selectedCategory}
+          onValueChange={(itemValue, itemIndex) => setSelectedCategory(itemValue)}
+          style={styles.input}
+        >
+          <Picker.Item label="Select a category" value="" />
+          {categories.map((category, index) => (
+            <Picker.Item label={category} value={category} key={index} />
+          ))}
+        </Picker>
 
       <Text style={styles.label}>Close Time:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={(text) => setPhoneNumber(text)}
-        value={phoneNumber}
-        keyboardType="numeric"
+        onChangeText={(text) => setClosedTime(text)}
+        value={closedTime}
+        
       /> 
 
       <Text style={styles.label}>Services:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={(text) => setPhoneNumber(text)}
-        value={phoneNumber}
-        keyboardType="numeric"
+        onChangeText={(text) => setServices(text)}
+        value={services}
       /> 
 
-      <Text style={styles.label}>Location:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setPhoneNumber(text)}
-        value={phoneNumber}
-        keyboardType="numeric"
-      /> 
 
-   
-     
 
-      
-
+  
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.addButton} >
-          <Text style={styles.buttonText}>Add Mechanic</Text>
+      <TouchableOpacity style={styles.addButton} onPress={handleRegister}>
+          <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.cancelButton}

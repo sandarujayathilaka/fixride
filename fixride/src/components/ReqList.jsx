@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { db } from "../config/firebase";
 import {
@@ -8,7 +9,7 @@ import {
   getDocs,
   doc,
   getDoc,
-  updateDoc, 
+  updateDoc,
 } from "firebase/firestore";
 import {
   StyleSheet,
@@ -20,8 +21,12 @@ import {
   Modal,
 } from "react-native";
 
+
+
+
 const ReqList = () => {
   const router = useRouter();
+  const isFocused = useIsFocused();
 
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -29,28 +34,29 @@ const ReqList = () => {
   const [selectedItemIndex, setSelectedItemIndex] = useState("");
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const requestDb = collection(db, "request");
-      const statusQuery = query(requestDb, where("status", "==", "Pending"));
-      const querySnapshot = await getDocs(statusQuery);
-      const requestData = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const imageUrl = data.imageUrl;
-        requestData.push({ id: doc.id, ...data, imageUrl });
-      });
-      setData(requestData);
-      console.log(data[0].id);
-    };
-
-    fetchData();
+  const fetchData = useCallback(async () => {
+    const requestDb = collection(db, "request");
+    const statusQuery = query(requestDb, where("status", "==", "Pending"));
+    const querySnapshot = await getDocs(statusQuery);
+    const requestData = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const imageUrl = data.imageUrl;
+      requestData.push({ id: doc.id, ...data, imageUrl });
+    });
+    setData(requestData);
   }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchData();
+    }
+  }, [isFocused, fetchData]);
 
   const handleViewDetailsClick = async (itemId,index) => {
     const requestRef = doc(db, "request", itemId);
     const docSnap = await getDoc(requestRef);
-    console.log(itemId);
+   
     if (docSnap.exists()) {
       setSelectedItem(docSnap.data());
       setModalVisible(true);
@@ -59,7 +65,7 @@ const ReqList = () => {
   };
 
   const handleRejectClick = async (itemId) => {
-    console.log(itemId);
+    
     if (itemId) {
       const requestRef = doc(db, "request", itemId);
 
@@ -76,7 +82,7 @@ const ReqList = () => {
 
 
   const handleClickAssign = () => {
-    console.log(data[selectedItemIndex].id);
+
     if (data[selectedItemIndex].id) {
       router.push({
         pathname: `/mac-list/${data[selectedItemIndex].id}`,

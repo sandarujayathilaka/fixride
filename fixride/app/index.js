@@ -41,10 +41,11 @@ function index() {
             {/* <Ongoings/>   
             <ReqList/>
             <MechanicList/> */}
-            <Ongoings/> 
-            {/* <AddGarage/> */}
+            {/* <Ongoings/>  */}
+            <AddGarage/>
             {/* <ReqList/> */}
             {/* <MechanicList/> */}
+            {/* <AddGarage2/> */}
          
             
         </View>
