@@ -103,10 +103,10 @@ const ReqList = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.text}>Repair requests</Text>
+        <Text style={styles.text}>Repair Requests</Text>
         <TouchableOpacity style={styles.button2}
           onPress={handleOngoingClick}>
-          <Text style={styles.buttonText2}>Ongoing</Text>
+          <Text style={styles.buttonText2}>Ongoings</Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.text2}>18 requests found</Text>
@@ -116,8 +116,9 @@ const ReqList = () => {
           <View key={item.id} style={styles.card}>
             <View style={styles.cardContent}>
               <View style={{ flexDirection: "column" }}>
-                <Text style={styles.cardText}>{item.vehicleModel}</Text>
-                <Text style={styles.cardText}>{item.powerSource}</Text>
+                <Text style={styles.cardText}>Vehicle Model: <Text style={styles.value}>{item.vehicleModel}</Text></Text>
+                <Text style={styles.cardText}>Vehicle Number:<Text style={styles.value}>{item.vehicleNo}</Text></Text>
+                <Text style={styles.cardText}>Power Source: <Text style={styles.value}>{item.powerSource}</Text></Text>
               </View>
             </View>
             <TouchableOpacity
@@ -243,25 +244,50 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   card: {
-    height: 140,
+    height: 155,
     marginTop: 20,
     backgroundColor: "#FFFDF3",
     marginHorizontal: 13,
     borderRadius: 10,
     justifyContent: "space-between",
     padding: 10,
-    borderWidth: 1,
-    borderColor: "#FFAC1C",
+    shadowColor: "#000", 
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84, 
+    elevation: 5, 
   },
+
+  modelCard: {
+    marginTop: 20,
+    backgroundColor: "#FFFDF3",
+    marginHorizontal: 13,
+    borderRadius: 10,
+    justifyContent: "space-between",
+    padding: 10,
+    shadowColor: "#000", 
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84, 
+    elevation: 5, 
+  },
+
+
   cardText: {
     fontSize: 18,
   },
   button: {
     borderWidth: 1,
-    borderColor: "#FFAC1C",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
+    backgroundColor: "gray",
   },
 
   button2:{
@@ -274,9 +300,8 @@ const styles = StyleSheet.create({
 
   buttonText: {
     fontSize: 18,
-    color: "black",
+    color: "white",
     textAlign: "center",
-    color: "#e89300",
   },
 
   buttonText2:{
@@ -325,16 +350,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",  
     color: "#5A5A5A",
   },
-  modelCard: {
-    marginTop: 20,
-    backgroundColor: "#FFFDF3",
-    marginHorizontal: 13,
-    borderRadius: 10,
-    justifyContent: "space-between",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#FFAC1C",
-  },
+
   subTitle:{
     flexDirection: "row",
     alignItems: "center",
@@ -374,5 +390,9 @@ const styles = StyleSheet.create({
     marginRight:8,
     marginTop:70,
     marginBottom:30
+  },
+  value:{
+    fontSize: 18,
+    fontWeight:'bold'
   },
 });

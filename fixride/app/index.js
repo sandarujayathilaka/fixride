@@ -36,13 +36,13 @@ function index() {
           }}
         >
             {/* <CateCard/> */}
-            {/* <GarageMngrDash/>   */}
+            <GarageMngrDash/>  
             {/* <AddMechanic/> */}
             {/* <Ongoings/>   
             <ReqList/>
             <MechanicList/> */}
             {/* <Ongoings/>  */}
-            <AddGarage/>
+            {/* <AddGarage/> */}
             {/* <ReqList/> */}
             {/* <MechanicList/> */}
             {/* <AddGarage2/> */}

@@ -90,6 +90,7 @@ function AddGarage() {
         style={styles.input}
         onChangeText={(text) => setName(text)}
         value={name}
+        placeholder='Enter your garage name'
       />
 
       <Text style={styles.label}>Phone Number:</Text>
@@ -98,6 +99,7 @@ function AddGarage() {
         onChangeText={(text) => setContact(text)}
         value={contact}
         keyboardType="numeric"
+        placeholder='Enter your garage contact number'
       />
 
       <Text style={styles.label}>Address:</Text>
@@ -105,6 +107,7 @@ function AddGarage() {
         style={styles.input}
         onChangeText={(text) => setAddress(text)}
         value={address}
+        placeholder='Enter your garage address'
         
       />
 
@@ -113,7 +116,7 @@ function AddGarage() {
         style={styles.input}
         onChangeText={(text) => setAbout(text)}
         value={about}
-      
+        placeholder='Enter some details about your garage'
       />
 
         <Text style={styles.label}>Category:</Text>
@@ -133,6 +136,7 @@ function AddGarage() {
         style={styles.input}
         onChangeText={(text) => setClosedTime(text)}
         value={closedTime}
+        placeholder='Enter your garage closing time'
         
       /> 
 
@@ -141,6 +145,7 @@ function AddGarage() {
         style={styles.input}
         onChangeText={(text) => setServices(text)}
         value={services}
+        placeholder='Enter your services'
       /> 
 
 

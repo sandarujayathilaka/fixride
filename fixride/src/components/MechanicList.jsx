@@ -32,7 +32,7 @@ const MechanicList = ({ RequestId }) => {
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isAssigned, setIsAssigned] = useState(false);
-  const [modalClosed, setModalClosed] = useState(true); // New state to track modal status
+  const [modalClosed, setModalClosed] = useState(true); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -155,15 +155,6 @@ const MechanicList = ({ RequestId }) => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          handleRejectClick(RequestId);
-        }}
-      >
-        <Text style={styles.buttonText2}>Reject</Text>
-      </TouchableOpacity>
-
       <View style={styles.cardContainer}>
         {(searchResults.length > 0 ? searchResults : data).map((item, index) => (
           <View key={item.id} style={styles.card}>
@@ -174,8 +165,9 @@ const MechanicList = ({ RequestId }) => {
                   {item.specializations.join("   |   ")}
                 </Text>
               </View>
-            </View>
-            <TouchableOpacity
+
+              <View style={{ flexDirection: "column" }}>
+              <TouchableOpacity
               style={styles.button}
               onPress={() => {
                 handleAssignMechanic(
@@ -189,9 +181,22 @@ const MechanicList = ({ RequestId }) => {
             >
               <Text style={styles.buttonText2}>Assign</Text>
             </TouchableOpacity>
+                </View>
+            </View>
           </View>
         ))}
       </View>
+
+     
+     <TouchableOpacity
+        style={styles.bottomRejectButton}
+        onPress={() => {
+          handleRejectClick(RequestId);
+        }}
+      >
+        <Text style={styles.buttonText2}>Reject</Text>
+      </TouchableOpacity>
+  
 
       {/* Modal to display additional details */}
       <Modal
@@ -281,7 +286,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   card: {
-    height: 140,
+    height: 100,
     marginTop: 20,
     backgroundColor: "#FFFDF3",
     marginHorizontal: 13,
@@ -306,8 +311,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     borderRadius: 5,
-    marginLeft: 90,
-    marginRight: 90,
   },
   cardContent: {
     flexDirection: "row",
@@ -360,4 +363,15 @@ const styles = StyleSheet.create({
     textDecorationColor: 'black',
     
   },
+  bottomRejectButton:{
+    alignItems: "center",
+    backgroundColor: "#ccc",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginLeft: 20,
+    marginRight: 200,
+    marginTop:15,
+    marginBottom:10,
+  }
 });

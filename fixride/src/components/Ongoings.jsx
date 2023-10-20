@@ -33,7 +33,7 @@ const Ongoings = () => {
   useEffect(() => {
     const fetchData = async () => {
       const requestDb = collection(db, "request");
-      const statusQuery = query(requestDb, where("mainStatus", "==", "Ongoing"));
+      const statusQuery = query(requestDb, where("mainstatus", "==", "Ongoing"));
       const querySnapshot = await getDocs(statusQuery);
       const requestData = [];
       querySnapshot.forEach((doc) => {
@@ -148,7 +148,6 @@ const styles = StyleSheet.create({
   },
   button: {
     borderWidth: 1,
-
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,

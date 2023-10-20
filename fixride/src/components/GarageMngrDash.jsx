@@ -42,14 +42,13 @@ function GarageMngrDash() {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../assets/logo.png")}
+        source={require("../../assets/grgMngrDash.png")}
         style={styles.logo}
       />
 
       <View style={styles.centerText}>
-        <Text style={styles.welcomeText}>WELCOME</Text>
-        <Text style={styles.fixRideText}>TO </Text>
-        <Text style={styles.fixRideText}>FixRide </Text>
+        <Text style={styles.welcomeText}>Lets Fix More Vehicles Today</Text>
+        <Text style={styles.fixRideText}>with FixRide 🙂</Text>
       </View>
 
       <View style={styles.gridContainer}>
@@ -75,9 +74,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logo: {
+    marginTop:20,
     width: 200, 
     height: 200, 
-    borderRadius: 100,
+    // borderRadius: 100,
   },
   gridContainer: {
     flexDirection: "row",
@@ -87,15 +87,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   gridItem: {
-    flexBasis: "48%",
+    flexBasis: "45%",
     backgroundColor: "#FFFBE7",
     padding: 16,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#FEC400",
-    marginVertical: 8,
-    marginRight:6,
+    shadowColor: "#000", 
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84,
+    elevation: 5, 
+    marginVertical: 30,
+    marginLeft: 10,
   },
+  
   cardImage: {
     marginLeft:45,
     alignItems: "center", 
@@ -108,15 +115,20 @@ const styles = StyleSheet.create({
     fontSize: 20, // Adjust the font size as needed
   },
   centerText: {
-    alignItems: "center",
+    alignItems: "flex-start", // Align the text to the left
     marginBottom: 16,
+    marginTop:19,
+    fontWeight: 'bold',
   },
   welcomeText: {
     fontSize: 24,
-    marginTop:18
+    marginTop:18,
+    fontWeight: 'bold',
   },
   fixRideText: {
     fontSize: 24,
+    fontWeight: 'bold',
+    marginTop:7,
   },
 });
 

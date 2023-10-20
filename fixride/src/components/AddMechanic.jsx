@@ -84,11 +84,16 @@ function AddMechanic() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Add New Mechanic</Text>
+      <Image
+        source={require("../../assets/newMechanic.png")}
+        style={styles.logo}
+      />
       <Text style={styles.label}>Name:</Text>
       <TextInput
         style={styles.input}
         onChangeText={(text) => setName(text)}
         value={name}
+        placeholder='Enter mechanic name'
       />
 
       <Text style={styles.label}>Phone Number:</Text>
@@ -97,18 +102,19 @@ function AddMechanic() {
         onChangeText={(text) => setPhoneNumber(text)}
         value={phoneNumber}
         keyboardType="numeric"
+        placeholder='Enter mechanic contatct number'
       />
 
       <Text style={styles.label}>Specializations:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Specialization 1"
+        placeholder="Most skilled area 1"
         onChangeText={(text) => updateSpecialization(0, text)}
         value={specializations[0]}
       />
       <TextInput
         style={styles.input}
-        placeholder="Specialization 2"
+        placeholder="Most skilled area 2"
         onChangeText={(text) => updateSpecialization(1, text)}
         value={specializations[1]}
       />
@@ -134,12 +140,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    justifyContent: 'center',
+    marginTop:10,
+  
   },
   heading: {
     fontSize: 24,
     marginBottom: 16,
     textAlign: 'center',
+    fontWeight:'bold'
   },
   input: {
     borderWidth: 1,
@@ -177,6 +185,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
+  },
+  logo: {
+    marginTop:16,
+    marginBottom:16,
+    marginHorizontal:70,
+    width: 200, 
+    height: 200, 
   },
   
 });
