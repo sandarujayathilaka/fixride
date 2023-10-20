@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import { router, useGlobalSearchParams } from "expo-router";
-import ReqStatus from '../../src/components/ReqStatus'
+import ReqStatusGMside from '../../src/components/ReqStatusGMside'
 
 export default function Status() {
 
@@ -11,7 +11,7 @@ export default function Status() {
 
   return (
     <View>
-      <ReqStatus RequestId={RequestId}/>
+      <ReqStatusGMside RequestId={RequestId}/>
     </View>
   );
 }

@@ -56,7 +56,7 @@ const Ongoings = () => {
     if (id) {
       setRequestId(id); 
       router.push({
-        pathname: `/status/${id}`,
+        pathname: `/mngrside_status/${id}`,
         params: {
           Id: id, 
         },

@@ -12,12 +12,13 @@ export default function ReqStatusGMside(props) {
   const [payStatus, setPayStatus] = useState("");
   const [doneStatus, setDoneStatus] = useState("");
   const [assignStatus, setAssignStatus] = useState("");
+  const[payment,setPayment]=useState('');
 
   const statuses = ["Approved", "Started", "Reached", "Done"];
 
   const bwcorrect = require("../../assets/bwcorrect.png");
   const colorCorrect = require("../../assets/correctcol.png");
-   const statusImg = require("../../assets/status.webp");
+   const statusImg = require("../../assets/reqStatusGM.gif");
 
   useEffect(() => {
     setRequestId(props.RequestId);
@@ -40,6 +41,7 @@ export default function ReqStatusGMside(props) {
             setPayStatus(latestRequest.payStatus);
             setDoneStatus(latestRequest.doneStatus);
             setAssignStatus(latestRequest.assignStatus);
+            setPayment(latestRequest.payment);
           }
           setLoading(false);
         } catch (error) {
@@ -67,16 +69,6 @@ export default function ReqStatusGMside(props) {
       </View>
       <View style={styles.allStatusContainer}>
 
-        <VerticalLine isGreen={currentStatus === "Approved"} />
-        <View style={styles.statusContainer}>
-          {assignStatus === "Assigned" ? (
-            <Image source={colorCorrect} style={styles.statusImage} />
-          ) : (
-            <Image source={bwcorrect} style={styles.statusImage} />
-          )}
-          <Text style={styles.statusText}>Assigned</Text>
-        </View>
-        <VerticalLine isGreen={assignStatus === "Assigned"} />
         <View style={styles.statusContainer}>
           {startStatus === "Started" ? (
             <Image source={colorCorrect} style={styles.statusImage} />
@@ -113,6 +105,8 @@ export default function ReqStatusGMside(props) {
           <Text style={styles.statusText}>Paid</Text>
         </View>
       </View>
+      <Text style={styles.statusText}>Payments</Text>
+      <Text style={styles.statusText}>{payment}</Text>
     </View>
   );
 }

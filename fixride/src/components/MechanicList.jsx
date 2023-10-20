@@ -22,17 +22,16 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 const MechanicList = ({ RequestId }) => {
-
-  const router= useRouter();
+  const router = useRouter();
 
   const [data, setData] = useState([]);
-  const [mName,setMechanicName]= useState("");
+  const [mName, setMechanicName] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isAssigned, setIsAssigned] = useState(false);
-  const [modalClosed, setModalClosed] = useState(true); 
+  const [modalClosed, setModalClosed] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,7 +108,6 @@ const MechanicList = ({ RequestId }) => {
   };
 
   const handleRejectClick = async (RequestId) => {
-   
     if (RequestId) {
       const requestRef = doc(db, "request", RequestId);
 
@@ -156,7 +154,7 @@ const MechanicList = ({ RequestId }) => {
       </View>
 
       <View style={styles.cardContainer}>
-        {(searchResults.length > 0 ? searchResults : data).map((item, index) => (
+        {(searchInput.length > 0 ? searchResults : data).map((item, index) => (
           <View key={item.id} style={styles.card}>
             <View style={styles.cardContent}>
               <View style={{ flexDirection: "column" }}>
@@ -167,28 +165,32 @@ const MechanicList = ({ RequestId }) => {
               </View>
 
               <View style={{ flexDirection: "column" }}>
-              <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                handleAssignMechanic(
-                  RequestId,
-                  item.name,
-                  item.id,
-                  item.phoneNumber
-                );
-                setMechanicName(item.name);
-              }}
-            >
-              <Text style={styles.buttonText2}>Assign</Text>
-            </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    handleAssignMechanic(
+                      RequestId,
+                      item.name,
+                      item.id,
+                      item.phoneNumber
+                    );
+                    setMechanicName(item.name);
+                  }}
+                >
+                  <Text style={styles.buttonText2}>Assign</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         ))}
+        {searchInput.length > 0 && searchResults.length === 0 && (
+          <Text style={styles.noMatchingMechanicsText}>
+            No matching mechanics are available.
+          </Text>
+        )}
       </View>
 
-     
-     <TouchableOpacity
+      <TouchableOpacity
         style={styles.bottomRejectButton}
         onPress={() => {
           handleRejectClick(RequestId);
@@ -196,7 +198,6 @@ const MechanicList = ({ RequestId }) => {
       >
         <Text style={styles.buttonText2}>Reject</Text>
       </TouchableOpacity>
-  
 
       {/* Modal to display additional details */}
       <Modal
@@ -215,20 +216,18 @@ const MechanicList = ({ RequestId }) => {
                   source={require("../../assets/done.png")} 
                   style={styles.image}
                /> */}
-              <Ionicons name="checkmark-done-circle" size={200} color="#C8E6C9"   style={styles.image}/>
+              <Ionicons name="checkmark-done-circle" size={200} color="#C8E6C9" style={styles.image} />
 
               <TouchableOpacity
-                
                 // onPress={() => {
                 //   handleDoneClick;
                 //   setIsAssigned(false); 
                 //   setModalVisible(false); 
                 //   setModalClosed(!modalClosed);
-                  
                 // }}
                 onPress={handleDoneClick}
               >
-                <Text  style={styles.cardText4}>DONE</Text>
+                <Text style={styles.cardText4}>DONE</Text>
               </TouchableOpacity>
             </View>
           ) : null}
@@ -239,6 +238,7 @@ const MechanicList = ({ RequestId }) => {
 };
 
 export default MechanicList;
+
 
 const styles = StyleSheet.create({
   container: {
