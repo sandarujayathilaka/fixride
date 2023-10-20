@@ -1,7 +1,7 @@
 import { addDoc, collection } from "firebase/firestore";
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from "react-native";
-import { db } from "../config/firebase";
+import { db } from "../../config/firebase";
 import Draggable from 'react-native-draggable';
 import { router } from "expo-router";
 import StarRating from 'react-native-star-rating';

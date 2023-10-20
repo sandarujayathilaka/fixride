@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { db } from '../config/firebase'; // Import your Firestore instance
+import { db } from '../../config/firebase'; // Import your Firestore instance
 import { collection, query, where,getDoc, getDocs,updateDoc } from "firebase/firestore";
 
 // Reusable components
