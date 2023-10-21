@@ -17,6 +17,7 @@ import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library"; 
 import { Feather } from "@expo/vector-icons";// Add this line
+import axios from "axios";
 
 
 
@@ -32,17 +33,31 @@ const RequestForm = (props) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [reqDate, setDateTime] = useState("");
   const [currentUser, setUser] = useState("");
+   const [location, setLocation] = useState("");
+useEffect(() => {
+  // Get the current date and time when the component mounts
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString();
+  setDateTime(formattedDate);
+  setUser("Sandaru");
 
-  useEffect(() => {
-    // Get the current date and time when the component mounts
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString();
-    setDateTime(formattedDate);
-    setUser("Sandaru");
-  }, []); //
+  // Replace "YOUR_API_KEY" with your actual Google Maps Geocoding API key
+  const apiKey = "AIzaSyACdwaw1h6cATe6laoMWoayEniMemjgVkE";
+
+  // Perform reverse geocoding
+  reverseGeocode(userLatitude, userLongitude, apiKey)
+    .then((locationName) => {
+      setLocation(locationName);
+    })
+    .catch((error) => {
+      console.error("Error in reverse geocoding:", error);
+      setLocation("Location not found");
+    });
+}, []);
+
 
   const handleSave = async () => {
-    console.log("lll789")
+  
     const requestDb = collection(db, "request");
 
     // Check if an image is selected
@@ -64,7 +79,7 @@ const RequestForm = (props) => {
             powerSource: selectedItem,
             imageUrl: `data:image/jpeg;base64,${base64data}`, // Store as base64 URL
             status: "Pending",
-            mainstatus: "Ongoing",
+            mainStatus: "Pending",
             dateTime: reqDate,
             username: currentUser,
             startStatus: "",
@@ -77,7 +92,8 @@ const RequestForm = (props) => {
             macName: "",
             garageId: garageId,
             latitude: userLatitude,
-            logitude:userLongitude
+            logitude:userLongitude,
+            location:location
           });
           console.log(veheNum);
 
@@ -97,7 +113,7 @@ const RequestForm = (props) => {
         powerSource: selectedItem,
         status: "Approved",
         dateTime: reqDate,
-        mainstatus: "Ongoing",
+        mainStatus: "Pending",
         username: currentUser,
         startStatus: "",
         reachStatus: "",
@@ -110,11 +126,14 @@ const RequestForm = (props) => {
         garageId: garageId,
         latitude: userLatitude,
         logitude: userLongitude,
+        location: location,
       });
       console.log(veheNum);
       handleItemPress(veheNum);
     }
   };
+
+
 
   // const handleImagePicker = async () => {
   //   const permissionResult =
@@ -138,6 +157,28 @@ const RequestForm = (props) => {
   //     }
   //   }
   // };
+
+  const reverseGeocode = async (latitude, longitude, apiKey) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+      );
+
+      if (
+        response.data &&
+        response.data.results &&
+        response.data.results.length > 0
+      ) {
+        const locationName = response.data.results[0].formatted_address;
+        return locationName;
+      } else {
+        return "Location not found";
+      }
+    } catch (error) {
+      console.error("Error in reverse geocoding:", error);
+      return "Location not found";
+    }
+  };
 
   const handleCameraCapture = async () => {
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
@@ -196,6 +237,14 @@ const RequestForm = (props) => {
         style={styles.input}
         onChangeText={(text) => setModel(text)}
         value={model}
+        placeholder="Enter Vehicle Model"
+      />
+
+      <Text style={styles.label}>Location:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => setLocation(text)}
+        value={location}
         placeholder="Enter Vehicle Model"
       />
 

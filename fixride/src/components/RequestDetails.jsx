@@ -30,6 +30,7 @@ export default function RequestDetails(props) {
    const [RequestId, setRequestId] = useState("");
    const [cTime, setCorrectTime] = useState("");
    const [cDate, setCorrectDate] = useState("");
+  const [payment, setPayment] = useState("Unpaid");
   const [showBusyMessage, setShowBusyMessage] = useState(false);
    const [messages, setMessages] = useState([
      "Waiting for approval ...",
@@ -67,6 +68,7 @@ export default function RequestDetails(props) {
           const doc = snapshot.docs[0];
           setRequest(doc.data());
           setRequestId(doc.id);
+          setPayment(requestDetails.payment)
         }
         setLoading(false);
       });
@@ -146,6 +148,7 @@ const handleOKPress = async () => {
         pathname: `/payment/${RequestId}`,
         params: {
           Id: RequestId,
+          payment:payment.toString()
         },
       });
     } else {
@@ -258,7 +261,7 @@ const handleOKPress = async () => {
             <View style={styles.serviceColumn}>
               <View>
                 <Text style={[styles.mainLable, { marginTop: 10 }]}>
-                  {requestDetails.mainstatus}
+                  {requestDetails.mainStatus}
                 </Text>
               </View>
               <View style={styles.datetime}>
@@ -395,12 +398,14 @@ const handleOKPress = async () => {
               </View>
             </View>
             <View>
-              <TouchableOpacity
-                style={styles.payButton}
-                onPress={handlePayment}
-              >
-                <Text>Card Payment</Text>
-              </TouchableOpacity>
+              { requestDetails.payment !== "Not Calculated" && (
+                <TouchableOpacity
+                  style={styles.payButton}
+                  onPress={handlePayment}
+                >
+                  <Text>Card Payment</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </>
         )}

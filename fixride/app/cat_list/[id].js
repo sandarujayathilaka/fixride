@@ -147,16 +147,20 @@ const DisplayContent = () => {
     // Determine if the garage is closed based on the comparison
     const isClosed = currentTimeInMinutes >= closedTimeInMinutes;
 
+     const statusStyle = {
+       color: isClosed ? "red" : "green",
+       fontWeight:400
+     };
+
     return (
       <TouchableOpacity onPress={() => handleItemPress(item.garageId)}>
         <View style={styles.card}>
           <Text style={styles.mainText}>{item.name}</Text>
-          <Text>
+          <Text style={styles.SubText}>
             {item.address} | Rate: {item.rating}
           </Text>
-          <Text>
-           Status:{" "}
-            {isClosed ? "Closed" : "Opened"}
+          <Text style={[styles.SubText, statusStyle]}>
+            Status: {isClosed ? "Closed" : "Opened"}
           </Text>
           <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
         </View>
@@ -183,7 +187,7 @@ const DisplayContent = () => {
 const styles = StyleSheet.create({
   card: {
     margin: 10,
-    height: 190,
+    height: 150,
     padding: 16,
     backgroundColor: "rgba(255, 255, 0, 0.2)", // Change the background color as needed
     borderRadius: 8,
@@ -203,15 +207,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   mainText: {
-    color: "black", // Change the text color here
+    color: "#00008B", // Change the text color here
     fontWeight: "600",
     fontSize: 30,
+  },
+  SubText: {
+    color: "black", // Change the text color here
+    fontWeight: "400",
+    fontSize: 18,
   },
   cardImage: {
     width: 80,
     height: 80, // Adjust this value to control the image height
     marginLeft: 250,
-    marginTop: -55,
+    marginTop: -75,
     borderRadius: 8,
   },
   topic: {

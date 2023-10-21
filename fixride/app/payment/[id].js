@@ -8,11 +8,12 @@ const MecRequestDetails = () => {
   const param = useGlobalSearchParams();
 
   const RequestId = param.Id;
+  const payment = param.payment;
  
 
   return (
     <View>
-      <PaymentPortal RequestId={RequestId} />
+      <PaymentPortal RequestId={RequestId} payment={payment} />
     </View>
   );
 };
