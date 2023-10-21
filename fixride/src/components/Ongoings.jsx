@@ -78,6 +78,7 @@ const Ongoings = () => {
           <View key={card.id} style={styles.card}>
             <View style={styles.cardContent}>
               <View style={{ flexDirection: "column" }}>
+                 <Text style={styles.cardText}>{card.reqID}</Text>
                 <Text style={styles.cardText}>{card.username}</Text>
                 <Text style={{}}>Phone: {card.contact}</Text>
               </View>
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
     marginBottom:20
   },
   card: {
-    height: 140,
+    height: 160,
     marginTop: 20,
     backgroundColor: "#FFFDF3",
     marginHorizontal: 13,

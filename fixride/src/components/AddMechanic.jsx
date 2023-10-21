@@ -10,7 +10,9 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import { db } from '../config/firebase';
+import { db, firebase } from '../config/firebase';
+import { ScrollView } from 'react-native-gesture-handler';
+
 
 function AddMechanic() {
   const router = useRouter();
@@ -18,8 +20,11 @@ function AddMechanic() {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [specializations, setSpecializations] = useState(['', '']);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const mechanicsCollection = collection(db, 'mechanic');
+  const availability = 'available';
 
   const isPhoneNumberUnique = async (phoneNumber) => {
     const q = query(mechanicsCollection, where('phoneNumber', '==', phoneNumber));
@@ -27,47 +32,105 @@ function AddMechanic() {
     return querySnapshot.empty;
   };
 
-  const handleAddMechanic = async () => {
-    if (!name || !phoneNumber) {
-      Alert.alert('Error', 'Please fill out all fields');
-      return;
-    }
+  // const handleAddMechanic = async () => {
+  //   if (!name || !phoneNumber) {
+  //     Alert.alert('Error', 'Please fill out all fields');
+  //     return;
+  //   }
 
-    if (phoneNumber.length !== 10) {
-      Alert.alert('Error', 'Phone number must be 10 digits');
-      return;
-    }
+  //   if (phoneNumber.length !== 10) {
+  //     Alert.alert('Error', 'Phone number must be 10 digits');
+  //     return;
+  //   }
 
-    try {
-      const isUnique = await isPhoneNumberUnique(phoneNumber);
+  //   try {
+  //     const isUnique = await isPhoneNumberUnique(phoneNumber);
 
-      if (!isUnique) {
-        Alert.alert('Error', 'Phone number is already in use.Please give an other phone number');
+  //     if (!isUnique) {
+  //       Alert.alert('Error', 'Phone number is already in use.Please give an other phone number');
+  //       return;
+  //     }
+
+  //     const newMechanic = {
+  //       name,
+  //       phoneNumber,
+  //       specializations,
+  //       availability: 'available',
+  //       email,
+  //       password,
+  //     };
+
+  //     const docRef = await addDoc(mechanicsCollection, newMechanic);
+
+  //     console.log('Mechanic added successfully!');
+  //     Alert.alert('Success', 'Mechanic added successfully.');
+
+  //   setName('');
+  //   setPhoneNumber('');
+  //   setSpecializations(['', '']);
+
+  //   } catch (error) {
+  //     console.error('Error adding mechanic: ', error);
+  //     Alert.alert('Error', 'Failed to add mechanic. Please try again later.');
+  //   }
+  // };
+
+
+    registerUser = async(email,password,name,phoneNumber,specializations,availability)=>{
+
+      if (!name || !phoneNumber) {
+        Alert.alert('Error', 'Please fill out all fields');
         return;
       }
+      if (phoneNumber.length !== 10) {
+        Alert.alert('Error', 'Phone number must be 10 digits');
+        return;
+      }
+          const isUnique = await isPhoneNumberUnique(phoneNumber);
+          if (!isUnique) {
+            Alert.alert('Error', 'Phone number is already in use.Please give an other phone number');
+            return;
+          }
+      await firebase.auth().createUserWithEmailAndPassword(email,password)
 
-      const newMechanic = {
-        name,
-        phoneNumber,
-        specializations,
-        availability: 'available',
-      };
+      .then(() => {
 
-      const docRef = await addDoc(mechanicsCollection, newMechanic);
+        firebase.auth().currentUser.sendEmailVerification({
+          handleCodeInApp:true,
+          url:'https://fixride-50426.firebaseapp.com',
+        })
+        .then(() => {
+          alert('Verification email sent')
+        }).catch((error) => {
+          alert(error.message)
+        })
+        .then(() => {
+          firebase.firestore().collection('mechanic')
+          .doc(firebase.auth().currentUser.uid)
+          .set({
+            name,
+            phoneNumber,
+            specializations,
+            availability,
+            email,
+          })
+          Alert.alert('Success', 'Mechanic added successfully.');
 
-      console.log('Mechanic added successfully!');
-      Alert.alert('Success', 'Mechanic added successfully.');
+            setName('');
+            setPhoneNumber('');
+            setSpecializations(['', '']);
+            setEmail('');
+            setPassword('');
+        })
+        .catch((error) => {
+          alert(error.message)
+        })
+      })
 
-    setName('');
-    setPhoneNumber('');
-    setSpecializations(['', '']);
-
-    } catch (error) {
-      console.error('Error adding mechanic: ', error);
-      Alert.alert('Error', 'Failed to add mechanic. Please try again later.');
+      .catch((error) => {
+        alert(error.message)
+      })
     }
-  };
-
 
   const handleCancel = () => {
     router.push(`/garageMngr-dash/grgMngrDash`);
@@ -82,6 +145,7 @@ function AddMechanic() {
 
 
   return (
+    <ScrollView>
     <View style={styles.container}>
       <Text style={styles.heading}>Add New Mechanic</Text>
       <Image
@@ -95,6 +159,8 @@ function AddMechanic() {
         value={name}
         placeholder='Enter mechanic name'
       />
+
+
 
       <Text style={styles.label}>Phone Number:</Text>
       <TextInput
@@ -119,10 +185,27 @@ function AddMechanic() {
         value={specializations[1]}
       />
 
+
+
+   <Text style={styles.label}>Email:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => setEmail(text)}
+        value={email}
+        placeholder='Enter mechanic email'
+      />
+
+    <Text style={styles.label}>Password:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => setPassword(text)}
+        value={password}
+        placeholder='Enter mechanic password'
+      />
       
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddMechanic}>
+        <TouchableOpacity style={styles.addButton} onPress={()=>  registerUser(email,password,name,phoneNumber,specializations,availability)}>
           <Text style={styles.buttonText}>Add Mechanic</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -133,6 +216,7 @@ function AddMechanic() {
         </TouchableOpacity>
       </View>
     </View>
+    </ScrollView>
   );
 }
 
