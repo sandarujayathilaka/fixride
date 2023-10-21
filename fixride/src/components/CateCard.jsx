@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const cardData = [
   {
@@ -42,15 +43,16 @@ const cardData = [
   },
 ];
 
-function CateCard() {
+const CateCard = ({ id }) => {
+  const navigation = useNavigation();
 
-const handleCardClick = (id) => {
-  // Handle card click here, e.g., navigate to a new screen or perform an action.
-  router.push(`/cat_list/${id}`, { cardId: id });
-  console.log(`Clicked on card with ID ${id}`);
-};
+  const handleCardClick = (id) => {
+    console.log("card", id);
 
+    // Navigate to the "cat_list/[id]" screen with the cardId as a parameter
 
+    navigation.navigate("CatList", { cardid: id });
+  };
 
   return (
     <ScrollView>
@@ -71,7 +73,7 @@ const handleCardClick = (id) => {
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   gridContainer: {

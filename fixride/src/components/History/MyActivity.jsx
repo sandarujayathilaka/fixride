@@ -2,7 +2,6 @@ import {View,Text,TextInput,Image,StyleSheet,TouchableOpacity,FlatList,ScrollVie
 import React, { useState, useEffect } from "react";
 import { collection, query, where, getDocs,onSnapshot } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import { useToast } from "react-native-toast-message";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { firebase} from '../../config/firebase'

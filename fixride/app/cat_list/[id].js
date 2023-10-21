@@ -11,6 +11,7 @@ import { router, useGlobalSearchParams } from "expo-router";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 import * as Location from "expo-location";
+import { useRoute } from "@react-navigation/native";
 
 const DisplayContent = () => {
   const [garages, setGarages] = useState([]);
@@ -21,8 +22,17 @@ const DisplayContent = () => {
 
   const MAX_DISTANCE_KM = 10;
 
-  const params = useGlobalSearchParams();
-  const cardId = params.id;
+  // const params = useGlobalSearchParams();
+  // const cardId = params.id;
+  const route = useRoute();
+
+  const { cardid } = route.params;
+
+  console.log("1", cardid);
+
+  let cardId = cardid;
+
+  console.log("2", cardId);
   imageSource = require("../../assets/Picture2.png");
 
   useEffect(() => {
