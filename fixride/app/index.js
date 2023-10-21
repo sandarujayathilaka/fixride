@@ -5,6 +5,7 @@ import CateCard from "../src/components/CateCard";
 import MechHome from '../src/components/mechHome';
 import Test from "../src/components/text";
 import Job from "../src/components/job";
+import JobOverview from "../src/components/jobOverview";
 
 function index() {
 
@@ -26,7 +27,7 @@ function index() {
             padding:5,
           }}
         >
-            <Job/>
+            <JobOverview/>
           
 
 

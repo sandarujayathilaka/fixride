@@ -1,43 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import img from '../../assets/job.png';
-import { db } from "../../src/config/firebase";
+import { db } from '../../src/config/firebase'; 
+import { collection, getDocs, query, where } from 'firebase/firestore';
+
 
 
 
 
 const Job = ({ vehicleImage }) => {
+
   const [data, setData] = useState({});
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const querySnapshot = await db
-          .collection('request')
-          .where('mainstatus', '==', 'Ongoing')
-          .where('macName', '==', 'Deno')
-          .get();
+       
+        const requestCollection = collection(db, "request"); 
+        const q = query(
+          requestCollection,
+          where("mainstatus", "==", "Ongoing"), 
+          where("macName", "==", "Asanka Idunil") 
+        );
+console.log(q)
+        
+        const querySnapshot = await getDocs(q);
 
-        const fetchedData = [];
-        querySnapshot.forEach((doc) => {
-          const { username, vehicleNo } = doc.data();
-          fetchedData.push({ username, vehicleNo });
-        });
-
-        if (fetchedData.length > 0) {
-          setData(fetchedData[fetchedData.length - 1]); // Assuming you want to set data from the last retrieved item
+        // Check if there are documents in the result
+        if (!querySnapshot.empty) {
+          // If there are documents in the result, update the component state
+          const doc = querySnapshot.docs[0]; // Assuming you want the first document
+          setData(doc.data());
+          console.log("Data",data)
         }
       } catch (error) {
-        console.error('Error fetching data: ', error);
+        console.error("Error retrieving documents: ", error);
       }
     };
 
     fetchData();
   }, []);
 
-  
 
-  const { username, vehicleNo } = data;
 
   return (
     <ScrollView>
@@ -46,8 +51,8 @@ const Job = ({ vehicleImage }) => {
         <View style={styles.contentContainer}>
           <Text style={styles.title}>Assigned Job</Text>
           <View style={styles.cardContainer}>
-            <Text style={styles.text}>Customer Name: {username}</Text>
-            <Text style={styles.text}>Vehicle Number: {vehicleNo}</Text>
+            <Text style={styles.text}>Customer Name: {data.username}</Text>
+            <Text style={styles.text}>Vehicle Number:{data.vehicleNo} </Text>
             <Text style={styles.text}>Location: </Text>
             <Image source={{ uri: vehicleImage }} style={styles.vehicleImage} />
             <TouchableOpacity style={styles.button}>

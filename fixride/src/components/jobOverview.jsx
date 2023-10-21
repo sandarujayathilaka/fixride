@@ -1,17 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
-import img from '../assets/job.png';
+import img from '../../assets/job.png';
+import { db } from '../../src/config/firebase'; 
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
-const JobOverview = () => {
+const JobOverview = ({ vehicleImage }) => {
+  const [data, setData] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const requestCollection = collection(db, "request"); 
+        const q = query(
+          requestCollection,
+          where("mainstatus", "==", "Ongoing"), 
+          where("macName", "==", "Asanka Idunil") 
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          setData(doc.data());
+        }
+      } catch (error) {
+        console.error("Error retrieving documents: ", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <Text style={styles.pageHeader}>Job Overview</Text>
       <View style={styles.container}>
         <View style={styles.subHeader}>
-          <Text style={styles.subHeaderText}>Customer Name</Text>
+          <Text style={styles.subHeaderText}>{data.username}</Text>
         </View>
         <View style={styles.subHeader}>
-          <Text style={styles.subHeaderText}>Vehicle Number</Text>
+          <Text style={styles.subHeaderText}>{data.vehicleNo}</Text>
         </View>
         <View style={styles.subHeader}>
           <Text style={styles.boldText}>Location</Text>
@@ -19,24 +46,38 @@ const JobOverview = () => {
         <Image source={img} style={styles.image} />
         <Text style={styles.grayText}>Vehicle Information</Text>
         <View style={styles.compactBoxContainer}>
-          {/* First Box */}
-          <View style={styles.compactBox} />
-          {/* Second Box */}
-          <View style={styles.compactBox} />
-          {/* Third Box */}
-          <View style={styles.compactBox} />
+          <View style={styles.compactBox}>
+            <Text style={styles.centerText}>{data.vehicleModel}</Text>
+            <Text style={styles.centerText}>Model</Text>
+          </View>
+          <View style={styles.compactBox}>
+            <Text style={styles.centerText}>{data.vehicleModel}</Text>
+            <Text style={styles.centerText}>Year</Text>
+          </View>
+          <View style={styles.compactBox}>
+            <Text style={styles.centerText}>{data.vehicleModel}</Text>
+            <Text style={styles.centerText}>Fuel Type</Text>
+          </View>
+          <View style={styles.compactBox}>
+            <Text style={styles.centerText}>{data.vehicleModel}</Text>
+            <Text style={styles.centerText}>Gear Type</Text>
+          </View>
         </View>
         <Text style={styles.grayText}>Customer Information</Text>
         <View style={styles.boxContainer}>
-          {/* First Box in a new row */}
-          <View style={styles.largeBox} />
+          <View style={styles.largeBox}>
+            <Text style={styles.justifyText}>{data.username}</Text>
+          </View>
         </View>
         <View style={styles.boxContainer}>
-          {/* Second Box in a new row */}
-          <View style={styles.largeBox} />
+          <View style={styles.largeBox}>
+            <Text style={styles.justifyText}>{data.username}</Text>
+          </View>
         </View>
         <Text style={styles.grayText}>Breakdown Description</Text>
-        <View style={styles.bigBox} />
+        <View style={styles.bigBox}>
+            <Text style={styles.justifyText}>{data.username}</Text>
+        </View>
         <View style={styles.buttonContainer}>
           <Text style={styles.startRideButton}>Start Ride</Text>
           <Text style={styles.updateStatusButton}>Update Status</Text>
@@ -93,28 +134,34 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#EDAE10',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   boxContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   largeBox: {
-    width: '90%',
+    width: '100%',
     height: 40,
     backgroundColor: '#ffffe6',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#EDAE10',
     marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   bigBox: {
-    width: '90%',
+    width: '100%',
     height: 90,
     backgroundColor: '#ffffe6',
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#EDAE10',
     marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -137,6 +184,13 @@ const styles = StyleSheet.create({
     borderColor: '#EDAE10',
     textAlign: 'center',
   },
+  centerText: {
+    textAlign: 'center',
+  },
+  justifyText: {
+    textAlign: 'left',
+  },
+  
 });
 
 export default JobOverview;
