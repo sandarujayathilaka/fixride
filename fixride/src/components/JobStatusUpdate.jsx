@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { firebase } from 'firebase/firestore'; // Ensure you have imported the firestore from the correct location
+import { db } from '../../src/config/firebase';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 const JobStatusUpdate = () => {
   const [status, setStatus] = useState('On the way');
@@ -10,23 +11,23 @@ const JobStatusUpdate = () => {
   const handleActivate = async (newStatus) => {
     if (mainStatus === 'Ongoing' && userName === 'Asanka Idunil') {
       setStatus(newStatus);
-      const requestRef = firebase.firestore().collection('requests'); // Assuming 'requests' is the name of your collection
-
-      // Assuming 'docId' is the ID of the relevant document you want to update
-      const querySnapshot = await requestRef.where('macName', '==', userName).get();
-
-      querySnapshot.forEach(async (doc) => {
-        const docRef = requestRef.doc(doc.id);
+      const requestCollection = collection(db, 'request');
+      const q = query(requestCollection, where('macName', '==', userName));
+      const querySnapshot = await getDocs(q);
+  
+      querySnapshot.forEach((doc) => {
+        const docRef = doc.ref; // Use doc.ref instead of doc function
         if (newStatus === 'On the way') {
-          await docRef.update({ startStatus: 'Started' });
+          updateDoc(docRef, { startStatus: 'Started' });
         } else if (newStatus === 'Reached') {
-          await docRef.update({ reachStatus: 'Reached' });
+          updateDoc(docRef, { reachStatus: 'Reached' });
         } else if (newStatus === 'Fixed') {
-          await docRef.update({ fixedStatus: 'Fixed' });
+          updateDoc(docRef, { fixedStatus: 'Fixed' });
         }
       });
     }
   };
+  
 
 
 

@@ -6,6 +6,7 @@ import MechHome from '../src/components/mechHome';
 import Test from "../src/components/text";
 import Job from "../src/components/job";
 import JobOverview from "../src/components/jobOverview";
+import JobStatusUpdate from "../src/components/JobStatusUpdate";
 
 function index() {
 
@@ -27,7 +28,7 @@ function index() {
             padding:5,
           }}
         >
-            <JobOverview/>
+            <JobStatusUpdate/>
           
 
 
