@@ -27,12 +27,8 @@ const DisplayContent = () => {
   const route = useRoute();
 
   const { cardid } = route.params;
-
-  console.log("1", cardid);
-
   let cardId = cardid;
 
-  console.log("2", cardId);
   imageSource = require("../../assets/Picture2.png");
 
   useEffect(() => {
