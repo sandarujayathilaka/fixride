@@ -1,8 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import img from '../assets/job.png';
+import img from '../../assets/job.png';
+import { db } from "../../src/config/firebase";
 
-const Job = ({ customerName, vehicleNumber, location, vehicleImage }) => {
+
+
+
+const Job = ({ vehicleImage }) => {
+  const [data, setData] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const querySnapshot = await db
+          .collection('request')
+          .where('mainstatus', '==', 'Ongoing')
+          .where('macName', '==', 'Deno')
+          .get();
+
+        const fetchedData = [];
+        querySnapshot.forEach((doc) => {
+          const { username, vehicleNo } = doc.data();
+          fetchedData.push({ username, vehicleNo });
+        });
+
+        if (fetchedData.length > 0) {
+          setData(fetchedData[fetchedData.length - 1]); // Assuming you want to set data from the last retrieved item
+        }
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  
+
+  const { username, vehicleNo } = data;
+
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -10,28 +46,15 @@ const Job = ({ customerName, vehicleNumber, location, vehicleImage }) => {
         <View style={styles.contentContainer}>
           <Text style={styles.title}>Assigned Job</Text>
           <View style={styles.cardContainer}>
-            <Text style={styles.text}>Customer Name: {customerName}</Text>
-            <Text style={styles.text}>Vehicle Number: {vehicleNumber}</Text>
-            <Text style={styles.text}>Location: {location}</Text>
-            <Image
-              source={{ uri: vehicleImage }}
-              style={styles.vehicleImage}
-            />
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                /* Handle View More button press */
-              }}
-            >
+            <Text style={styles.text}>Customer Name: {username}</Text>
+            <Text style={styles.text}>Vehicle Number: {vehicleNo}</Text>
+            <Text style={styles.text}>Location: </Text>
+            <Image source={{ uri: vehicleImage }} style={styles.vehicleImage} />
+            <TouchableOpacity style={styles.button}>
               <Text style={styles.buttonText}>View More</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.goButton}
-            onPress={() => {
-              /* Handle Go button press */
-            }}
-          >
+          <TouchableOpacity style={styles.goButton}>
             <Text style={styles.buttonText}>Go</Text>
           </TouchableOpacity>
         </View>
@@ -39,6 +62,12 @@ const Job = ({ customerName, vehicleNumber, location, vehicleImage }) => {
     </ScrollView>
   );
 };
+
+
+
+
+
+
 
 const styles = StyleSheet.create({
   container: {

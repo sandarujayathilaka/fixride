@@ -1,15 +1,15 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
-import img from '../assets/WelcomeScreen.png';
-
+import img from '../../assets/WelcomeScreen.png';
+import { router } from "expo-router";
 
 const MechHome = () => {
-  const navigation = useNavigation(); // Initialize navigation
 
   const handleAssignedJobPress = () => {
     // Navigate to the Job component when the "Assigned Job" button is pressed
-    navigation.navigate('Job');
+    router.push(`/Job/Jobs/`);
+
   };
 
   return (

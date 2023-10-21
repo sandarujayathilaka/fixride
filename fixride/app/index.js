@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Text,SafeAreaView, ScrollView, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import CateCard from "../src/components/CateCard";
+import MechHome from '../src/components/mechHome';
 import Test from "../src/components/text";
+import Job from "../src/components/job";
 
 function index() {
 
@@ -24,8 +26,8 @@ function index() {
             padding:5,
           }}
         >
-            <CateCard/>
-            <Test/>
+            <Job/>
+          
 
 
         </View>
