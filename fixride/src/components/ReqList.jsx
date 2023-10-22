@@ -19,6 +19,7 @@ import {
   TouchableOpacity,
   Image,
   Modal,
+  Alert
 } from "react-native";
 
 
@@ -64,22 +65,45 @@ const ReqList = () => {
     }
   };
 
-  const handleRejectClick = async (itemId) => {
+  // const handleRejectClick = async (itemId) => {
     
-    if (itemId) {
-      const requestRef = doc(db, "request", itemId);
+  //   if (itemId) {
+  //     const requestRef = doc(db, "request", itemId);
+
+  //     try {
+  //       await updateDoc(requestRef, {
+  //         status: "Rejected",
+  //       });
+  //       setModalVisible(false); // Close the modal
+  //     } catch (error) {
+  //       console.error("Error updating status:", error);
+  //     }
+  //   }
+  // };
+
+  const handleRejectClick = async (RequestId) => {
+    if (RequestId) {
+      const requestRef = doc(db, "request", RequestId);
 
       try {
         await updateDoc(requestRef, {
           status: "Rejected",
         });
+       
+        Alert.alert("Request Rejected", "The request has been rejected.", [
+          {
+            text: "OK",
+            onPress: async () => {
+              setModalVisible(false); 
+              await fetchData();
+            },
+          },
+        ]);
       } catch (error) {
         console.error("Error updating status:", error);
       }
     }
   };
-
-
 
   const handleClickAssign = () => {
 

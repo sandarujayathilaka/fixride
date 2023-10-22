@@ -18,6 +18,7 @@ import {
   Image,
   Modal,
   TextInput,
+  Alert,
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 
@@ -59,7 +60,7 @@ const MechanicList = ({ RequestId }) => {
       await Promise.all([
         updateDoc(reqDocRef, {
           status: "Approved",
-          mainStatus: "Ongoing",
+          mainstatus: "Ongoing",
           assignStatus: "Assigned",
           macName: mechanicName,
           macId: macId,
@@ -115,6 +116,15 @@ const MechanicList = ({ RequestId }) => {
         await updateDoc(requestRef, {
           status: "Rejected",
         });
+       
+        Alert.alert("Request Rejected", "The request has been rejected.", [
+          {
+            text: "OK",
+            onPress: () => {
+              handleDoneClick();
+            },
+          },
+        ]);
       } catch (error) {
         console.error("Error updating status:", error);
       }

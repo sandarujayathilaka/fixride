@@ -171,19 +171,19 @@ function AddMechanic() {
         placeholder='Enter mechanic contatct number'
       />
 
-      <Text style={styles.label}>Specializations:</Text>
+      <Text style={styles.label}>Skills:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Most skilled area 1"
+        placeholder="Most skilled area "
         onChangeText={(text) => updateSpecialization(0, text)}
         value={specializations[0]}
       />
-      <TextInput
+      {/* <TextInput
         style={styles.input}
         placeholder="Most skilled area 2"
         onChangeText={(text) => updateSpecialization(1, text)}
         value={specializations[1]}
-      />
+      /> */}
 
 
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
-import { doc, getDoc } from "firebase/firestore";
+import { View, Text, StyleSheet, Image,TouchableOpacity , ScrollView} from "react-native";
+import { doc, getDoc,updateDoc } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 
 export default function ReqStatusGMside(props) {
@@ -62,7 +62,18 @@ export default function ReqStatusGMside(props) {
     );
   }
 
+  const updateRequestStatus = async () => {
+    try {
+      const requestRef = doc(db, "request", RequestId);
+      await updateDoc(requestRef, { mainstatus: "Done" });
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    }
+  };
+  
+
   return (
+    
     <View style={styles.container}>
       <View style={styles.containerImage}>
         <Image source={statusImg} style={styles.statusTopicImage} />
@@ -107,6 +118,18 @@ export default function ReqStatusGMside(props) {
       </View>
       <Text style={styles.statusText}>Payments</Text>
       <Text style={styles.statusText}>{payment}</Text>
+
+      <View style={styles.doneBtnContainer}>
+        <TouchableOpacity
+          style={[styles.addButton, { opacity: payStatus === "Paid" ? 1 : 0.5 }]}
+          onPress={payStatus === "Paid" ? updateRequestStatus : null}
+          disabled={payStatus !== "Paid"}
+        >
+          <Text style={styles.buttonText}>Close Job</Text>
+        </TouchableOpacity>
+      </View>
+
+    
     </View>
   );
 }
@@ -115,6 +138,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     backgroundColor: "white",
+    
   },
   statusContainer: {
     flexDirection: "row",
@@ -155,4 +179,22 @@ const styles = StyleSheet.create({
   allStatusContainer: {
     marginTop: 150, // Center horizontally
   },
+  addButton: {
+    backgroundColor: '#EDAE10',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    marginRight: 8,
+    
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  doneBtnContainer:{
+    marginTop:50,
+    padding:10,
+    marginBottom:50
+  }
 });

@@ -78,9 +78,9 @@ const Ongoings = () => {
           <View key={card.id} style={styles.card}>
             <View style={styles.cardContent}>
               <View style={{ flexDirection: "column" }}>
-                 <Text style={styles.cardText}>{card.reqID}</Text>
-                <Text style={styles.cardText}>{card.username}</Text>
-                <Text style={{}}>Phone: {card.contact}</Text>
+                 <Text style={styles.cardText}>ID: {card.reqID}</Text>
+                <Text style={styles.cardText}>Name: {card.username}</Text>
+                <Text style={styles.cardText}>Phone: {card.contact}</Text>
               </View>
 
               <View style={{ flexDirection: "column" }}>
@@ -112,26 +112,21 @@ const Ongoings = () => {
 export default Ongoings;
 
 const styles = StyleSheet.create({
-    text: {
-        fontSize: 30,
-        fontWeight: "bold",
-        marginTop: 40,
-        marginLeft: 13,
-      },
-      text2: {
-        fontSize: 15,
-        marginLeft: 13,
-      },
-  separator: {
-    borderBottomWidth: 1,
-    borderBottomColor: "lightgray",
-    marginVertical: 10,
+  text: {
+    fontSize: 30,
+    fontWeight: "bold",
+    marginTop: 40,
+    marginLeft: 13,
+  },
+  text2: {
+    fontSize: 15,
+    marginLeft: 13,
   },
   container: {
     width: "100%",
     height: "100%",
     marginTop: -30,
-    marginBottom:20
+    marginBottom: 20,
   },
   card: {
     height: 160,
@@ -141,18 +136,26 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "space-between",
     padding: 10,
-    borderWidth: 1,
-    borderColor: "#FFAC1C",
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3, // for Android shadow
   },
   cardText: {
     fontSize: 18,
+    fontWeight:"bold",
   },
   button: {
-    borderWidth: 1,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
     backgroundColor: "gray",
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3, // for Android shadow
   },
   buttonText: {
     fontSize: 18,
@@ -160,11 +163,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
   },
-  cardImage: {
-    width: 100,
-    height: 40,
-  },
-
   cardContent: {
     flexDirection: "row",
     alignItems: "center",
