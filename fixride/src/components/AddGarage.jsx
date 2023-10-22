@@ -5,14 +5,16 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 
 import {Picker} from '@react-native-picker/picker';
 import { db } from '../config/firebase';
 import { useRouter } from 'expo-router';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
+
 function AddGarage() {
 
   const router = useRouter();
 
   const [about, setAbout] = useState('');
   const [address, setAddress] = useState('');
-  const [closedTime, setClosedTime] = useState('');
-  const [openTime, setOpenTime] = useState('');
+
   const [contact, setContact] = useState('');
   const [name, setName] = useState('');
   const [latitude, setLatitude] = useState('');
@@ -21,6 +23,41 @@ function AddGarage() {
   const [services,setServices] = useState('');
   const [rating, setRating] = useState('3.5');
   const [imageUrl, setImageUrl] = useState('No image');
+
+  const [showOpenTimePicker, setShowOpenTimePicker] = useState(false);
+  const [showCloseTimePicker, setShowCloseTimePicker] = useState(false);
+
+  
+  const [openTime, setOpenTime] = useState(new Date()); // Initialize with the current date and time
+ const [closedTime, setClosedTime] = useState(new Date()); // Initialize with the current date and time
+
+  const showOpenTimePickerModal = () => setShowOpenTimePicker(true);
+  const showCloseTimePickerModal = () => setShowCloseTimePicker(true);
+  
+
+    // Functions to handle the time picker changes
+    // const handleOpenTimeChange = (event, selectedTime) => {
+    //   setShowOpenTimePicker(false);
+    //   if (selectedTime) {
+    //     setOpenTime(selectedTime);
+    //   }
+    // };
+
+    const handleOpenTimeChange = (event, selectedDate) => {
+      setShowOpenTimePicker(false);
+      if (selectedDate) {
+        setOpenTime(selectedDate);
+      }
+    };
+    
+  
+    const handleCloseTimeChange = (event, selectedDate) => {
+      setShowCloseTimePicker(false);
+      if (selectedDate) {
+        setClosedTime(selectedDate);
+      }
+    };
+    
 
 
   const gatageCollection = collection(db, 'garage');
@@ -58,6 +95,9 @@ function AddGarage() {
 
 
   const handleRegister = async () => {
+
+    const openTimeFormatted = `${openTime.getHours()}:${openTime.getMinutes()}`;
+    const closeTimeFormatted = `${closedTime.getHours()}:${closedTime.getMinutes()}`;
 
 
     const generateGarageId = () => {
@@ -111,8 +151,8 @@ function AddGarage() {
       about,
       address,
       category: selectedCategory,
-      closedTime,
-      openTime,
+      closedTime: closeTimeFormatted,
+      openTime: openTimeFormatted,
       contact,
       name,
       latitude,
@@ -120,7 +160,8 @@ function AddGarage() {
       services,
       rating,
       garageId,
-      imageUrl,
+      imageUrl, 
+  
 
     };
   
@@ -222,30 +263,39 @@ function AddGarage() {
         </View>
        
 
-      <Text style={styles.label}>Open Time:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setOpenTime(text)}
-        value={openTime}
-        placeholder='Enter your garage opening time'
-        
-      /> 
+<       Text style={styles.label}>Open Time:</Text>
+        <TouchableOpacity style={styles.input} onPress={showOpenTimePickerModal}>
+        {openTime && <Text>{openTime.toLocaleTimeString()}</Text>}
+        </TouchableOpacity>
 
-      <Text style={styles.label}>Close Time:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setClosedTime(text)}
-        value={closedTime}
-        placeholder='Enter your garage closing time' 
-      /> 
+        {showOpenTimePicker && (
+          <DateTimePicker
+            testID="openTimePicker"
+            value={openTime}
+            mode="time"
+            is24Hour={true}
+            display="default"
+            onChange={handleOpenTimeChange}
+          />
+        )}
 
-      {/* <Text style={styles.label}>Services:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setServices(text)}
-        value={services}
-        placeholder='Enter your services'
-      />  */}
+        <Text style={styles.label}>Close Time:</Text>
+        <TouchableOpacity style={styles.input} onPress={showCloseTimePickerModal}>
+        {closedTime && <Text>{closedTime.toLocaleTimeString()}</Text>}
+        </TouchableOpacity>
+
+        {showCloseTimePicker && (
+          <DateTimePicker
+            testID="closeTimePicker"
+            value={closedTime instanceof Date ? closedTime : new Date()} 
+            mode="time"
+            is24Hour={true}
+            display="default"
+            onChange={handleCloseTimeChange}
+          />
+        )}
+
+
 
       <View style={styles.buttonContainer}>
       <TouchableOpacity style={styles.addButton} onPress={() => {
@@ -275,6 +325,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 16,
     textAlign: 'center',
+    fontWeight:"bold"
   },
   input: {
     borderWidth: 1,
