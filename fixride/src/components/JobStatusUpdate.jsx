@@ -1,35 +1,44 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { db } from '../../src/config/firebase';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import ontheway from '../../assets/ontheway.gif';
+import Reached from '../../assets/Reached.gif';
+import done from '../../assets/done.gif';
 
 const JobStatusUpdate = () => {
   const [status, setStatus] = useState('On the way');
-  const mainStatus = 'Ongoing'; // Assuming this is the main status
-  const userName = 'Asanka Idunil'; // Replace 'YourUserName' with the current user's name
+  const [gifSource, setGifSource] = useState({
+    'On the way': ontheway,
+    'Reached': Reached,
+    'Fixed': done
+  });
+
+  const mainStatus = 'Ongoing';
+  const userName = 'Mahinda Rajapaksa';
 
   const handleActivate = async (newStatus) => {
-    if (mainStatus === 'Ongoing' && userName === 'Asanka Idunil') {
+    if (mainStatus === 'Ongoing' && userName === 'Mahinda Rajapaksa') {
       setStatus(newStatus);
       const requestCollection = collection(db, 'request');
       const q = query(requestCollection, where('macName', '==', userName));
       const querySnapshot = await getDocs(q);
-  
+
       querySnapshot.forEach((doc) => {
         const docRef = doc.ref; // Use doc.ref instead of doc function
         if (newStatus === 'On the way') {
           updateDoc(docRef, { startStatus: 'Started' });
+          setGifSource(ontheway);
         } else if (newStatus === 'Reached') {
           updateDoc(docRef, { reachStatus: 'Reached' });
+          setGifSource(Reached);
         } else if (newStatus === 'Fixed') {
           updateDoc(docRef, { fixedStatus: 'Fixed' });
+          setGifSource(done);
         }
       });
     }
   };
-  
-
-
 
   return (
     <View style={styles.container}>
@@ -50,10 +59,7 @@ const JobStatusUpdate = () => {
           <Text style={styles.text}>Fixed</Text>
         </View>
       </View>
-      <Image
-        source={{ uri: 'https://example.com/your-image.png' }}
-        style={styles.image}
-      />
+      <Image source={gifSource[status]} style={styles.image} />
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
