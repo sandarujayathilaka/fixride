@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   logocardImage: {
     width: "100%",
-    height: 250,
+    height: 200,
     resizeMode: "cover",
     borderRadius: 0,
   },

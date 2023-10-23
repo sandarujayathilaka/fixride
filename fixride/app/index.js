@@ -1,49 +1,51 @@
-import { Text,SafeAreaView, ScrollView, View } from "react-native";
-import { useRouter } from "expo-router";
-import CateCard from "../src/components/CateCard";
-import Test from "../src/components/text";
-import RequestDetails from "../src/components/RequestDetails";
-import ChooseLocation from "../src/components/History/ChooseLocation";
-import Home from "../src/components/History/Home";
-import TrackLive from "../src/components/History/TrackLive";
-import MyActivity from "../src/components/History/MyActivity";
+import React, { useState, useEffect } from "react";
+import { SafeAreaView } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React, { useState, useEffect, Suspense } from "react";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { firebase } from "../src/config/firebase";
+import CateCard from "../src/components/CateCard";
 import Login from "../src/components/History/Login";
 import Registration from "../src/components/History/Registration";
-import Dashboard from "../src/components/History/Dashboard";
 import DisplayContent from "../app/cat_list/[id]";
-
 import Status from "../app/status/[id]";
-
 import MecRequestDetails from "../app/payment/[id]";
-
 import MecRequestDetail from "../app/req_details/[id]";
-
 import GarageInfo from "../app/garage_info/[id]";
-
 import Form from "../app/form/[id]";
 
-
+const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-function App() {
-  const [initializing, setInitalizing] = useState(true);
+// function HomeScreen() {
+//   return (
+//     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+//       <CateCard />
+//     </SafeAreaView>
+//   );
+// }
 
+// function SettingsScreen() {
+//   return (
+//     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+//       {/* Your settings screen content */}
+//     </SafeAreaView>
+//   );
+// }
+
+function App() {
+  const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
   function onAuthStateChanged(user) {
     setUser(user);
 
-    if (initializing) setInitalizing(false);
+    if (initializing) setInitializing(false);
   }
 
   useEffect(() => {
     const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-
     return subscriber;
   }, []);
 
@@ -52,8 +54,8 @@ function App() {
   return (
     <NavigationContainer>
       {user ? (
-        <Stack.Navigator initialRouteName="CateCard">
-          <Stack.Screen name="CateCard" component={CateCard} />
+        <Stack.Navigator initialRouteName="HomeTabs">
+          <Stack.Screen name="FIXRIDE" component={HomeTabs} />
 
           <Stack.Screen
             name="CatList"
@@ -74,7 +76,7 @@ function App() {
             name="Payment"
             component={MecRequestDetails}
             options={({ route }) => ({
-              title: `Payment ${route.params.Requestid,route.params.Payment}`,
+              title: `Payment ${route.params.Requestid}`,
             })}
           />
 
@@ -82,25 +84,15 @@ function App() {
             name="Req_details"
             component={MecRequestDetail}
             options={({ route }) => ({
-              title: `Req_details ${
-                (route.params.Requestid,
-                route.params.Date,
-                route.params.Username)
-              }`,
+              title: `Req_details ${route.params.Requestid}`,
             })}
           />
-
-        
 
           <Stack.Screen
             name="Garage_info"
             component={GarageInfo}
             options={({ route }) => ({
-              title: `Garage_info ${
-                (route.params.iid,
-                route.params.userlatitude,
-                route.params.userlongitude)
-              }`,
+              title: `Garage_info ${route.params.iid}`,
             })}
           />
 
@@ -108,18 +100,20 @@ function App() {
             name="Form"
             component={Form}
             options={({ route }) => ({
-              title: `Form ${
-                (route.params.garageid,
-                route.params.userlatitude,
-                route.params.userlongitude)
-              }`,
+              title: `Form ${route.params.garageid}`,
             })}
+          />
+
+          {/* Wrap your Tab.Navigator in a Screen component */}
+          <Stack.Screen
+            name="HomeTabs"
+            component={HomeTabs}
+            options={{ headerShown: false }}
           />
         </Stack.Navigator>
       ) : (
         <Stack.Navigator>
           <Stack.Screen name="Login" component={Login} />
-
           <Stack.Screen name="Registration" component={Registration} />
         </Stack.Navigator>
       )}
@@ -127,5 +121,30 @@ function App() {
   );
 }
 
-export default App
+// Define the Tab Navigator separately
+function HomeTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
 
+          if (route.name === "Home") {
+            iconName = "home"; // Use the home icon here
+          } else if (route.name === "Tasks") {
+            iconName = "clipboard"; // Use the clipboard icon here
+          }
+
+          // Return the FontAwesome5 icon
+          return <FontAwesome5 name={iconName} size={size} color={color} />;
+        },
+        headerShown:false
+      })}
+    >
+      <Tab.Screen name="Home" component={CateCard} />
+      <Tab.Screen name="Tasks" component={CateCard} />
+    </Tab.Navigator>
+  );
+}
+
+export default App;
