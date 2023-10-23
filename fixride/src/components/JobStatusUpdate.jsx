@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native';
 import { db } from '../../src/config/firebase';
 import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import ontheway from '../../assets/ontheway.gif';
 import Reached from '../../assets/Reached.gif';
 import done from '../../assets/done.gif';
+import { router } from "expo-router";
 
 const JobStatusUpdate = () => {
+
+  const handleConfirmPress = () => {
+    // Navigate to the Job component when the "Assigned Job" button is pressed
+    router.push(`/ConfirmReport/Reportn/`);
+
+  };
+
   const [status, setStatus] = useState('On the way');
   const [gifSource, setGifSource] = useState({
     'On the way': ontheway,
@@ -25,7 +33,7 @@ const JobStatusUpdate = () => {
       const querySnapshot = await getDocs(q);
 
       querySnapshot.forEach((doc) => {
-        const docRef = doc.ref; // Use doc.ref instead of doc function
+        const docRef = doc.ref; 
         if (newStatus === 'On the way') {
           updateDoc(docRef, { startStatus: 'Started' });
           setGifSource(ontheway);
@@ -41,54 +49,68 @@ const JobStatusUpdate = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.topic}>Update Job Status</Text>
-      <View style={styles.chainContainer}>
-        <View style={styles.point}>
-          <Text style={styles.text}>{status === 'On the way' ? '✔' : ''}</Text>
-          <Text style={styles.text}>On the way</Text>
+    <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <View style={styles.container}>
+        <Text style={styles.topic}>Update Job Status</Text>
+        <View style={styles.chainContainer}>
+          <View style={styles.point}>
+            <Text style={styles.text}>{status === 'On the way' ? '✔' : ''}</Text>
+            <Text style={styles.text}>On the way</Text>
+          </View>
+          <View style={styles.chain} />
+          <View style={styles.point}>
+            <Text style={styles.text}>{status === 'Reached' ? '✔' : ''}</Text>
+            <Text style={styles.text}>Reached</Text>
+          </View>
+          <View style={styles.chain} />
+          <View style={styles.point}>
+            <Text style={styles.text}>{status === 'Fixed' ? '✔' : ''}</Text>
+            <Text style={styles.text}>Fixed</Text>
+          </View>
         </View>
-        <View style={styles.chain} />
-        <View style={styles.point}>
-          <Text style={styles.text}>{status === 'Reached' ? '✔' : ''}</Text>
-          <Text style={styles.text}>Reached</Text>
+        <Image source={gifSource[status]} style={styles.image} />
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleActivate('On the way')}
+            disabled={status === 'Started'}
+          >
+            <Text style={styles.buttonText}>Activate On the way</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleActivate('Reached')}
+            disabled={status === 'Reached'}
+          >
+            <Text style={styles.buttonText}>Activate Reached</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleActivate('Fixed')}
+            disabled={status === 'Fixed'}
+          >
+            <Text style={styles.buttonText}>Activate Fixed</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.chain} />
-        <View style={styles.point}>
-          <Text style={styles.text}>{status === 'Fixed' ? '✔' : ''}</Text>
-          <Text style={styles.text}>Fixed</Text>
-        </View>
+        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmPress}>
+          <Text style={styles.confirmButtonText}>Confirm Completion</Text>
+        </TouchableOpacity>
       </View>
-      <Image source={gifSource[status]} style={styles.image} />
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleActivate('On the way')}
-        >
-          <Text style={styles.buttonText}>Activate On the way</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleActivate('Reached')}
-        >
-          <Text style={styles.buttonText}>Activate Reached</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleActivate('Fixed')}
-        >
-          <Text style={styles.buttonText}>Activate Fixed</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 20,
   },
   topic: {
     fontSize: 20,
@@ -113,20 +135,36 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   image: {
-    width: 200,
-    height: 200,
+    width: 400,
+    height: 300,
     marginVertical: 20,
   },
   buttonContainer: {
     marginTop: 20,
   },
   button: {
-    backgroundColor: 'lightblue',
+    backgroundColor: '#ffffe6',
     padding: 10,
     margin: 5,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: '#EDAE10',
+    width: 250,
   },
   buttonText: {
     color: 'black',
+    textAlign: 'center',
+  },
+  confirmButton: {
+    backgroundColor: '#EDAE10',
+    padding: 15,
+    width: 350,
+    marginVertical: 20,
+    borderRadius: 10,
+
+  },
+  confirmButtonText: {
+    color: 'white',
     textAlign: 'center',
   },
 });

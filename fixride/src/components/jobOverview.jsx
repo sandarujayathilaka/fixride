@@ -3,8 +3,16 @@ import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import img from '../../assets/job.png';
 import { db } from '../../src/config/firebase'; 
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { router } from "expo-router";
 
 const JobOverview = ({ vehicleImage }) => {
+
+
+  const handleUpdateStatusPress = () => {
+    // Navigate to the Job component when the "Assigned Job" button is pressed
+    router.push(`/UpdateStatus/JobStatusUpdaten/`);
+
+  };
   const [data, setData] = useState({});
 
   useEffect(() => {
@@ -14,7 +22,7 @@ const JobOverview = ({ vehicleImage }) => {
         const q = query(
           requestCollection,
           where("mainstatus", "==", "Ongoing"), 
-          where("macName", "==", "Asanka Idunil") 
+          where("macName", "==", "Mahinda Rajapaksa") 
         );
         const querySnapshot = await getDocs(q);
 
@@ -80,7 +88,7 @@ const JobOverview = ({ vehicleImage }) => {
         </View>
         <View style={styles.buttonContainer}>
           <Text style={styles.startRideButton}>Start Ride</Text>
-          <Text style={styles.updateStatusButton}>Update Status</Text>
+          <Text style={styles.updateStatusButton} onPress={handleUpdateStatusPress}>Update Status</Text>
         </View>
       </View>
     </ScrollView>

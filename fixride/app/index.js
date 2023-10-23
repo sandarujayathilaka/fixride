@@ -7,6 +7,7 @@ import Test from "../src/components/text";
 import Job from "../src/components/job";
 import JobOverview from "../src/components/jobOverview";
 import JobStatusUpdate from "../src/components/JobStatusUpdate";
+import Report from "../src/components/report";
 
 function index() {
 
@@ -28,7 +29,7 @@ function index() {
             padding:5,
           }}
         >
-            <JobStatusUpdate/>
+            <Report/>
           
 
 

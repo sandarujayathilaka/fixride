@@ -3,12 +3,18 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'rea
 import img from '../../assets/job.png';
 import { db } from '../../src/config/firebase'; 
 import { collection, getDocs, query, where } from 'firebase/firestore';
-
+import { router } from "expo-router";
 
 
 
 
 const Job = ({ vehicleImage }) => {
+
+  const handleViewMorePress = () => {
+    // Navigate to the Job component when the "Assigned Job" button is pressed
+    router.push(`/View/JobOverviewn/`);
+
+  };
 
   const [data, setData] = useState({});
 
@@ -21,7 +27,7 @@ const Job = ({ vehicleImage }) => {
         const q = query(
           requestCollection,
           where("mainstatus", "==", "Ongoing"), 
-          where("macName", "==", "Asanka Idunil") 
+          where("macName", "==", "Mahinda Rajapaksa") 
         );
 console.log(q)
         
@@ -56,7 +62,7 @@ console.log(q)
             <Text style={styles.text}>Location: </Text>
             <Image source={{ uri: vehicleImage }} style={styles.vehicleImage} />
             <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>View More</Text>
+              <Text style={styles.buttonText} onPress={handleViewMorePress}>View More</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.goButton}>
