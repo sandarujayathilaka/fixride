@@ -11,11 +11,11 @@ import { router, useGlobalSearchParams } from "expo-router";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 import * as Location from "expo-location";
-import { useRoute } from "@react-navigation/native";
-import { useNavigation } from "@react-navigation/native";
+import { useRoute,useNavigation } from "@react-navigation/native";
+
+
 
 const DisplayContent = () => {
-  const navigation = useNavigation();
   const [garages, setGarages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
@@ -27,11 +27,11 @@ const DisplayContent = () => {
   // const params = useGlobalSearchParams();
   // const cardId = params.id;
   const route = useRoute();
+  const navigation = useNavigation();
+
   const { cardid } = route.params;
-  console.log("cl", cardid);
   let cardId = cardid;
-  console.log("cl2", cardId);
-  
+
   imageSource = require("../../assets/Picture2.png");
 
   useEffect(() => {
@@ -74,14 +74,17 @@ const DisplayContent = () => {
     }
   }, [userLocation, cardId]);
 
-  const handleItemPress = (id) => {
-    console.log(id)
-    
+const handleItemPress = (id) => {
+  console.log(id);
 
-      navigation.navigate("Garage_info", {  iid: id,
-            userlatitude: userLocation.latitude,
-            userlongitude: userLocation.longitude, });
-  };
+  navigation.navigate("Garage_info", {
+    iid: id,
+
+    userlatitude: userLocation.latitude,
+
+    userlongitude: userLocation.longitude,
+  });
+};
 
   const getUserLocation = async () => {
     console.log("Called getUserLocation");
@@ -153,16 +156,20 @@ const DisplayContent = () => {
     // Determine if the garage is closed based on the comparison
     const isClosed = currentTimeInMinutes >= closedTimeInMinutes;
 
+     const statusStyle = {
+       color: isClosed ? "red" : "green",
+       fontWeight:400
+     };
+
     return (
       <TouchableOpacity onPress={() => handleItemPress(item.garageId)}>
         <View style={styles.card}>
           <Text style={styles.mainText}>{item.name}</Text>
-          <Text>
+          <Text style={styles.SubText}>
             {item.address} | Rate: {item.rating}
           </Text>
-          <Text>
-           Status:{" "}
-            {isClosed ? "Closed" : "Opened"}
+          <Text style={[styles.SubText, statusStyle]}>
+            Status: {isClosed ? "Closed" : "Opened"}
           </Text>
           <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
         </View>
@@ -189,7 +196,7 @@ const DisplayContent = () => {
 const styles = StyleSheet.create({
   card: {
     margin: 10,
-    height: 190,
+    height: 150,
     padding: 16,
     backgroundColor: "rgba(255, 255, 0, 0.2)", // Change the background color as needed
     borderRadius: 8,
@@ -209,15 +216,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   mainText: {
-    color: "black", // Change the text color here
+    color: "#00008B", // Change the text color here
     fontWeight: "600",
     fontSize: 30,
+  },
+  SubText: {
+    color: "black", // Change the text color here
+    fontWeight: "400",
+    fontSize: 18,
   },
   cardImage: {
     width: 80,
     height: 80, // Adjust this value to control the image height
     marginLeft: 250,
-    marginTop: -55,
+    marginTop: -75,
     borderRadius: 8,
   },
   topic: {

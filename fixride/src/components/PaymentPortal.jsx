@@ -1,7 +1,3 @@
-import {
-    doc,
-  updateDoc,
-} from "firebase/firestore";
 import React, { useState } from "react";
 import {
   View,
@@ -9,15 +5,18 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
+  Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { db } from "../../src/config/firebase";
+import { doc, updateDoc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 
 const PaymentPortal = (props) => {
-  
-  const navigation = useNavigation();
- const RequestId = props.RequestId;
+  const RequestId = props.RequestId;
+  const payment = props.payment;
+   console.log("Pay", payment);
   const [cardNumber, setCardNumber] = useState("");
   const [expiration, setExpiration] = useState("");
   const [cvv, setCVV] = useState("");
@@ -28,13 +27,8 @@ const PaymentPortal = (props) => {
   const validateCVV = (text) => /^[0-9]{3,4}$/.test(text);
 
 const handlePayment = async () => {
-  // Validate payment details and perform the payment operation
-
-  // Assuming you have the RequestId from props or some other source
-  
-
   try {
-    console.log(RequestId)
+    console.log(RequestId);
     const requestDocRef = doc(db, "request", RequestId); // Replace "request" with your Firestore collection name
 
     // Update the document with the new values
@@ -51,118 +45,174 @@ const handlePayment = async () => {
 };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Payment Portal</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.heading}>Card Payment </Text>
       <View style={styles.inputContainer}>
-        <TextInput
+        <View
           style={[
-            styles.input,
+            styles.inputWrapper,
             cardNumber && !validateCard(cardNumber) && styles.invalidInput,
           ]}
-          placeholder="Card Number"
-          value={cardNumber}
-          onChangeText={(text) => setCardNumber(text)}
-        />
-        {validateCard(cardNumber) && (
-          <Icon
-            name="check-circle"
-            size={20}
-            color="green"
-            style={styles.icon}
+        >
+          <TextInput
+            style={[
+              styles.input,
+              { width: Dimensions.get("window").width - 40 },
+            ]}
+            placeholder="Card Number"
+            value={cardNumber}
+            onChangeText={(text) => setCardNumber(text)}
           />
-        )}
+          {validateCard(cardNumber) && (
+            <Icon
+              name="check-circle"
+              size={20}
+              color="green"
+              style={styles.icon}
+            />
+          )}
+        </View>
       </View>
+
       <View style={styles.inputContainer}>
-        <TextInput
-          style={[
-            styles.input,
-            expiration &&
-              !validateExpiration(expiration) &&
-              styles.invalidInput,
-          ]}
-          placeholder="Expiration Date (MM/YY)"
-          value={expiration}
-          onChangeText={(text) => setExpiration(text)}
-        />
-        {validateExpiration(expiration) && (
-          <Icon
-            name="check-circle"
-            size={20}
-            color="green"
-            style={styles.icon}
-          />
-        )}
+        <View style={styles.halfInput}>
+          <View
+            style={[
+              styles.inputWrapper,
+              expiration &&
+                !validateExpiration(expiration) &&
+                styles.invalidInput,
+            ]}
+          >
+            <TextInput
+              style={styles.input}
+              placeholder="Ex Date (MM/YY)"
+              value={expiration}
+              onChangeText={(text) => setExpiration(text)}
+            />
+            {validateExpiration(expiration) && (
+              <Icon
+                name="check-circle"
+                size={20}
+                color="green"
+                style={styles.icon}
+              />
+            )}
+          </View>
+        </View>
+        <View style={styles.halfInput}>
+          <View
+            style={[
+              styles.inputWrapper,
+              cvv && !validateCVV(cvv) && styles.invalidInput,
+              { marginLeft: 10 }, // Add margin here
+            ]}
+          >
+            <TextInput
+              style={styles.input}
+              placeholder="CVV"
+              value={cvv}
+              onChangeText={(text) => setCVV(text)}
+            />
+            {validateCVV(cvv) && (
+              <Icon
+                name="check-circle"
+                size={20}
+                color="green"
+                style={styles.icon}
+              />
+            )}
+          </View>
+        </View>
       </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[
-            styles.input,
-            cvv && !validateCVV(cvv) && styles.invalidInput,
-          ]}
-          placeholder="CVV"
-          value={cvv}
-          onChangeText={(text) => setCVV(text)}
-        />
-        {validateCVV(cvv) && (
-          <Icon
-            name="check-circle"
-            size={20}
-            color="green"
-            style={styles.icon}
-          />
-        )}
+      <View style={styles.payment}>
+        <Text style={styles.paymentText}>Rs.{payment}.00</Text>
       </View>
-      <TextInput
-        style={styles.input}
-        placeholder="Amount"
-        value={amount}
-        onChangeText={setAmount}
-      />
+
       <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
         <Text style={styles.payButtonText}>Pay Now</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#F5F5F5",
   },
   heading: {
-    fontSize: 24,
+    fontSize: 28,
     marginBottom: 20,
+    color: "#333",
+    marginTop:10
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    width: "90%",
+  },
+  halfInput: {
+    flex: 1,
+  },
+  inputWrapper: {
+    position: "relative",
+    width: "100%",
+    marginBottom: 20,
+    paddingLeft: 15,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: "white",
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingRight: 40,
+    overflow: "hidden",
+    width: "100%",
   },
   input: {
-    width: "80%",
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    paddingLeft: 10,
+    flex: 1,
+    fontSize: 16,
+    width: "100%",
+    backgroundColor: "transparent",
+    borderColor: "transparent",
+    paddingLeft: 0,
   },
   invalidInput: {
     borderColor: "red",
   },
   icon: {
-    marginLeft: 5,
+    position: "absolute",
+    right: 10,
+    top: "50%",
+    transform: [{ translateY: -10 }],
   },
   payButton: {
     backgroundColor: "#007BFF",
-    padding: 15,
-    borderRadius: 5,
+    width: "90%",
+    height: 60,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 3,
   },
   payButtonText: {
     color: "white",
-    fontSize: 18,
-    textAlign: "center",
+    fontSize: 20,
   },
+  payment:{
+    marginTop:20,
+    marginBottom:20
+  },
+   paymentText:{
+   color:"green",
+   fontSize:40,
+   fontWeight:"500"
+  }
 });
 
 export default PaymentPortal;
