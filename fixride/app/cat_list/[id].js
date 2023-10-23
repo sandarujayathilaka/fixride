@@ -12,6 +12,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 import * as Location from "expo-location";
 import { useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 const DisplayContent = () => {
   const [garages, setGarages] = useState([]);
@@ -25,6 +26,7 @@ const DisplayContent = () => {
   // const params = useGlobalSearchParams();
   // const cardId = params.id;
   const route = useRoute();
+  const navigation = useNavigation();
 
   const { cardid } = route.params;
   let cardId = cardid;
@@ -71,17 +73,17 @@ const DisplayContent = () => {
     }
   }, [userLocation, cardId]);
 
-  const handleItemPress = (id) => {
-    console.log(id)
-      router.push({
-        pathname: `/garage_info/${id}`,
-        params: {
-          Id: id,
-          userLatitude: userLocation.latitude,
-          userLongitude: userLocation.longitude,
-        },
-      });
-  };
+const handleItemPress = (id) => {
+  console.log(id);
+
+  navigation.navigate("Garage_info", {
+    iid: id,
+
+    userlatitude: userLocation.latitude,
+
+    userlongitude: userLocation.longitude,
+  });
+};
 
   const getUserLocation = async () => {
     console.log("Called getUserLocation");

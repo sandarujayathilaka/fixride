@@ -15,6 +15,7 @@ import { router, useGlobalSearchParams } from "expo-router";
 import { collection,where, getDocs, query } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 import { Feather } from "@expo/vector-icons";// Add this line
+import { useRoute,useNavigation } from "@react-navigation/native";
 
 const GarageInfo = () => {
   const [garageData, setGarageData] = useState(null);
@@ -24,11 +25,39 @@ const GarageInfo = () => {
   const [garageClosingTime, setGarageClosingTime] = useState("");
 
 
-  const params = useGlobalSearchParams();
-  const Id = params.id;
-  const userLatitude = params.userLatitude
-  const userLongitude =params.userLongitude
-  console.log("called",Id)
+   const route = useRoute();
+   const navigation = useNavigation();
+
+   const { iid } = route.params;
+
+   console.log("1", iid);
+
+   let Id = iid;
+
+   console.log("2", Id);
+
+   // const userLatitude = params.userLatitude
+
+   // const userLongitude =params.userLongitude
+
+   const { userlatitude } = route.params;
+
+   console.log("1", userlatitude);
+
+   let userLatitude = userlatitude;
+
+   console.log("2", userLatitude);
+
+   console.log("called", Id);
+
+   const { userlongitude } = route.params;
+
+   console.log("1", userlongitude);
+
+   let userLongitude = userlongitude;
+
+   console.log("2", userLongitude);
+
   const imageSource = require("../../assets/logo.webp");
 
   const [loading, setLoading] = useState(true);
@@ -92,21 +121,21 @@ console.log(garageCollectionRef);
  }, [Id]);
 
 
- const handleRequestMechanic = (id) => {
-   if (isGarageClosed) {
-     // Show the modal if the garage is closed
-     toggleModal();
-   } else {
-     router.push({
-       pathname: `/form/${id}`,
-       params: {
-         Id: id,
-         userLatitude: userLatitude,
-         userLongitude: userLongitude,
-       },
-     });
-   }
- };
+const handleRequestMechanic = (id) => {
+  if (isGarageClosed) {
+    // Show the modal if the garage is closed
+
+    toggleModal();
+  } else {
+    navigation.navigate("Form", {
+      garageid: id,
+
+      userlatitude: userLatitude,
+
+      userlongitude: userLongitude,
+    });
+  }
+};
 
   const handleContactUs = () => {
     if (garageData && garageData.contact) {

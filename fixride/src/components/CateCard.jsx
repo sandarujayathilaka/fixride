@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+ 
+
 const homeLogo = require("../../assets/homelogo.jpg");
 const cardData = [
   // {
@@ -46,7 +48,11 @@ const cardData = [
   },
 ];
 
-const CateCard = ({ id }) => {
+function CateCard() {
+  const [userData, setUserData] = useState({});
+  const [timeGreeting, setTimeGreeting] = useState("");
+  const userEmail = "deno@gmail.com"; // Replace with the user's email
+
   const navigation = useNavigation();
 
   const handleCardClick = (id) => {
@@ -56,12 +62,6 @@ const CateCard = ({ id }) => {
 
     navigation.navigate("CatList", { cardid: id });
   };
-}
-
-function CateCard() {
-  const [userData, setUserData] = useState({});
-  const [timeGreeting, setTimeGreeting] = useState("");
-  const userEmail = "deno@gmail.com"; // Replace with the user's email
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,21 +108,7 @@ function CateCard() {
     const greeting = getTimeBasedGreeting();
     setTimeGreeting(greeting);
   }, []);
-const CateCard = ({ id }) => {
-  const navigation = useNavigation();
 
-  const handleCardClick = (id) => {
-    // Handle card click here, e.g., navigate to a new screen or perform an action.
-    router.push(`/cat_list/${id}`, { cardId: id });
-    console.log(`Clicked on card with ID ${id}`);
-  };
-  const handleCardClick = (id) => {
-    console.log("card", id);
-
-    // Navigate to the "cat_list/[id]" screen with the cardId as a parameter
-
-    navigation.navigate("CatList", { cardid: id });
-  };
 
   return (
     <ScrollView style={styles.container}>
@@ -145,7 +131,7 @@ const CateCard = ({ id }) => {
       </View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

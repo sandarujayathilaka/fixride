@@ -16,10 +16,11 @@ import React, { useEffect, useState } from 'react'
 import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
 import { db,doc } from "../config/firebase";
 import { ActivityIndicator } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
 
 export default function RequestDetails(props) {
-
+const navigation = useNavigation();
   const date = props.date;
   const user = props.username
 
@@ -116,45 +117,32 @@ export default function RequestDetails(props) {
  }, [messages, currentMessageIndex]);
 
 const handleOKPress = async () => {
-  
-  // Close the modal
+
   setModalVisible(false);
 
-  // Redirect to the home page (you should replace '/home' with your actual home page route)
-  router.push(`/cat_list/All`, { cardId: 'All' });
+  navigation.navigate("CatList", { cardid: 'All' });
 
-  // Update the request status to "Busy" in Firestore
-  
 };
+   const handleTrackStatus = () => {
+     if (RequestId) {
+       navigation.navigate("Status", { Requestid: RequestId });
+     } else {
+       console.error("Invalid or missing RequestId");
+     }
+   };
 
-  const handleTrackStatus = () => {
-    if (RequestId) {
-      router.push({
-        pathname: `/status/${RequestId}`,
-        params: {
-          Id: RequestId,
-        },
-      });
-    } else {
-      console.error("Invalid or missing RequestId");
-    }
-  };
+   const handlePayment = () => {
+     if (RequestId) {
+       console.log("hhhhh", RequestId);
 
-  
-  const handlePayment = () => {
-    if (RequestId) {
-      console.log("hhhhh",RequestId)
-      router.push({
-        pathname: `/payment/${RequestId}`,
-        params: {
-          Id: RequestId,
-          payment:payment.toString()
-        },
-      });
-    } else {
-      console.error("Invalid or missing RequestId");
-    }
-  };
+       navigation.navigate("Payment", {
+         Requestid: RequestId,
+         Payment: payment.toString(),
+       });
+     } else {
+       console.error("Invalid or missing RequestId");
+     }
+   };
 
   const handleRefresh = () => {
     setRefreshing(true);

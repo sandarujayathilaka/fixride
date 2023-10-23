@@ -18,7 +18,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library"; 
 import { Feather } from "@expo/vector-icons";// Add this line
 import axios from "axios";
-
+import { useNavigation } from "@react-navigation/native";
 
 
 const RequestForm = (props) => {
@@ -34,6 +34,7 @@ const RequestForm = (props) => {
   const [reqDate, setDateTime] = useState("");
   const [currentUser, setUser] = useState("");
    const [location, setLocation] = useState("");
+   const navigation = useNavigation();
 useEffect(() => {
   // Get the current date and time when the component mounts
   const currentDate = new Date();
@@ -202,21 +203,25 @@ useEffect(() => {
       }
     }
   };
-
   const handleItemPress = (id) => {
-    router.push({
-      pathname: `/req_details/${id}`,
-      params: {
-        Id:id,
-        date: reqDate,
-        Num: veheNum,
-        vehemodel: model,
-        paymentmethod: payment,
-        vehematter: matter,
-        power: selectedItem,
-        user: currentUser,
-      },
-    }); //when need to pass multiple value with link use this method
+    navigation.navigate("Req_details", {
+      Requestid: id,
+
+      Date: reqDate,
+
+      Num: veheNum,
+
+      vehemodel: model,
+
+      paymentmethod: payment,
+
+      vehematter: matter,
+
+      power: selectedItem,
+
+      Username: currentUser,
+    });
+
     console.log(`Clicked with form ${id}`);
   };
 
