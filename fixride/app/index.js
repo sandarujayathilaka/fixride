@@ -29,7 +29,7 @@ function index() {
             padding:5,
           }}
         >
-            <Report/>
+            <JobStatusUpdate/>
           
 
 

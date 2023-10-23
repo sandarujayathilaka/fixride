@@ -5,6 +5,7 @@ import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore
 import ontheway from '../../assets/ontheway.gif';
 import Reached from '../../assets/Reached.gif';
 import done from '../../assets/done.gif';
+import Paid from '../../assets/Paid.gif';
 import { router } from "expo-router";
 
 const JobStatusUpdate = () => {
@@ -19,14 +20,15 @@ const JobStatusUpdate = () => {
   const [gifSource, setGifSource] = useState({
     'On the way': ontheway,
     'Reached': Reached,
-    'Fixed': done
+    'Fixed': done,
+    'Paid' : Paid
   });
 
   const mainStatus = 'Ongoing';
-  const userName = 'Mahinda Rajapaksa';
+  const userName = 'Navidu';
 
   const handleActivate = async (newStatus) => {
-    if (mainStatus === 'Ongoing' && userName === 'Mahinda Rajapaksa') {
+    if (mainStatus === 'Ongoing' && userName === 'Navidu') {
       setStatus(newStatus);
       const requestCollection = collection(db, 'request');
       const q = query(requestCollection, where('macName', '==', userName));
@@ -43,6 +45,9 @@ const JobStatusUpdate = () => {
         } else if (newStatus === 'Fixed') {
           updateDoc(docRef, { fixedStatus: 'Fixed' });
           setGifSource(done);
+        } else if (newStatus === 'Paid') {
+          updateDoc(docRef, { payStatus: 'Paid' });
+          setGifSource(Paid);
         }
       });
     }
@@ -67,6 +72,11 @@ const JobStatusUpdate = () => {
             <Text style={styles.text}>{status === 'Fixed' ? '✔' : ''}</Text>
             <Text style={styles.text}>Fixed</Text>
           </View>
+          <View style={styles.chain} />
+          <View style={styles.point}>
+            <Text style={styles.text}>{status === 'Paid' ? '✔' : ''}</Text>
+            <Text style={styles.text}>Paid</Text>
+          </View>
         </View>
         <Image source={gifSource[status]} style={styles.image} />
         <View style={styles.buttonContainer}>
@@ -90,6 +100,13 @@ const JobStatusUpdate = () => {
             disabled={status === 'Fixed'}
           >
             <Text style={styles.buttonText}>Activate Fixed</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handleActivate('Paid')}
+            disabled={status === 'Paid'}
+          >
+            <Text style={styles.buttonText}>Activate Paid</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmPress}>
@@ -136,7 +153,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 400,
-    height: 300,
+    height: 250,
     marginVertical: 20,
   },
   buttonContainer: {
