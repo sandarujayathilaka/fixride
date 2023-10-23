@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as Location from 'expo-location';
 import { collection, addDoc } from 'firebase/firestore';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView ,Alert} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import { db } from '../config/firebase';
 import { useRouter } from 'expo-router';
@@ -58,6 +58,9 @@ function AddGarage() {
       }
     };
     
+    const handleNavigate = () => {
+      router.push(`/garageMngr-dash/grgMngrDash`);
+    };
 
 
   const gatageCollection = collection(db, 'garage');
@@ -183,7 +186,15 @@ function AddGarage() {
       setLongitude('');
       setServices('');
 
-      handleNavigate();
+      Alert.alert('Success', 'Your garage has been registered!', [
+        {
+          text: 'OK',
+          onPress: () => {
+            // Navigate to the desired screen
+            handleNavigate();
+          },
+        },
+      ]);
 
     } catch (error) {
       console.error('Error adding document: ', error);
@@ -191,9 +202,7 @@ function AddGarage() {
   };
   
 
-  const handleNavigate = () => {
-    router.push(`/garageMngr-dash/grgMngrDash`);
-  };
+
 
 
   return (
