@@ -1,10 +1,10 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import RequestDetails from '../../src/components/RequestDetails'
+import OngoingDetails from '../../src/components/History/OngoingDetails'
 import { router, useGlobalSearchParams } from "expo-router";
 import { useRoute } from "@react-navigation/native";
 
-const MecRequestDetail = () => {
+const OngoingRequestDetail = () => {
 
 //  const param = useGlobalSearchParams();
 
@@ -30,9 +30,9 @@ let RequestId = Requestid;
 console.log("2", RequestId);
   return (
     <View>
-      <RequestDetails date={date} RequestId={RequestId} username={username} />
+      <OngoingDetails date={date} RequestId={RequestId} username={username} />
     </View>
   );
 }
 
-export default MecRequestDetail
+export default OngoingRequestDetail

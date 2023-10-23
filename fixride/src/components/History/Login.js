@@ -79,7 +79,6 @@ style={styles.button}
     </Text>
 <TouchableOpacity 
 onPress={()=> navigation.navigate('Registration')}
-
 >
 <Text style={{fontWeight:'bold', fontSize:16, color:'orange',textAlign:'center'}}>
      Register Now

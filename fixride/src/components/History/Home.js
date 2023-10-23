@@ -8,6 +8,7 @@ import Loader from './Loader';
 import { locationPermission, getCurrentLocation } from '../../helper/helperFunction';
 import { addDoc, collection, updateDoc, doc, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase";
+import { useNavigation } from "@react-navigation/native";
 
 
 const screen = Dimensions.get('window');
@@ -175,7 +176,7 @@ const Home = ({ navigation }) => {
       };
 
     const onPressLocation = () => {
-        navigation.navigate('chooseLocation', { getCordinates: fetchValue })
+        navigation.navigate('ChooseLocation', { getCordinates: fetchValue })
     }
     const fetchValue = (data) => {
         console.log("this is data", data)

@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react'
 import { firebase } from '../../config/firebase';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native'
+import { ScrollView } from 'react-native-gesture-handler';
 
 const validatePassword = (password) => {
   const digitRegex = /[0-9]/;
@@ -26,6 +27,7 @@ const Registration = () => {
     const [firstname,setFirstName] = useState('');
     const [gender,setGender] = useState('');
     const [phone,setPhone] = useState('');
+    const [userType, setUserType] = useState('User');
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [conpasswordVisible, setConPasswordVisible] = useState(false);
     const [error, setError] = useState('');
@@ -39,7 +41,7 @@ const Registration = () => {
       }
     }, [firstname]);
 
-    registerUser = async(email,password,firstname,gender,phone)=>{
+    registerUser = async(email,password,firstname,gender,phone,userType)=>{
       if(firstname.trim() === ""){
         alert("Username is required");
       }else if(firstname.length <= 3){
@@ -70,6 +72,7 @@ const Registration = () => {
             gender,
             email,
             phone,
+            userType,
           })
         })
         .catch((error) => {
@@ -126,6 +129,7 @@ const Registration = () => {
       }
     };
     return(
+      <ScrollView>
       <View style={styles.container}>
         <Text style={{fontWeight:'bold',fontSize:23}}>
           Sign Up
@@ -213,11 +217,20 @@ const Registration = () => {
 </View>
 
 {conerror ? <Text style={styles.errorText}>{conerror}</Text> : null}
-
+<View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={userType}
+            onValueChange={(itemValue, itemIndex) => setUserType(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="User" value="User" />
+            <Picker.Item label="Garage Owner" value="Garage Owner" />
+          </Picker>
+        </View>
 
         </View>
         <TouchableOpacity 
-onPress={()=>  registerUser(email,password,firstname,gender,phone)}
+onPress={()=>  registerUser(email,password,firstname,gender,phone,userType)}
 style={styles.button}
 >
 <Text style={{fontWeight:'bold', fontSize:22,color:'white'}}>Sign Up</Text>
@@ -230,11 +243,12 @@ style={styles.button}
 onPress={()=> navigation.navigate('Login')}
 
 >
-<Text style={{fontWeight:'bold', fontSize:16, color:'orange',textAlign:'center'}}>
+<Text style={{fontWeight:'bold', fontSize:16, color:'orange',textAlign:'center',marginBottom:40}}>
      Sign in
     </Text>
 </TouchableOpacity>
       </View>
+      </ScrollView>
     )
 
 }

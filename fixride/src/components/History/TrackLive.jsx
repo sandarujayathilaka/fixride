@@ -8,6 +8,8 @@ import Loader from './Loader';
 import { addDoc, collection, updateDoc, getDoc,doc, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { useRoute } from '@react-navigation/native';
+import { locationPermission, getCurrentLocation } from '../../helper/helperFunction';
+
 
 const screen = Dimensions.get('window');
 const ASPECT_RATIO = screen.width / screen.height;
@@ -20,50 +22,50 @@ const TrackLive = () => {
   const { id } = route.params;
  
  let requestId = id;
+ console.log("rid",requestId);
     const mapRef = useRef()
     const markerRef = useRef()
-    
+ 
+ 
     const [state, setState] = useState({
         curLoc: {
-            latitude: 8.7542,
-            longitude: 80.4982,
-        },
-        destinationCords: {latitude: 8.7542,
-          longitude: 80.4982,},
-        isLoading: false,
+          latitude: 8.7542,
+          longitude: 80.4982,
+      },
+        destinationCords: {
+          latitude: 8.7542,
+          longitude: 80.4981,
+      },
+        isLoading: true,
         coordinate: new AnimatedRegion({
-            latitude: 8.7542,
-            longitude: 80.4982,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA
-        }),
+          latitude: 8.7542,
+          longitude: 80.4982,
+          latitudeDelta: LATITUDE_DELTA,
+          longitudeDelta: LONGITUDE_DELTA
+      }),
         time: 0,
         distance: 0,
         heading: 0,
         isReached: false,
 
     })
-    const initialCoordinate = {
-      latitude: 8.7542,
-      longitude: 80.4982,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    };
+   
 
     const { curLoc, time, distance, destinationCords, isLoading, coordinate,heading, isReached } = state
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
-    const markerCoordinate = coordinate || initialCoordinate;
+    const markerCoordinate = coordinate;
     const [circleRadius, setCircleRadius] = useState(0);
     const [modalVisible, setModalVisible] = useState(false);
-    
+    const [errorModel, setErrorModel] = useState(false);
+  
     const checkReached = () => {
         console.log("rgfeached");
-        console.log(destinationCords.latitude1,curLoc.latitude);
-        console.log(destinationCords.longitude1,curLoc.longitude);
+        console.log(destinationCords.latitude,curLoc.latitude);
+        console.log(destinationCords.longitude,curLoc.longitude);
         if(isReached === false){
         if (
-          destinationCords.latitude1 === curLoc.latitude &&
-          destinationCords.longitude1 === curLoc.longitude
+          destinationCords.latitude === curLoc.latitude &&
+          destinationCords.longitude === curLoc.longitude
         ) {
           // Destination is reached
           console.log("reached");
@@ -133,63 +135,89 @@ const TrackLive = () => {
         }
       };
 
-    const getLocation = async () => {       
+      const errorcloseModal = () => {
+       
+        setErrorModel(false);
+      };
+      
+      const confirm = async () => {
+        closeModal(); // Close the pop-up modal
         try {
-           
+        
+        } catch (error) {
+          console.error('Failed to reach status:', error);
+        }
+      };
+
+      const getLocation = async () => {
+        try {
             const docRef = collection(db, "tracking");
             const doc = await getDocs(docRef);
-            console.log("ddd",doc);
+            console.log("ddd", doc);
             let foundDocumentRef = null;
-
+    
             doc.forEach((doc1) => {
                 const id = doc1.data().requestId;
-                console.log("id",id);
-                console.log("eid",requestId);
+                console.log("id", id);
+                console.log("eid", requestId);
                 if (id === requestId) {
-                  console.log("Document found:", id);
-                  foundDocumentRef = doc1.ref; // Store the found DocumentReference
+                    console.log("Document found:", id);
+                    foundDocumentRef = doc1.ref; // Store the found DocumentReference
                 }
-              });
-              if (foundDocumentRef) {
+            });
+    
+            if (foundDocumentRef) {
                 // Retrieve the data from the DocumentReference
                 const foundDocumentSnapshot = await getDoc(foundDocumentRef);
                 console.log(foundDocumentSnapshot);
+                
                 if (foundDocumentSnapshot.exists()) {
-                    const { mehanicLocation, userLocation } = foundDocumentSnapshot.data();
-                    const latitude = mehanicLocation.latitude;
-                    const longitude = mehanicLocation.longitude;
-                    const latitude1 = userLocation.latitude;
-                    const longitude1 = userLocation.longitude;
-
-                    animate(latitude, longitude);
-            updateState({
-                curLoc: { latitude, longitude },
-                coordinate: new AnimatedRegion({
-                    latitude: latitude,
-                    longitude: longitude,
-                    latitudeDelta: LATITUDE_DELTA,
-                    longitudeDelta: LONGITUDE_DELTA
-                }),
-                destinationCords:{latitude1,longitude1},
-                heading:heading,
-            });
-           
-        } else {
-            console.log('Document not found'); // Handle if the document does not exist
-          }
-        } else {
-          console.log('Reference not found'); // Handle if the document does not exist
+                    const { mehanicLocation, userLocation,heading } = foundDocumentSnapshot.data();
+                    console.log("cugetrrent", mehanicLocation, userLocation);
+                    if (mehanicLocation && userLocation && heading) {
+                    const curLoc = {
+                        latitude: parseFloat(mehanicLocation.latitude),
+                        longitude: parseFloat(mehanicLocation.longitude),
+                    };
+                    console.log("curLoc", curLoc);
+    
+                    const destinationCords = {
+                        latitude: parseFloat(userLocation.latitude),
+                        longitude: parseFloat(userLocation.longitude),
+                    };
+                    console.log("destinationCords", destinationCords);
+    
+                    animate(curLoc.latitude, curLoc.longitude);
+                    console.log("heading", heading);
+                    updateState({
+                        curLoc: curLoc,
+                        destinationCords: destinationCords,
+                        coordinate: new AnimatedRegion({
+                            latitude: curLoc.latitude,
+                            longitude: curLoc.longitude,
+                            latitudeDelta: LATITUDE_DELTA,
+                            longitudeDelta: LONGITUDE_DELTA
+                        }),
+                        heading: heading,
+                        isLoading: false,
+                    });
+                  }else{
+                    setErrorModel(true);
+                  }
+                } else {
+                    console.log('Document not found'); // Handle if the document does not exist
+                }
+            } else {
+                console.log('Reference not found'); // Handle if the document does not exist
+            }
+        } catch (error) {
+            console.error(error);
+            // Handle any errors that occur during fetching
         }
-    
-        console.log("latitude4");
-    
-        
-      } catch (error) {
-        console.error(error);
-        // Handle any errors that occur during fetching
-      }
     };
-
+    
+console.log("state",state);
+console.log("updateState",updateState);
     useEffect(() => {
         const interval = setInterval(() => {
             getLocation()
@@ -199,6 +227,7 @@ const TrackLive = () => {
 //
    
     const animate = (latitude, longitude) => {
+      console.log("animate",latitude,longitude);
         const newCoordinate = { latitude, longitude };
         if (Platform.OS == 'android') {
             if (markerRef.current) {
@@ -224,7 +253,9 @@ const TrackLive = () => {
             time: t
         })
     }
-
+console.log("cul",curLoc);
+console.log("del",destinationCords);
+console.log("coo",coordinate);
     return (
         <View style={styles.container}>
  {modalVisible && ( // Display the pop-up modal when destination is reached
@@ -240,6 +271,23 @@ const TrackLive = () => {
           </View>
         </Modal>
       )}
+      {errorModel && ( // Display the pop-up modal when destination is reached
+        <Modal transparent={true} visible={isReached}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>Mechanic didn't start his journey.Please stay calm.</Text>
+              <View style={styles.modalButtons}>
+                <Button title="Close" onPress={errorcloseModal} />
+                <Button title="Ok" onPress={confirm} />
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
+      {isLoading ? ( // Show loading until destinationCords is available
+        <Loader isLoading={isLoading} />
+      ) : (
+        <>
             {distance !== 0 && time !== 0 && (<View style={{ alignItems: 'center', marginVertical: 16 }}>
             <Text>
   Distance left: {distance < 1 ? `${(distance * 1000).toFixed(0)} m` : `${distance.toFixed(0)} km`}
@@ -248,8 +296,8 @@ const TrackLive = () => {
   Time left: {time < 1 ? `${(time * 60).toFixed(0)} sec` : `${time.toFixed(0)} min`}
 </Text>
 
-
             </View>)}
+           
             <View style={{ flex: 1 }}>
                 <MapView
                     ref={mapRef}
@@ -260,7 +308,6 @@ const TrackLive = () => {
                         longitudeDelta: LONGITUDE_DELTA,
                     }}
                 >
-
                     <Marker.Animated
                         ref={markerRef}
                         coordinate={markerCoordinate}
@@ -315,12 +362,13 @@ const TrackLive = () => {
                                 });
                         }}
                               onError={(errorMessage) => {
-                                console.log('GOT AN ERROR');
+                                console.log('GOT AN ERROR',errorMessage);
                               }}
                             />
                           )}
                           
-                </MapView>
+                </MapView>       
+                
                 <TouchableOpacity
                     style={{
                         position: 'absolute',
@@ -331,12 +379,15 @@ const TrackLive = () => {
                 >
                     <Image source={imagePath.greenIndicator} />
                 </TouchableOpacity>
-            </View>
+                </View>
             <View style={styles.bottomCard}>
                 <Text>Wait our mechanic is on the way</Text>
             </View>
             <Loader isLoading={isLoading} />
+            </>
+        )}
         </View>
+       
     );
 };
 
@@ -366,12 +417,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        borderWidth: 1,               // Add border
+        borderColor: 'black',       // Specify border color
+        marginLeft: 1,             // Add left margin
+        marginRight: 1,
       },
       modalContent: {
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 10,
         alignItems: 'center',
+        borderWidth: 1,               // Add border
+        borderColor: 'black',       // Specify border color
+        marginLeft: 40,             // Add left margin
+        marginRight: 40,
       },
       modalText: {
         fontSize: 18,

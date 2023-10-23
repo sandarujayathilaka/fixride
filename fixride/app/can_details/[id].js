@@ -1,17 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import RequestDetails from '../../src/components/RequestDetails'
+import CancelledDetails from '../../src/components/History/CancelledDetails'
 import { router, useGlobalSearchParams } from "expo-router";
 import { useRoute } from "@react-navigation/native";
 
-const MecRequestDetail = () => {
+const CanRequestDetail = () => {
 
-//  const param = useGlobalSearchParams();
-
-//  const date =param.date;
-//  const username = param.user
-// const RequestId = param.Id;
-// console.log("Req",RequestId)
 const route = useRoute();
 const { Date } = route.params;
 console.log("1", Date);
@@ -30,9 +24,9 @@ let RequestId = Requestid;
 console.log("2", RequestId);
   return (
     <View>
-      <RequestDetails date={date} RequestId={RequestId} username={username} />
+      <CancelledDetails date={date} RequestId={RequestId} username={username} />
     </View>
   );
 }
 
-export default MecRequestDetail
+export default CanRequestDetail

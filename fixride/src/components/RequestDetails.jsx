@@ -16,10 +16,11 @@ import React, { useEffect, useState } from 'react'
 import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
 import { db,doc } from "../config/firebase";
 import { ActivityIndicator } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
 
 export default function RequestDetails(props) {
-
+  const navigation = useNavigation();
   const date = props.date;
   const user = props.username
 
@@ -118,21 +119,17 @@ const handleOKPress = async () => {
   // Close the modal
   setModalVisible(false);
 
-  // Redirect to the home page (you should replace '/home' with your actual home page route)
-  router.push(`/cat_list/All`, { cardId: 'All' });
-
-  // Update the request status to "Busy" in Firestore
+ 
+  navigation.navigate("CatList", { cardid: 'All' });
+ 
   
 };
 
   const handleTrackStatus = () => {
     if (RequestId) {
-      router.push({
-        pathname: `/status/${RequestId}`,
-        params: {
-          Id: RequestId,
-        },
-      });
+
+      navigation.navigate("Status", { Requestid: RequestId });
+
     } else {
       console.error("Invalid or missing RequestId");
     }
@@ -142,12 +139,8 @@ const handleOKPress = async () => {
   const handlePayment = () => {
     if (RequestId) {
       console.log("hhhhh",RequestId)
-      router.push({
-        pathname: `/payment/${RequestId}`,
-        params: {
-          Id: RequestId,
-        },
-      });
+
+      navigation.navigate("Payment", { Requestid: RequestId });
     } else {
       console.error("Invalid or missing RequestId");
     }

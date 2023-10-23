@@ -17,10 +17,11 @@ import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library"; 
 import { Feather } from "@expo/vector-icons";// Add this line
-
+import { useNavigation } from "@react-navigation/native";
 
 
 const RequestForm = (props) => {
+  const navigation = useNavigation();
   const garageId = props.garageId
   const userLatitude = props.userLatitude
   const userLongitude = props.userLongitude
@@ -163,19 +164,16 @@ const RequestForm = (props) => {
   };
 
   const handleItemPress = (id) => {
-    router.push({
-      pathname: `/req_details/${id}`,
-      params: {
-        Id:id,
-        date: reqDate,
-        Num: veheNum,
-        vehemodel: model,
-        paymentmethod: payment,
-        vehematter: matter,
-        power: selectedItem,
-        user: currentUser,
-      },
-    }); //when need to pass multiple value with link use this method
+    
+    navigation.navigate("Req_details", { Requestid:id,
+       Date: reqDate,
+          Num: veheNum,
+          vehemodel: model,
+          paymentmethod: payment,
+          vehematter: matter,
+          power: selectedItem,
+          Username: currentUser, });
+   
     console.log(`Clicked with form ${id}`);
   };
 

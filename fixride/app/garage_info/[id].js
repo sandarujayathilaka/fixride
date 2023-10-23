@@ -15,8 +15,11 @@ import { router, useGlobalSearchParams } from "expo-router";
 import { collection,where, getDocs, query } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 import { Feather } from "@expo/vector-icons";// Add this line
+import { useNavigation,useRoute } from "@react-navigation/native";
+
 
 const GarageInfo = () => {
+  const navigation = useNavigation();
   const [garageData, setGarageData] = useState(null);
   const [selectedButton, setSelectedButton] = useState("Services");
   const [isGarageClosed, setIsGarageClosed] = useState(false);
@@ -24,11 +27,28 @@ const GarageInfo = () => {
   const [garageClosingTime, setGarageClosingTime] = useState("");
 
 
-  const params = useGlobalSearchParams();
-  const Id = params.id;
-  const userLatitude = params.userLatitude
-  const userLongitude =params.userLongitude
+  // const params = useGlobalSearchParams();
+  // const Id = params.id;
+  const route = useRoute();
+  const { iid } = route.params;
+  console.log("1", iid);
+  let Id = iid;
+  console.log("2", Id);
+
+  // const userLatitude = params.userLatitude
+  // const userLongitude =params.userLongitude
+
+  const { userlatitude } = route.params;
+  console.log("1", userlatitude);
+  let userLatitude = userlatitude;
+  console.log("2", userLatitude);
   console.log("called",Id)
+
+  const { userlongitude } = route.params;
+  console.log("1", userlongitude);
+  let userLongitude = userlongitude;
+  console.log("2", userLongitude);
+
   const imageSource = require("../../assets/logo.webp");
 
   const [loading, setLoading] = useState(true);
@@ -97,14 +117,10 @@ console.log(garageCollectionRef);
      // Show the modal if the garage is closed
      toggleModal();
    } else {
-     router.push({
-       pathname: `/form/${id}`,
-       params: {
-         Id: id,
-         userLatitude: userLatitude,
-         userLongitude: userLongitude,
-       },
-     });
+
+    navigation.navigate("Form", { garageid: id,
+           userlatitude: userLatitude,
+           userlongitude: userLongitude, });
    }
  };
 

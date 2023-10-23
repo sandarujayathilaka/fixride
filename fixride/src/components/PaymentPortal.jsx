@@ -12,9 +12,11 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { db } from "../../src/config/firebase";
+import { useNavigation } from "@react-navigation/native";
 
 const PaymentPortal = (props) => {
-    
+  
+  const navigation = useNavigation();
  const RequestId = props.RequestId;
   const [cardNumber, setCardNumber] = useState("");
   const [expiration, setExpiration] = useState("");
