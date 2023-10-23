@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 20,
+    marginBottom: 10,
   },
   chainContainer: {
     flexDirection: 'row',

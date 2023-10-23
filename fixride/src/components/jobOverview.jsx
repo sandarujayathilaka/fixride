@@ -84,7 +84,7 @@ const JobOverview = ({ vehicleImage }) => {
         </View>
         <Text style={styles.grayText}>Breakdown Description</Text>
         <View style={styles.bigBox}>
-            <Text style={styles.justifyText}>{data.username}</Text>
+            <Text style={styles.justifyText}>{data.matter}</Text>
         </View>
         <View style={styles.buttonContainer}>
           <Text style={styles.startRideButton}>Start Ride</Text>

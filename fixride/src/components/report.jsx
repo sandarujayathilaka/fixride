@@ -69,7 +69,13 @@ const Report = () => {
       setDescription('');
 
       console.log('Report added with ID: ', docRef.id);
-      Alert.alert('Success', 'Job Done successfully.');
+      Alert.alert('Success', 'Job Done successfully.', [
+        {
+        
+          text: 'OK',
+          //onPress={handleUpdateStatusPress},
+        },
+      ]);
     } catch (error) {
       console.error('Error adding report: ', error);
       Alert.alert('Error', 'Failed to submit report.');
