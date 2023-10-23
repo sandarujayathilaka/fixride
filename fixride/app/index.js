@@ -22,6 +22,18 @@ import ChooseLocation from "../src/components/History/ChooseLocation";
 import Home from "../src/components/History/Home";
 import TrackLive from "../src/components/History/TrackLive";
 import MyActivity from "../src/components/History/MyActivity";
+import Test from "../src/components/text";
+import GarageMngrDash from "../src/components/GarageMngrDash";
+import ManagerStatus from "../app/mngrside_status/[id]";
+import AvailableMac from "../app/mac-list/[id]";
+import AddMechanic from "../src/components/AddMechanic";
+ import ReqList from "../src/components/ReqList";
+ import Ongoings from "../src/components/Ongoings";
+ import MechanicList from "../src/components/MechanicList";
+ import AddGarage from "../src/components/AddGarage";
+import ReqStatusGMside from "../src/components/ReqStatusGMside";
+
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -86,9 +98,9 @@ function App() {
             // Navigate based on userType here
 
             if (userType === "User") {
-              navigationRef.current.navigate("MyActivity");
+              navigationRef.current.navigate("HomeTabs");
             } else if (userType === "Garage Owner") {
-              navigationRef.current.navigate("CateCard");
+              navigationRef.current.navigate("GarageMngrDash");
             } else if (userType === "Mechanic") {
               navigationRef.current.navigate("TrackLive");
             }
@@ -109,27 +121,17 @@ function App() {
   return (
     <NavigationContainer ref={navigationRef}>
       {user ? (
-        <Stack.Navigator
-          initialRouteName={
-            userType === "User"
-              ? "HomeTabs"
-              : userType === "Garage Owner"
-              ? "CateCard"
-              : "Home"
-          }
-        >
-          <Stack.Screen name="FIXRIDE" component={HomeTabs} />
+        userType === "User" ? (
+          <Stack.Navigator>
+            <Stack.Screen name="HomeTabs" component={HomeTabs}  options={{ headerShown: false }}/>
+            <Stack.Screen name="Home" component={Home} />
 
-          <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="ChooseLocation" component={ChooseLocation} />
 
-          <Stack.Screen name="ChooseLocation" component={ChooseLocation} />
-
-          <Stack.Screen name="MyActivity" component={MyActivity} />
-
-          <Stack.Screen name="TrackLive" component={TrackLive} />
-
-          <Stack.Screen name="CateCard" component={CateCard} />
-          <Stack.Screen
+            <Stack.Screen name="MyActivity" component={MyActivity} />
+            <Stack.Screen name="TrackLive" component={TrackLive} />
+            <Stack.Screen name="CateCard" component={CateCard} />
+            <Stack.Screen
             name="CatList"
             component={DisplayContent}
             options={({ route }) => ({
@@ -212,23 +214,58 @@ function App() {
             })}
           />
 
-          {/* Wrap your Tab.Navigator in a Screen component */}
-          <Stack.Screen
-            name="HomeTabs"
-            component={HomeTabs}
-            options={{ headerShown: false }}
+         
+            {/* <Stack.Screen name="UserScreen1" component={UserScreen1} /> */}
+          </Stack.Navigator>
+        ) : userType === "Garage Owner" ? (
+          <Stack.Navigator>
+            <Stack.Screen name="GarageMngrDash" component={GarageMngrDash} />
+            <Stack.Screen name="AddMechanic" component={AddMechanic} />
+            <Stack.Screen name="ReqList" component={ReqList} />
+            <Stack.Screen name="Ongoings" component={Ongoings} />
+            <Stack.Screen name="MechanicList" component={MechanicList} />
+            <Stack.Screen name="AddGarage" component={AddGarage} />
+            <Stack.Screen name="ReqStatusGMside" component={ReqStatusGMside} />
+            
+            <Stack.Screen
+            name="Manager_Status"
+            component={ManagerStatus}
+            options={({ route }) => ({
+              title: `Manager_Status ${route.params.Id}`,
+            })}
           />
-        </Stack.Navigator>
+
+          <Stack.Screen
+            name="MacList"
+            component={AvailableMac}
+            options={({ route }) => ({
+              title: `MacList ${route.params.Id}`,
+            })}
+          />
+
+
+          </Stack.Navigator>
+        ) : userType === "Mechanic" ? (
+          <Stack.Navigator>
+            <Stack.Screen name="TrackLive" component={TrackLive} />
+
+            {/* Define other Mechanic related screens */}
+          </Stack.Navigator>
+        ) : (
+          // Handle any other user type here
+
+          <LoadingScreen />
+        )
       ) : (
         <Stack.Navigator>
           <Stack.Screen name="Login" component={Login} />
+
           <Stack.Screen name="Registration" component={Registration} />
         </Stack.Navigator>
       )}
     </NavigationContainer>
   );
-}
-
+  }
 // Define the Tab Navigator separately
 function HomeTabs() {
   return (

@@ -10,9 +10,7 @@ import { useRoute } from "@react-navigation/native";
 
 const CanRequestDetail = () => {
   const route = useRoute();
-
   const { Date } = route.params;
-
   console.log("1", Date);
 
   let date = Date;
