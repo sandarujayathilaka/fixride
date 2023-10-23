@@ -51,8 +51,10 @@ const MyActivity = () => {
     console.log("Fetching data...",selectedButton);
   
     // Build the query
+    console.log("dd",name);
+    console.log("dd1",selectedButton);
     const query = firebase.firestore().collection('request')
-      .where("username", "==", name).where("mainstatus", "==", selectedButton); // Filter documents where "username" matches "name"
+      .where("username", "==", name).where("mainStatus", "==", selectedButton); // Filter documents where "username" matches "name"
   
     try {
       const querySnapshot = await query.get();
@@ -125,10 +127,7 @@ const MyActivity = () => {
        
         } 
       }));
-  
-    //  console.log("usersList:", usersList);
-  
-      // Now you can set the data
+
       setData(usersList);
       setLoading(false);
     } catch (error) {
@@ -142,13 +141,30 @@ const MyActivity = () => {
      navigation.navigate('TrackLive', { id });
 
   };
+  const handleItemDetail = (id,reqDate,currentUser) => {
+  navigation.navigate("Ongoing_details", { Requestid:id,
+    Date: reqDate,
+       Username: currentUser, });
+      };
 
+      const handleComDetail = (id,reqDate,currentUser) => {
+        navigation.navigate("Com_details", { Requestid:id,
+          Date: reqDate,
+             Username: currentUser, });
+            };
+
+            const handleCanDetail = (id,reqDate,currentUser) => {
+              navigation.navigate("Can_details", { Requestid:id,
+                Date: reqDate,
+                   Username: currentUser, });
+                  };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleItemDetail(item.id)}>
-      <View style={styles.card}>
+    <View>
         {selectedButton === "Ongoing" ? (
           <>
+          <TouchableOpacity onPress={() => handleItemDetail(item.vehicleNo,item.dateTime,item.username)}>
+      <View style={styles.card}>
             <View style={styles.headerContainer}>
               <Text style={styles.mainText}>{item.gname}</Text>
               <Text style={styles.date}>{item.date}</Text>
@@ -159,7 +175,7 @@ const MyActivity = () => {
             </View>
             <View style={styles.divider} />
             <View style={styles.statusContainer}>
-              <Text style={styles.mainstatus}>{item.mainstatus}</Text>
+              <Text style={styles.mainstatus}>{item.mainStatus}</Text>
               <View style={styles.statusCircle}>
                 <Text style={styles.status}>{item.status}</Text>
               </View>
@@ -169,13 +185,17 @@ const MyActivity = () => {
               <TouchableOpacity onPress={() => handleItemPress(item.id)} style={styles.customTrack}>
                 <Text style={styles.buttonTrack}>Track Live</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleItemDetail(item.id)} style={styles.customDetail}>
+              <TouchableOpacity onPress={() => handleItemDetail(item.vehicleNo,item.dateTime,item.username)} style={styles.customDetail}>
                 <Text style={styles.buttonDetail}>Details</Text>
               </TouchableOpacity>
             </View>
-          </>
+            </View>
+    </TouchableOpacity>
+    </>
         ) : selectedButton === "Completed" ? (
           <>
+          <TouchableOpacity onPress={() => handleComDetail(item.vehicleNo,item.dateTime,item.username)}>
+      <View style={styles.card}>
             <View style={styles.headerContainer}>
               <Text style={styles.mainText}>{item.gname}</Text>
               <Text style={styles.date}>{item.date}</Text>
@@ -187,13 +207,17 @@ const MyActivity = () => {
             <View style={styles.divider} />
             <View style={styles.statusContainer}>
               <Text style={styles.mainstatus}>{item.payment}</Text>
-              <TouchableOpacity onPress={() => handleItemPress()} style={styles.customDetail}>
+              <TouchableOpacity onPress={() => handleComDetail(item.vehicleNo,item.dateTime,item.username)} style={styles.customDetail}>
                 <Text style={styles.buttonDetail}>Details</Text>
               </TouchableOpacity>
             </View>
+            </View>
+    </TouchableOpacity>
           </>
         ) : (
           <>
+          <TouchableOpacity onPress={() => handleCanDetail(item.vehicleNo,item.dateTime,item.username)}>
+      <View style={styles.card}>
             <View style={styles.headerContainer}>
               <Text style={styles.mainText}>{item.gname}</Text>
               <Text style={styles.date}>{item.date}</Text>
@@ -205,18 +229,18 @@ const MyActivity = () => {
             <View style={styles.divider} />
             <View style={styles.statusContainer}>
               <Text style={styles.mainstatus}>{item.reason}</Text>
-              <TouchableOpacity onPress={() => handleItemPress()} style={styles.customDetail}>
+              <TouchableOpacity onPress={() => handleCanDetail(item.vehicleNo,item.dateTime,item.username)} style={styles.customDetail}>
                 <Text style={styles.buttonDetail}>Details</Text>
               </TouchableOpacity>
             </View>
+            </View>
+    </TouchableOpacity>
           </>
         )}
-      </View>
-    </TouchableOpacity>
+     
+    </View>
   );
   
-  
-
   const filteredData = data.filter((item) => {
     const vehicleModel = item.vehicleModel || "";
     const vehicleNo = item.vehicleNo || "";
@@ -229,11 +253,10 @@ const MyActivity = () => {
       garageName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       date.toLowerCase().includes(searchTerm.toLowerCase()) ||
         vehicleNo.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      item.mainstatus === selectedButton
+      item.mainStatus === selectedButton
     );
   });
-  
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>My Activity</Text>

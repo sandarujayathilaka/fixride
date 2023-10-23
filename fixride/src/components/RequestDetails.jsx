@@ -123,6 +123,11 @@ const handleOKPress = async () => {
   navigation.navigate("CatList", { cardid: 'All' });
 
 };
+
+const handleItemPress = (id) => {
+  console.log("item", id);
+  navigation.navigate("TrackLive", { id });
+};
    const handleTrackStatus = () => {
      if (RequestId) {
        navigation.navigate("Status", { Requestid: RequestId });
@@ -294,7 +299,10 @@ const handleOKPress = async () => {
               <View style={styles.serviceColumn}>
                 <View style={{ margin: 10 }}>
                   <Text style={styles.mainLable}>Mechanic Details</Text>
-                  <TouchableOpacity style={styles.trackStatusButton}>
+                  <TouchableOpacity
+                    onPress={() => handleItemPress(requestDetails.id)}
+                    style={styles.trackStatusButton}
+                  >
                     <Text style={styles.trackStatusButtonText}>Live Track</Text>
                   </TouchableOpacity>
                   <Text
@@ -386,7 +394,7 @@ const handleOKPress = async () => {
               </View>
             </View>
             <View>
-              { requestDetails.payment !== "Not Calculated" && (
+              {requestDetails.payment !== "Not Calculated" && (
                 <TouchableOpacity
                   style={styles.payButton}
                   onPress={handlePayment}

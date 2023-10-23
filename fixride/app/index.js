@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import { SafeAreaView } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -14,6 +14,14 @@ import MecRequestDetails from "../app/payment/[id]";
 import MecRequestDetail from "../app/req_details/[id]";
 import GarageInfo from "../app/garage_info/[id]";
 import Form from "../app/form/[id]";
+import ComRequestDetail from "../app/com_details/[id]";
+import CanRequestDetail from "../app/can_details/[id]";
+import OngoingRequestDetail from "../app/ongoing_details/[id]";
+import LoadingScreen from "../src/components/History/LoadingScreen";
+import ChooseLocation from "../src/components/History/ChooseLocation";
+import Home from "../src/components/History/Home";
+import TrackLive from "../src/components/History/TrackLive";
+import MyActivity from "../src/components/History/MyActivity";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -34,29 +42,93 @@ const Stack = createStackNavigator();
 //   );
 // }
 
+export const navigationRef = React.createRef();
+
 function App() {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const [initializing, setInitializing] = React.useState(true);
+
+  const [user, setUser] = React.useState(null);
+
+  const [userType, setUserType] = React.useState(null);
+
+  React.useEffect(() => {
+    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
+
+    return subscriber; // Unsubscribe when component unmounts
+  }, []);
 
   function onAuthStateChanged(user) {
     setUser(user);
 
-    if (initializing) setInitializing(false);
+    if (user) {
+      // Fetch user data and userType here
+
+      firebase
+        .firestore()
+        .collection("users")
+
+        .doc(user.uid)
+
+        .get()
+
+        .then((snapshot) => {
+          if (snapshot.exists) {
+            const userData = snapshot.data();
+
+            const userType = userData.userType;
+
+            // Set userType in state
+
+            console.log(userType);
+
+            setUserType(userType);
+
+            // Navigate based on userType here
+
+            if (userType === "User") {
+              navigationRef.current.navigate("MyActivity");
+            } else if (userType === "Garage Owner") {
+              navigationRef.current.navigate("CateCard");
+            } else if (userType === "Mechanic") {
+              navigationRef.current.navigate("TrackLive");
+            }
+          }
+        })
+
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+    }
+
+    setInitializing(false);
   }
 
-  useEffect(() => {
-    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
-
-  if (initializing) return null;
-
+  if (initializing) {
+    return <LoadingScreen />;
+  }
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       {user ? (
-        <Stack.Navigator initialRouteName="HomeTabs">
+        <Stack.Navigator
+          initialRouteName={
+            userType === "User"
+              ? "HomeTabs"
+              : userType === "Garage Owner"
+              ? "CateCard"
+              : "Home"
+          }
+        >
           <Stack.Screen name="FIXRIDE" component={HomeTabs} />
 
+          <Stack.Screen name="Home" component={Home} />
+
+          <Stack.Screen name="ChooseLocation" component={ChooseLocation} />
+
+          <Stack.Screen name="MyActivity" component={MyActivity} />
+
+          <Stack.Screen name="TrackLive" component={TrackLive} />
+
+          <Stack.Screen name="CateCard" component={CateCard} />
           <Stack.Screen
             name="CatList"
             component={DisplayContent}
@@ -93,6 +165,42 @@ function App() {
             component={GarageInfo}
             options={({ route }) => ({
               title: `Garage_info ${route.params.iid}`,
+            })}
+          />
+
+          <Stack.Screen
+            name="Ongoing_details"
+            component={OngoingRequestDetail}
+            options={({ route }) => ({
+              title: `Ongoing_details ${
+                (route.params.Requestid,
+                route.params.Date,
+                route.params.Username)
+              }`,
+            })}
+          />
+
+          <Stack.Screen
+            name="Com_details"
+            component={ComRequestDetail}
+            options={({ route }) => ({
+              title: `Com_details ${
+                (route.params.Requestid,
+                route.params.Date,
+                route.params.Username)
+              }`,
+            })}
+          />
+
+          <Stack.Screen
+            name="Can_details"
+            component={CanRequestDetail}
+            options={({ route }) => ({
+              title: `Can_details ${
+                (route.params.Requestid,
+                route.params.Date,
+                route.params.Username)
+              }`,
             })}
           />
 
@@ -142,7 +250,7 @@ function HomeTabs() {
       })}
     >
       <Tab.Screen name="Home" component={CateCard} />
-      <Tab.Screen name="Tasks" component={CateCard} />
+      <Tab.Screen name="Tasks" component={MyActivity} />
     </Tab.Navigator>
   );
 }
