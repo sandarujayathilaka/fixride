@@ -20,10 +20,10 @@ console.log("2", RequestId);
 
 const { Payment } = route.params;
 let payment = Payment
-
+console.log("paymentportal", payment);
   return (
     <View>
-      <PaymentPortal RequestId={RequestId} payment={payment} />
+      <PaymentPortal requestId={RequestId} paymentt={payment} />
     </View>
   );
 };

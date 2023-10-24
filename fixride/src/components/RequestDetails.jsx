@@ -138,9 +138,10 @@ const handleOKPress = async () => {
   
   const handlePayment = () => {
     if (RequestId) {
-      console.log("hhhhh",RequestId)
-
-      navigation.navigate("Payment", { Requestid: RequestId });
+      console.log("xxx",RequestId)
+      console.log("hxxxhhhh",requestDetails.payment)
+      const pay = requestDetails.payment;
+      navigation.navigate("Payment", { Requestid: RequestId,Payment:pay });
     } else {
       console.error("Invalid or missing RequestId");
     }

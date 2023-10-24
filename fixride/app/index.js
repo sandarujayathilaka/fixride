@@ -32,8 +32,12 @@ import AddMechanic from "../src/components/AddMechanic";
  import MechanicList from "../src/components/MechanicList";
  import AddGarage from "../src/components/AddGarage";
 import ReqStatusGMside from "../src/components/ReqStatusGMside";
-
-
+import MechHome from "../src/components/MechHome";
+import MechStatus from "../src/components/MechStatus";
+import JobStatusUpdate from "../src/components/JobStatusUpdate";
+import JobOverview from "../src/components/JobOverview";
+import Job from "../src/components/Job";
+import Report from "../src/components/Report";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -98,11 +102,11 @@ function App() {
             // Navigate based on userType here
 
             if (userType === "User") {
-              navigationRef.current.navigate("HomeTabs");
+              navigationRef.current.navigate("FIXRIDE");
             } else if (userType === "Garage Owner") {
               navigationRef.current.navigate("GarageMngrDash");
             } else if (userType === "Mechanic") {
-              navigationRef.current.navigate("TrackLive");
+              navigationRef.current.navigate("MechHome");
             }
           }
         })
@@ -123,7 +127,7 @@ function App() {
       {user ? (
         userType === "User" ? (
           <Stack.Navigator>
-            <Stack.Screen name="HomeTabs" component={HomeTabs}  options={{ headerShown: false }}/>
+            <Stack.Screen name="FIXRIDE" component={HomeTabs} />
             <Stack.Screen name="Home" component={Home} />
 
             <Stack.Screen name="ChooseLocation" component={ChooseLocation} />
@@ -150,7 +154,7 @@ function App() {
             name="Payment"
             component={MecRequestDetails}
             options={({ route }) => ({
-              title: `Payment ${route.params.Requestid}`,
+              title: `Payment ${route.params.Requestid,route.params.Payment}`,
             })}
           />
 
@@ -247,9 +251,12 @@ function App() {
           </Stack.Navigator>
         ) : userType === "Mechanic" ? (
           <Stack.Navigator>
-            <Stack.Screen name="TrackLive" component={TrackLive} />
-
-            {/* Define other Mechanic related screens */}
+            <Stack.Screen name="MechHome" component={MechHome} />
+            <Stack.Screen name="Job" component={Job} />
+            <Stack.Screen name="JobOverview" component={JobOverview} />
+            <Stack.Screen name="JobStatusUpdate" component={JobStatusUpdate} />
+            <Stack.Screen name="MechStatus" component={MechStatus} />
+            <Stack.Screen name="Report" component={Report} />
           </Stack.Navigator>
         ) : (
           // Handle any other user type here

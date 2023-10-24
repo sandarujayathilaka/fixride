@@ -209,27 +209,29 @@ export default function CancelledDetails(props) {
     }
   };
 
-  const handlePayment = () => {
-    if (RequestId) {
-      console.log("hhhhh", RequestId);
+  // const handlePayment = () => {
+  //   if (RequestId) {
+  //     console.log("hhhhh", RequestId);
 
-      // router.push({
+  //     // router.push({
 
-      //   pathname: `/payment/${RequestId}`,
+  //     //   pathname: `/payment/${RequestId}`,
 
-      //   params: {
+  //     //   params: {
 
-      //     Id: RequestId,
+  //     //     Id: RequestId,
 
-      //   },
+  //     //   },
 
-      // });
+  //     // });
 
-      navigation.navigate("Payment", { Requestid: RequestId });
-    } else {
-      console.error("Invalid or missing RequestId");
-    }
-  };
+  //     console.log("can",requestDetails.payment)
+  //     const pay = requestDetails.payment;
+  //     navigation.navigate("Payment", { Requestid: RequestId,Payment:pay });
+  //   } else {
+  //     console.error("Invalid or missing RequestId");
+  //   }
+  // };
 
   const handleRefresh = () => {
     setRefreshing(true);
