@@ -11,19 +11,12 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 import { db } from "../../src/config/firebase";
 import { doc, updateDoc } from "firebase/firestore";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 const PaymentPortal = (props) => {
-  // const RequestId = props.RequestId;
-  // const payment = props.payment;
-  const route=useRoute();
-  const {requestId} = route.params;
-  const {paymentt} = route.params;
-
-  let payment=paymentt;
-  let RequestId=requestId;
+  const RequestId = props.RequestId;
+  const payment = props.payment;
    console.log("Pay", payment);
-   console.log("RequestId", RequestId);
   const [cardNumber, setCardNumber] = useState("");
   const [expiration, setExpiration] = useState("");
   const [cvv, setCVV] = useState("");

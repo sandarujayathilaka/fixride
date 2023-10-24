@@ -162,21 +162,21 @@ const handleOKPress = async () => {
   };
 
   
-  // const handlePayment = () => {
-  //   if (RequestId) {
-  //     console.log("hhhhh",RequestId)
-  //     // router.push({
-  //     //   pathname: `/payment/${RequestId}`,
-  //     //   params: {
-  //     //     Id: RequestId,
-  //     //   },
-  //     // });
+  const handlePayment = () => {
+    if (RequestId) {
+      console.log("hhhhh",RequestId)
+      // router.push({
+      //   pathname: `/payment/${RequestId}`,
+      //   params: {
+      //     Id: RequestId,
+      //   },
+      // });
 
-  //     navigation.navigate("Payment", { Requestid: RequestId });
-  //   } else {
-  //     console.error("Invalid or missing RequestId");
-  //   }
-  // };
+      navigation.navigate("Payment", { Requestid: RequestId });
+    } else {
+      console.error("Invalid or missing RequestId");
+    }
+  };
 
   const handleRefresh = () => {
     setRefreshing(true);

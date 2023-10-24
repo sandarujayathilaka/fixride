@@ -4,7 +4,7 @@ import RequestDetails from '../../src/components/RequestDetails'
 import { router, useGlobalSearchParams } from "expo-router";
 import { useRoute } from "@react-navigation/native";
 
-const MecRequestDetail = () => {
+const MecRequestDetails = () => {
 
 const route = useRoute();
 
@@ -40,4 +40,4 @@ console.log("2", RequestId);
   );
 }
 
-export default MecRequestDetail
+export default MecRequestDetails

@@ -163,10 +163,14 @@ const handleOKPress = async () => {
   const handlePayment = () => {
     if (RequestId) {
       console.log("hhhhh",RequestId)
-      console.log("hhhhh",requestDetails.payment)
-const pay = requestDetails.payment.toString();
+      // router.push({
+      //   pathname: `/payment/${RequestId}`,
+      //   params: {
+      //     Id: RequestId,
+      //   },
+      // });
 
-      navigation.navigate("Payment", { Requestid: RequestId, Payment:pay });
+      navigation.navigate("Payment", { Requestid: RequestId });
     } else {
       console.error("Invalid or missing RequestId");
     }
@@ -281,7 +285,7 @@ const pay = requestDetails.payment.toString();
             <View style={styles.serviceColumn}>
               <View>
                 <Text style={[styles.mainLable, { marginTop: 10 }]}>
-                  {requestDetails.mainStatus}
+                  {requestDetails.mainstatus}
                 </Text>
               </View>
               <View style={styles.datetime}>
