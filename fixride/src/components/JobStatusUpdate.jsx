@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native';
 import { db } from '../../src/config/firebase';
 import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
@@ -6,17 +6,17 @@ import ontheway from '../../assets/ontheway.gif';
 import Reached from '../../assets/Reached.gif';
 import done from '../../assets/done.gif';
 import Paid from '../../assets/Paid.gif';
-import { router } from "expo-router";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,useRoute } from "@react-navigation/native";
 
 
 const JobStatusUpdate = () => {
   const navigation = useNavigation();
-
+  const route = useRoute();
+  const {name } = route.params;
+  const [id, setId]=useState('');
   const handleConfirmPress = () => {
-    // Navigate to the Job component when the "Assigned Job" button is pressed
-   // router.push(`/ConfirmReport/Reportn/`);
-   navigation.navigate("Report");
+  console.log('js',id)
+   navigation.navigate("Report",{requestId:id});
   };
 
   const [status, setStatus] = useState('On the way');
@@ -27,11 +27,16 @@ const JobStatusUpdate = () => {
     'Paid' : Paid
   });
 
+  useEffect(() => {
+    // This effect will set the initial gifSource based on the current status
+    setGifSource(gifSource[status]);
+  }, [status]);
+
   const mainStatus = 'Ongoing';
-  const userName = 'Navidu';
+  const userName = name;
 
   const handleActivate = async (newStatus) => {
-    if (mainStatus === 'Ongoing' && userName === 'Navidu') {
+    if (mainStatus === 'Ongoing' && userName === name) {
       setStatus(newStatus);
       const requestCollection = collection(db, 'request');
       const q = query(requestCollection, where('macName', '==', userName));
@@ -39,18 +44,24 @@ const JobStatusUpdate = () => {
 
       querySnapshot.forEach((doc) => {
         const docRef = doc.ref; 
+        console.log(doc.id)
+        setId(doc.id)
         if (newStatus === 'On the way') {
-          updateDoc(docRef, { startStatus: 'Started' });
           setGifSource(ontheway);
+          updateDoc(docRef, { startStatus: 'Started' });
+          
         } else if (newStatus === 'Reached') {
-          updateDoc(docRef, { reachStatus: 'Reached' });
           setGifSource(Reached);
+          updateDoc(docRef, { reachStatus: 'Reached' });
+         
         } else if (newStatus === 'Fixed') {
-          updateDoc(docRef, { fixedStatus: 'Fixed' });
           setGifSource(done);
+          updateDoc(docRef, { fixedStatus: 'Fixed' });
+          
         } else if (newStatus === 'Paid') {
-          updateDoc(docRef, { payStatus: 'Paid' });
           setGifSource(Paid);
+          updateDoc(docRef, { payStatus: 'Paid' });
+          
         }
       });
     }
@@ -81,7 +92,7 @@ const JobStatusUpdate = () => {
             <Text style={styles.text}>Paid</Text>
           </View>
         </View>
-        <Image source={gifSource[status]} style={styles.image} />
+        <Image source={gifSource} style={styles.image} />
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.button}

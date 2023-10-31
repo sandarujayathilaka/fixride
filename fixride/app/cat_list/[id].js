@@ -5,34 +5,34 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { router, useGlobalSearchParams } from "expo-router";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../src/config/firebase";
 import * as Location from "expo-location";
-import { useRoute,useNavigation } from "@react-navigation/native";
-
-
+import { useRoute, useNavigation } from "@react-navigation/native";
 
 const DisplayContent = () => {
   const [garages, setGarages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
-  const [latitude,setlatitude] = useState("")
-  const [longitude,setlongitude] = useState("")
+  const [latitude, setlatitude] = useState("");
+  const [longitude, setlongitude] = useState("");
 
   const MAX_DISTANCE_KM = 10;
 
   // const params = useGlobalSearchParams();
   // const cardId = params.id;
+
   const route = useRoute();
   const navigation = useNavigation();
 
-  const { cardid } = route.params;
+  const { cardid, phone, firstname } = route.params;
   let cardId = cardid;
 
-  imageSource = require("../../assets/Picture2.png");
+  imageSource = require("../../assets/garage.png");
 
   useEffect(() => {
     setLoading(true);
@@ -48,7 +48,7 @@ const DisplayContent = () => {
       );
       const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
         let usersList = [];
-        console.log("location:",userLocation)
+        console.log("location:", userLocation);
 
         snapshot.forEach((doc) => {
           const garageData = doc.data();
@@ -74,17 +74,27 @@ const DisplayContent = () => {
     }
   }, [userLocation, cardId]);
 
-const handleItemPress = (id) => {
-  console.log(id);
+  const handleItemPress = (id) => {
+    console.log(id);
+    // router.push({
+    //   pathname: `/garage_info/${id}`,
+    //   params: {
+    //     Id: id,
+    //     userLatitude: userLocation.latitude,
+    //     userLongitude: userLocation.longitude,
+    //   },
+    // });
+    navigation.navigate("Garage_info", {
+      iid: id,
 
-  navigation.navigate("Garage_info", {
-    iid: id,
+      userlatitude: userLocation.latitude,
 
-    userlatitude: userLocation.latitude,
-
-    userlongitude: userLocation.longitude,
-  });
-};
+      userlongitude: userLocation.longitude,
+      categoryId: cardId,
+      phone: phone,
+      firstname: firstname,
+    });
+  };
 
   const getUserLocation = async () => {
     console.log("Called getUserLocation");
@@ -156,10 +166,10 @@ const handleItemPress = (id) => {
     // Determine if the garage is closed based on the comparison
     const isClosed = currentTimeInMinutes >= closedTimeInMinutes;
 
-     const statusStyle = {
-       color: isClosed ? "red" : "green",
-       fontWeight:400
-     };
+    const statusStyle = {
+      color: isClosed ? "red" : "green",
+      fontWeight: 400,
+    };
 
     return (
       <TouchableOpacity onPress={() => handleItemPress(item.garageId)}>
@@ -171,7 +181,9 @@ const handleItemPress = (id) => {
           <Text style={[styles.SubText, statusStyle]}>
             Status: {isClosed ? "Closed" : "Opened"}
           </Text>
-          <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+          <View style={styles.imageContainer}>
+            <Image source={imageSource} style={styles.cardImage} />
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -181,7 +193,11 @@ const handleItemPress = (id) => {
     <View>
       <Text style={styles.topic}>Nearby Garages</Text>
       {loading ? (
-        <Text>Loading...</Text>
+        <ActivityIndicator
+          size="large"
+          color="orange"
+          style={{ marginTop: 260 }}
+        />
       ) : (
         <FlatList
           data={garages}
@@ -231,6 +247,9 @@ const styles = StyleSheet.create({
     marginLeft: 250,
     marginTop: -75,
     borderRadius: 8,
+  },
+  imageContainer: {
+    alignItems: "center", // Center the image horizontally
   },
   topic: {
     fontSize: 20,

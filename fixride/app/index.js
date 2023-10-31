@@ -33,11 +33,14 @@ import AddMechanic from "../src/components/AddMechanic";
  import AddGarage from "../src/components/AddGarage";
 import ReqStatusGMside from "../src/components/ReqStatusGMside";
 import MechHome from "../src/components/MechHome";
-import MechStatus from "../src/components/MechStatus";
-import JobStatusUpdate from "../src/components/JobStatusUpdate";
-import JobOverview from "../src/components/JobOverview";
 import Job from "../src/components/Job";
+import JobOverview from "../src/components/JobOverview";
+import JobStatusUpdate from "../src/components/JobStatusUpdate";
 import Report from "../src/components/Report";
+import MechStatusUpdate from "../src/components/MechStatusUpdate";
+import Dashboard from "../src/components/History/Dashboard";
+import Feedback from "../src/components/History/Feedback"
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -128,97 +131,83 @@ function App() {
         userType === "User" ? (
           <Stack.Navigator>
             <Stack.Screen name="FIXRIDE" component={HomeTabs} />
-            <Stack.Screen name="Home" component={Home} />
-
-            <Stack.Screen name="ChooseLocation" component={ChooseLocation} />
 
             <Stack.Screen name="MyActivity" component={MyActivity} />
             <Stack.Screen name="TrackLive" component={TrackLive} />
             <Stack.Screen name="CateCard" component={CateCard} />
+            <Stack.Screen name="Feedback" component={Feedback} />
+
             <Stack.Screen
-            name="CatList"
-            component={DisplayContent}
-            options={({ route }) => ({
-              title: `Cat List ${route.params.cardid}`,
-            })}
-          />
-          <Stack.Screen
-            name="Status"
-            component={Status}
-            options={({ route }) => ({
-              title: `Status ${route.params.Requestid}`,
-            })}
-          />
+              name="CatList"
+              component={DisplayContent}
+              options={{
+                title: `Garage List`,
+              }}
+            />
+            <Stack.Screen
+              name="Status"
+              component={Status}
+              options={{
+                title: `Status`
+              }}
+            />
 
-          <Stack.Screen
-            name="Payment"
-            component={MecRequestDetails}
-            options={({ route }) => ({
-              title: `Payment ${route.params.Requestid,route.params.Payment}`,
-            })}
-          />
+            <Stack.Screen
+              name="Payment"
+              component={MecRequestDetails}
+              options={{
+                title: `Payment`
+              }}
+            />
 
-          <Stack.Screen
-            name="Req_details"
-            component={MecRequestDetail}
-            options={({ route }) => ({
-              title: `Req_details ${route.params.Requestid}`,
-            })}
-          />
+            <Stack.Screen
+              name="Req_details"
+              component={MecRequestDetail}
+              options={{
+                title: `Request Details`
+              }}
+            />
 
-          <Stack.Screen
-            name="Garage_info"
-            component={GarageInfo}
-            options={({ route }) => ({
-              title: `Garage_info ${route.params.iid}`,
-            })}
-          />
+            <Stack.Screen
+              name="Garage_info"
+              component={GarageInfo}
+              options={{
+                title: `Garage Information`
+              }}
+            />
 
-          <Stack.Screen
-            name="Ongoing_details"
-            component={OngoingRequestDetail}
-            options={({ route }) => ({
-              title: `Ongoing_details ${
-                (route.params.Requestid,
-                route.params.Date,
-                route.params.Username)
-              }`,
-            })}
-          />
+            <Stack.Screen
+              name="Ongoing_details"
+              component={OngoingRequestDetail}
+              options={{
+                title: `Ongoing Details `,
+              }}
+            />
 
-          <Stack.Screen
-            name="Com_details"
-            component={ComRequestDetail}
-            options={({ route }) => ({
-              title: `Com_details ${
-                (route.params.Requestid,
-                route.params.Date,
-                route.params.Username)
-              }`,
-            })}
-          />
+            <Stack.Screen
+              name="Com_details"
+              component={ComRequestDetail}
+              options={{
+                title: `Completed details`
+              }}
+            />
 
-          <Stack.Screen
-            name="Can_details"
-            component={CanRequestDetail}
-            options={({ route }) => ({
-              title: `Can_details ${
-                (route.params.Requestid,
-                route.params.Date,
-                route.params.Username)
-              }`,
-            })}
-          />
+            <Stack.Screen
+              name="Can_details"
+              component={CanRequestDetail}
+              options={{
+                title: `Cancel details`
+              }}
+            />
 
-          <Stack.Screen
-            name="Form"
-            component={Form}
-            options={({ route }) => ({
-              title: `Form ${route.params.garageid}`,
-            })}
-          />
+            <Stack.Screen
+              name="Form"
+              component={Form}
+              options={{
+                title: `Request Form`
+              }}
+            />
 
-         
             {/* <Stack.Screen name="UserScreen1" component={UserScreen1} /> */}
           </Stack.Navigator>
         ) : userType === "Garage Owner" ? (
@@ -230,24 +219,22 @@ function App() {
             <Stack.Screen name="MechanicList" component={MechanicList} />
             <Stack.Screen name="AddGarage" component={AddGarage} />
             <Stack.Screen name="ReqStatusGMside" component={ReqStatusGMside} />
-            
+
             <Stack.Screen
-            name="Manager_Status"
-            component={ManagerStatus}
-            options={({ route }) => ({
-              title: `Manager_Status ${route.params.Id}`,
-            })}
-          />
+              name="Manager_Status"
+              component={ManagerStatus}
+              options={{
+                title: `Manager Status`
+              }}
+            />
 
-          <Stack.Screen
-            name="MacList"
-            component={AvailableMac}
-            options={({ route }) => ({
-              title: `MacList ${route.params.Id}`,
-            })}
-          />
-
-
+            <Stack.Screen
+              name="MacList"
+              component={AvailableMac}
+              options={{
+                title: `Machenic List`
+              }}
+            />
           </Stack.Navigator>
         ) : userType === "Mechanic" ? (
           <Stack.Navigator>
@@ -255,8 +242,16 @@ function App() {
             <Stack.Screen name="Job" component={Job} />
             <Stack.Screen name="JobOverview" component={JobOverview} />
             <Stack.Screen name="JobStatusUpdate" component={JobStatusUpdate} />
-            <Stack.Screen name="MechStatus" component={MechStatus} />
             <Stack.Screen name="Report" component={Report} />
+            <Stack.Screen
+              name="MechStatusUpdate"
+              component={MechStatusUpdate}
+            />
+            <Stack.Screen name="Home" component={Home} />
+
+            <Stack.Screen name="ChooseLocation" component={ChooseLocation} />
+
+            {/* Define other Mechanic related screens */}
           </Stack.Navigator>
         ) : (
           // Handle any other user type here
@@ -285,6 +280,8 @@ function HomeTabs() {
             iconName = "home"; // Use the home icon here
           } else if (route.name === "Tasks") {
             iconName = "clipboard"; // Use the clipboard icon here
+          } else if (route.name === "User") {
+            iconName = "user"; // Use the clipboard icon here
           }
 
           // Return the FontAwesome5 icon
@@ -295,6 +292,7 @@ function HomeTabs() {
     >
       <Tab.Screen name="Home" component={CateCard} />
       <Tab.Screen name="Tasks" component={MyActivity} />
+      <Tab.Screen name="User" component={Dashboard} />
     </Tab.Navigator>
   );
 }

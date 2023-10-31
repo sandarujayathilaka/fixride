@@ -3,22 +3,21 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'rea
 import img from '../../assets/job.png';
 import { db } from '../config/firebase'; 
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { router } from "expo-router";
-import { useNavigation } from "@react-navigation/native";
-
-
+import { useNavigation ,useRoute } from "@react-navigation/native";
 
 
 const Job = ({ vehicleImage }) => {
   const navigation = useNavigation();
+const route = useRoute();
+const {name } = route.params;
 
   const handleViewMorePress = () => {
-    // Navigate to the Job component when the "Assigned Job" button is pressed
-    //router.push(`/View/JobOverviewn/`);
-    navigation.navigate("JobOverview");
+
+    navigation.navigate("JobOverview",{name:name});
   };
 
   const [data, setData] = useState({});
+const [id,setId] = useState('');
 
 
   useEffect(() => {
@@ -28,8 +27,8 @@ const Job = ({ vehicleImage }) => {
         const requestCollection = collection(db, "request"); 
         const q = query(
           requestCollection,
-          where("mainstatus", "==", "Ongoing"), 
-          where("macName", "==", "Mahinda Rajapaksa") 
+          where("mainStatus", "==", "Ongoing"), 
+          where("macName", "==", name) 
         );
 console.log(q)
         
@@ -40,7 +39,7 @@ console.log(q)
           // If there are documents in the result, update the component state
           const doc = querySnapshot.docs[0]; // Assuming you want the first document
           setData(doc.data());
-          console.log("Data",data)
+          setId(doc.id)
         }
       } catch (error) {
         console.error("Error retrieving documents: ", error);
@@ -50,7 +49,12 @@ console.log(q)
     fetchData();
   }, []);
 
+  const handlePress = () => {
+      
+      console.log(id);
+      navigation.navigate("Home", { Requestid: id });
 
+  };
 
   return (
     <ScrollView>
@@ -61,13 +65,13 @@ console.log(q)
           <View style={styles.cardContainer}>
             <Text style={styles.text}>Customer Name: {data.username}</Text>
             <Text style={styles.text}>Vehicle Number:{data.vehicleNo} </Text>
-            <Text style={styles.text}>Location: </Text>
-            <Image source={{ uri: vehicleImage }} style={styles.vehicleImage} />
+            <Text style={styles.text}>Location: {data.location}</Text>
+            {/* <Image source={{ uri: vehicleImage }} style={styles.vehicleImage} /> */}
             <TouchableOpacity style={styles.button}>
               <Text style={styles.buttonText} onPress={handleViewMorePress}>View More</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.goButton}>
+          <TouchableOpacity onPress={handlePress} style={styles.goButton}>
             <Text style={styles.buttonText}>Go</Text>
           </TouchableOpacity>
         </View>

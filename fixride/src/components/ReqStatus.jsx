@@ -17,7 +17,7 @@ export default function ReqStatus(props) {
 
   const bwcorrect = require("../../assets/bwcorrect.png");
   const colorCorrect = require("../../assets/correctcol.png");
-   const statusImg = require("../../assets/status.webp");
+  const statusImg = require("../../assets/status.webp");
 
   useEffect(() => {
     setRequestId(props.RequestId);
@@ -136,13 +136,13 @@ const styles = StyleSheet.create({
     marginLeft: 120,
   },
   statusImage: {
-    width: 35, // Adjust the width as needed
-    height: 35, // Adjust the height as needed
+    width: 25, // Adjust the width as needed
+    height: 25, // Adjust the height as needed
     marginRight: 10,
   },
   statusText: {
     fontSize: 20,
-    fontWeight:"500"
+    fontWeight: "500",
   },
   verticalLine: {
     width: 3,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center", // Center vertically
     alignItems: "center",
-    marginTop: 100, // Center horizontally
+    marginTop: 65, // Center horizontally
   },
   allStatusContainer: {
     marginTop: 150, // Center horizontally

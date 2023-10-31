@@ -1,6 +1,6 @@
-import {View,Text,TextInput,Image,StyleSheet,TouchableOpacity,FlatList,ScrollView,} from "react-native";
+import {View,Text,TextInput,Image,StyleSheet,TouchableOpacity,FlatList,Modal,Button,ScrollView,} from "react-native";
 import React, { useState, useEffect } from "react";
-import { collection, query, where, getDocs,onSnapshot } from "firebase/firestore";
+import { collection, query, where, getDocs, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { NavigationContainer } from "@react-navigation/native";
@@ -17,6 +17,7 @@ const MyActivity = () => {
   const [user, setUser] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorModel, setErrorModel] = useState(false);
   const navigation = useNavigation();
   imageSource = require("../../../assets/images/no1.png");
  
@@ -136,10 +137,57 @@ const MyActivity = () => {
   };
   
   console.log("usersList1:", data);
-  const handleItemPress = (id) => {
-     console.log("item",id)
-     navigation.navigate('TrackLive', { id });
+  const handleItemPress = async(id) => {
+    try {
+      console.log("f", id);
+      const docRef = collection(db, "tracking");
+      const doc = await getDocs(docRef);
+      console.log("ddd", doc);
+      let foundDocumentRef = null;
 
+      doc.forEach((doc1) => {
+          const iid = doc1.data().requestId;
+          console.log("id", iid);
+          console.log("eid", id);
+          if (id === iid) {
+              console.log("Document found:", id);
+              foundDocumentRef = doc1.ref; // Store the found DocumentReference
+          }
+      });
+
+      if (foundDocumentRef) {
+          // Retrieve the data from the DocumentReference
+          const foundDocumentSnapshot = await getDoc(foundDocumentRef);
+          console.log(foundDocumentSnapshot);
+          navigation.navigate('TrackLive', { id });
+          if (foundDocumentSnapshot.exists()) {
+           // navigation.navigate('TrackLive', { id });
+          } else {
+           // setErrorModel(true);
+          }
+      } else {
+        
+        setErrorModel(true);
+      }
+  } catch (error) {
+      console.error(error);
+      // Handle any errors that occur during fetching
+  }
+    
+  
+  };
+  const errorcloseModal = () => {
+       
+    setErrorModel(false);
+  };
+
+  const confirm = async () => {
+    errorcloseModal(); // Close the pop-up modal
+    try {
+    
+    } catch (error) {
+      console.error('Failed to reach status:', error);
+    }
   };
   const handleItemDetail = (id,reqDate,currentUser) => {
   navigation.navigate("Ongoing_details", { Requestid:id,
@@ -185,6 +233,20 @@ const MyActivity = () => {
               <TouchableOpacity onPress={() => handleItemPress(item.id)} style={styles.customTrack}>
                 <Text style={styles.buttonTrack}>Track Live</Text>
               </TouchableOpacity>
+              {errorModel && ( // Display the pop-up modal when destination is reached
+        <Modal transparent={true} visible={errorModel}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>Mechanic didn't start his journey.</Text>
+              <Text style={styles.modalText}>Please stay calm.</Text>
+              <View style={styles.modalButtons}>
+                <Button title="Close" onPress={errorcloseModal} />
+                <Button title="Ok" onPress={confirm} />
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
               <TouchableOpacity onPress={() => handleItemDetail(item.vehicleNo,item.dateTime,item.username)} style={styles.customDetail}>
                 <Text style={styles.buttonDetail}>Details</Text>
               </TouchableOpacity>
@@ -454,6 +516,35 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     fontWeight: "bold",
     fontSize: 18,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderWidth: 1,               // Add border
+    borderColor: 'black',       // Specify border color
+    marginLeft: 1,             // Add left margin
+    marginRight: 1,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderWidth: 1,               // Add border
+    borderColor: 'black',       // Specify border color
+    marginLeft: 40,             // Add left margin
+    marginRight: 40,
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
   },
 });
 

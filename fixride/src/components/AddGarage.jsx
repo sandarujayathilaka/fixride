@@ -4,6 +4,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import { db } from '../config/firebase';
+import { useRoute } from '@react-navigation/native';
 
 function AddGarage() {
   const [about, setAbout] = useState('');
@@ -16,14 +17,15 @@ function AddGarage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [services,setServices] = useState('');
   const [rating, setRating] = useState('3.5');
-
+  const route = useRoute();
+  const { email } = route.params;
   const gatageCollection = collection(db, 'garage');
 
   const categories = [
-    'Category 1',
-    'Category 2',
-    'Category 3',
-    'Category 4',
+    'Motorcycles',
+    'Heavy',
+    'Standard',
+    'All',
   ];
 
   useEffect(() => {
@@ -44,6 +46,7 @@ function AddGarage() {
   const handleRegister = async () => {
     
     const docData = {
+      email,
       about,
       address,
       category: selectedCategory,

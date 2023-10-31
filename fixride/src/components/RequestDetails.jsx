@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import React, { useEffect, useState } from 'react'
-import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
+import { collection, getDocs, getDoc, onSnapshot, query, where } from "firebase/firestore";
 import { db,doc } from "../config/firebase";
 import { ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
@@ -23,7 +23,7 @@ export default function RequestDetails(props) {
   const navigation = useNavigation();
   const date = props.date;
   const user = props.username
-
+  const garageName = props.garageName;
 
 
    const[requestDetails,setRequest] = useState({})
@@ -31,12 +31,14 @@ export default function RequestDetails(props) {
    const [RequestId, setRequestId] = useState("");
    const [cTime, setCorrectTime] = useState("");
    const [cDate, setCorrectDate] = useState("");
+  const [payment, setPayment] = useState("Unpaid");
+  const [errorModel, setErrorModel] = useState(false);
   const [showBusyMessage, setShowBusyMessage] = useState(false);
    const [messages, setMessages] = useState([
      "Waiting for approval ...",
      "Garage seems busy ...",
-     "Please Wait 2-3 Minutes ...",
-     "Thanks for Your Patience ...",
+     "Please wait few seconds ...",
+     "Appreciate your patience ! ",
      // Add more messages here
    ]);
    const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
@@ -68,6 +70,8 @@ export default function RequestDetails(props) {
           const doc = snapshot.docs[0];
           setRequest(doc.data());
           setRequestId(doc.id);
+          console.log("first",)
+          setPayment(doc.data().payment)
         }
         setLoading(false);
       });
@@ -119,15 +123,22 @@ const handleOKPress = async () => {
   // Close the modal
   setModalVisible(false);
 
+  // Redirect to the home page (you should replace '/home' with your actual home page route)
+ // router.push(`/cat_list/All`, { cardId: 'All' });
+ navigation.navigate("CatList", { cardid: 'All' });
  
-  navigation.navigate("CatList", { cardid: 'All' });
- 
+  // Update the request status to "Busy" in Firestore
   
 };
 
   const handleTrackStatus = () => {
     if (RequestId) {
-
+      // router.push({
+      //   pathname: `/status/${RequestId}`,
+      //   params: {
+      //     Id: RequestId,
+      //   },
+      // });
       navigation.navigate("Status", { Requestid: RequestId });
 
     } else {
@@ -137,10 +148,19 @@ const handleOKPress = async () => {
 
   
   const handlePayment = () => {
-    if (RequestId) {
-      console.log("xxx",RequestId)
-      console.log("hxxxhhhh",requestDetails.payment)
-      const pay = requestDetails.payment;
+    if (RequestId && payment!=="Unpaid") {
+      console.log("hhhhh",RequestId)
+      // router.push({
+      //   pathname: `/payment/${RequestId}`,
+      //   params: {
+      //     Id: RequestId,
+      //     payment:payment.toString()
+      //   },
+      // });
+      console.log("paymentt",payment)
+      console.log(payment.toString())
+
+      const pay =payment.toString();
       navigation.navigate("Payment", { Requestid: RequestId,Payment:pay });
     } else {
       console.error("Invalid or missing RequestId");
@@ -175,8 +195,57 @@ const handleOKPress = async () => {
   };
 
 
-  
+  const handleItemPress = async() => {
+    try {
+      console.log("f", RequestId);
+      const docRef = collection(db, "tracking");
+      const doc = await getDocs(docRef);
+      console.log("ddd", doc);
+      let foundDocumentRef = null;
 
+      doc.forEach((doc1) => {
+          const iid = doc1.data().requestId;
+          console.log("id", iid);
+          console.log("eid", RequestId);
+          if (RequestId === iid) {
+              console.log("Document found:", RequestId);
+              foundDocumentRef = doc1.ref; // Store the found DocumentReference
+          }
+      });
+
+      if (foundDocumentRef) {
+          // Retrieve the data from the DocumentReference
+          const foundDocumentSnapshot = await getDoc(foundDocumentRef);
+          console.log(foundDocumentSnapshot);
+          navigation.navigate('TrackLive', { id:RequestId });
+          if (foundDocumentSnapshot.exists()) {
+           // navigation.navigate('TrackLive', { id });
+          } else {
+           // setErrorModel(true);
+          }
+      } else {
+        
+        setErrorModel(true);
+      }
+  } catch (error) {
+      console.error(error);
+      // Handle any errors that occur during fetching
+  }
+
+ };
+ const errorcloseModal = () => {
+       
+  setErrorModel(false);
+};
+
+const confirm = async () => {
+  errorcloseModal(); // Close the pop-up modal
+  try {
+  
+  } catch (error) {
+    console.error('Failed to reach status:', error);
+  }
+};
   return (
     <ScrollView
       style={styles.container}
@@ -187,8 +256,7 @@ const handleOKPress = async () => {
       <View style={styles.container}>
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="blue" />
-            <Text>Loading...</Text>
+            <ActivityIndicator size="large" color="orange" />
           </View>
         ) : requestDetails.status === "Pending" ? (
           // Display the current message based on the currentMessageIndex
@@ -225,10 +293,9 @@ const handleOKPress = async () => {
           </>
         ) : (
           <>
-            <Text style={styles.topic}>Activity Details</Text>
             <View style={styles.serviceColumn}>
               <View>
-                <Text style={styles.mainLable}>ddk</Text>
+                <Text style={styles.mainLable}>{garageName}</Text>
                 <Text style={{ fontSize: 16 }}>0774333450</Text>
               </View>
               <View style={styles.datetime}>
@@ -252,7 +319,7 @@ const handleOKPress = async () => {
             <View style={styles.serviceColumn}>
               <View>
                 <Text style={[styles.mainLable, { marginTop: 10 }]}>
-                  {requestDetails.mainstatus}
+                  {requestDetails.mainStatus}
                 </Text>
               </View>
               <View style={styles.datetime}>
@@ -267,6 +334,7 @@ const handleOKPress = async () => {
                 >
                   <Text style={styles.trackStatusButtonText}>Track Status</Text>
                 </TouchableOpacity>
+                
               </View>
             </View>
 
@@ -297,9 +365,26 @@ const handleOKPress = async () => {
               <View style={styles.serviceColumn}>
                 <View style={{ margin: 10 }}>
                   <Text style={styles.mainLable}>Mechanic Details</Text>
-                  <TouchableOpacity style={styles.trackStatusButton}>
+                  <TouchableOpacity
+                    onPress={() => handleItemPress()}
+                    style={styles.trackStatusButton}
+                  >
                     <Text style={styles.trackStatusButtonText}>Live Track</Text>
                   </TouchableOpacity>
+                  {errorModel && ( // Display the pop-up modal when destination is reached
+      <Modal transparent={true} visible={errorModel}>
+        <View style={styles.modalContainerr}>
+          <View style={styles.modalContentt}>
+            <Text style={styles.modalTextt}>Mechanic didn't start his journey.</Text>
+            <Text style={styles.modalTextt}>Please stay calm.</Text>
+            <View style={styles.modalButtonss}>
+              <Button title="Close" onPress={errorcloseModal} />
+              <Button title="Ok" onPress={confirm} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+    )}
                   <Text
                     style={{ fontSize: 25, marginTop: 10, fontWeight: "500" }}
                   >
@@ -345,14 +430,6 @@ const handleOKPress = async () => {
                 <Text style={styles.detail}>{requestDetails.powerSource}</Text>
               </View>
               <View style={styles.row}>
-                <Text style={styles.label}>Breakdown Location</Text>
-                <Text style={styles.detail}>Matara</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Vehicle Model</Text>
-                <Text style={styles.detail}>{requestDetails.vehicleModel}</Text>
-              </View>
-              <View style={styles.row}>
                 <Text style={styles.label}>Selected Payment method</Text>
                 <Text style={styles.detail}>
                   {requestDetails.paymentMethod}
@@ -389,12 +466,14 @@ const handleOKPress = async () => {
               </View>
             </View>
             <View>
-              <TouchableOpacity
-                style={styles.payButton}
-                onPress={handlePayment}
-              >
-                <Text>Card Payment</Text>
-              </TouchableOpacity>
+              {requestDetails.payment !== "Not Calculated" && (
+                <TouchableOpacity
+                  style={styles.payButton}
+                  onPress={handlePayment}
+                >
+                  <Text>Card Payment</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </>
         )}
@@ -481,7 +560,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center", // Center vertically
     alignItems: "center",
-    marginTop: 100, // Center horizontally
+    marginTop: 20, // Center horizontally
   },
   waitingImage: {
     width: 425, // Set the desired width
@@ -522,7 +601,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   messageText: {
-    fontSize: 20,
+    fontSize: 23,
     fontWeight: "bold",
     textAlign: "center",
     marginVertical: 20,
@@ -554,5 +633,34 @@ const styles = StyleSheet.create({
     height:60,
     marginTop:10,
     marginLeft:50
-  }
+  },
+  modalContainerr: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderWidth: 1,               // Add border
+    borderColor: 'black',       // Specify border color
+    marginLeft: 1,             // Add left margin
+    marginRight: 1,
+  },
+  modalContentt: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderWidth: 1,               // Add border
+    borderColor: 'black',       // Specify border color
+    marginLeft: 40,             // Add left margin
+    marginRight: 40,
+  },
+  modalTextt: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  modalButtonss: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
 });

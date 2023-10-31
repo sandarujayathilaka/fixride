@@ -22,7 +22,7 @@ const TrackLive = () => {
   const { id } = route.params;
  
  let requestId = id;
- console.log("rid",requestId);
+ //console.log("rid",requestId);
     const mapRef = useRef()
     const markerRef = useRef()
  
@@ -36,7 +36,7 @@ const TrackLive = () => {
           latitude: 8.7542,
           longitude: 80.4981,
       },
-        isLoading: true,
+      isLoading:true,
         coordinate: new AnimatedRegion({
           latitude: 8.7542,
           longitude: 80.4982,
@@ -51,28 +51,27 @@ const TrackLive = () => {
     })
    
 
-    const { curLoc, time, distance, destinationCords, isLoading, coordinate,heading, isReached } = state
+    const { curLoc, time, distance, destinationCords,isLoading, coordinate,heading, isReached } = state
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
     const markerCoordinate = coordinate;
     const [circleRadius, setCircleRadius] = useState(0);
     const [modalVisible, setModalVisible] = useState(false);
-    const [errorModel, setErrorModel] = useState(false);
-  
+   
     const checkReached = () => {
-        console.log("rgfeached");
-        console.log(destinationCords.latitude,curLoc.latitude);
-        console.log(destinationCords.longitude,curLoc.longitude);
+      //  console.log("rgfeached");
+      //  console.log(destinationCords.latitude,curLoc.latitude);
+      //  console.log(destinationCords.longitude,curLoc.longitude);
         if(isReached === false){
         if (
           destinationCords.latitude === curLoc.latitude &&
           destinationCords.longitude === curLoc.longitude
         ) {
           // Destination is reached
-          console.log("reached");
+         // console.log("reached");
           setModalVisible(true);
           setState((prevState) => ({ ...prevState, isReached: true }));
         }else{
-            console.log("unreached");
+    //        console.log("unreached");
         }
       }
       };
@@ -126,7 +125,7 @@ const TrackLive = () => {
       const confirmReached = async () => {
         closeModal(); // Close the pop-up modal
         try {
-          console.log('Reach status');
+      //    console.log('Reach status');
           // Set a flag in your state to prevent the modal from appearing again
           // For example, you can add a reached flag to your state
           // updateState({ reached: true });
@@ -135,33 +134,21 @@ const TrackLive = () => {
         }
       };
 
-      const errorcloseModal = () => {
-       
-        setErrorModel(false);
-      };
-      
-      const confirm = async () => {
-        closeModal(); // Close the pop-up modal
-        try {
-        
-        } catch (error) {
-          console.error('Failed to reach status:', error);
-        }
-      };
+    
 
       const getLocation = async () => {
         try {
             const docRef = collection(db, "tracking");
             const doc = await getDocs(docRef);
-            console.log("ddd", doc);
+        //    console.log("ddd", doc);
             let foundDocumentRef = null;
     
             doc.forEach((doc1) => {
                 const id = doc1.data().requestId;
-                console.log("id", id);
-                console.log("eid", requestId);
+             //   console.log("id", id);
+             //   console.log("eid", requestId);
                 if (id === requestId) {
-                    console.log("Document found:", id);
+              //      console.log("Document found:", id);
                     foundDocumentRef = doc1.ref; // Store the found DocumentReference
                 }
             });
@@ -169,12 +156,13 @@ const TrackLive = () => {
             if (foundDocumentRef) {
                 // Retrieve the data from the DocumentReference
                 const foundDocumentSnapshot = await getDoc(foundDocumentRef);
-                console.log(foundDocumentSnapshot);
+              //  console.log(foundDocumentSnapshot);
                 
                 if (foundDocumentSnapshot.exists()) {
                     const { mehanicLocation, userLocation,heading } = foundDocumentSnapshot.data();
-                    console.log("cugetrrent", mehanicLocation, userLocation);
-                    if (mehanicLocation && userLocation && heading) {
+                    console.log("cugetrrent", mehanicLocation, userLocation,heading);
+                    //if (mehanicLocation && userLocation && heading) {
+                      console.log("g")
                     const curLoc = {
                         latitude: parseFloat(mehanicLocation.latitude),
                         longitude: parseFloat(mehanicLocation.longitude),
@@ -185,7 +173,7 @@ const TrackLive = () => {
                         latitude: parseFloat(userLocation.latitude),
                         longitude: parseFloat(userLocation.longitude),
                     };
-                    console.log("destinationCords", destinationCords);
+                   console.log("destinationCords", destinationCords);
     
                     animate(curLoc.latitude, curLoc.longitude);
                     console.log("heading", heading);
@@ -199,16 +187,16 @@ const TrackLive = () => {
                             longitudeDelta: LONGITUDE_DELTA
                         }),
                         heading: heading,
-                        isLoading: false,
+                        isLoading:false,
+                      
                     });
-                  }else{
-                    setErrorModel(true);
-                  }
+                //  }
+                 
                 } else {
                     console.log('Document not found'); // Handle if the document does not exist
                 }
             } else {
-                console.log('Reference not found'); // Handle if the document does not exist
+             
             }
         } catch (error) {
             console.error(error);
@@ -216,8 +204,8 @@ const TrackLive = () => {
         }
     };
     
-console.log("state",state);
-console.log("updateState",updateState);
+//console.log("state",state);
+//console.log("updateState",updateState);
     useEffect(() => {
         const interval = setInterval(() => {
             getLocation()
@@ -253,9 +241,9 @@ console.log("updateState",updateState);
             time: t
         })
     }
-console.log("cul",curLoc);
-console.log("del",destinationCords);
-console.log("coo",coordinate);
+//console.log("cul",curLoc);
+//console.log("del",destinationCords);
+//console.log("coo",coordinate);
     return (
         <View style={styles.container}>
  {modalVisible && ( // Display the pop-up modal when destination is reached
@@ -271,19 +259,7 @@ console.log("coo",coordinate);
           </View>
         </Modal>
       )}
-      {errorModel && ( // Display the pop-up modal when destination is reached
-        <Modal transparent={true} visible={isReached}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalText}>Mechanic didn't start his journey.Please stay calm.</Text>
-              <View style={styles.modalButtons}>
-                <Button title="Close" onPress={errorcloseModal} />
-                <Button title="Ok" onPress={confirm} />
-              </View>
-            </View>
-          </View>
-        </Modal>
-      )}
+      
       {isLoading ? ( // Show loading until destinationCords is available
         <Loader isLoading={isLoading} />
       ) : (

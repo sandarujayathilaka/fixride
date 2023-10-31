@@ -6,21 +6,26 @@ import imagePath from '../../constants/imagePath';
 import MapViewDirections from 'react-native-maps-directions';
 import Loader from './Loader';
 import { locationPermission, getCurrentLocation } from '../../helper/helperFunction';
-import { addDoc, collection, updateDoc, doc, getDocs } from "firebase/firestore";
+import { addDoc, collection, updateDoc, doc, getDocs, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import { useNavigation } from "@react-navigation/native";
-
+import { useRoute } from "@react-navigation/native";
+import CustomBtn from './CustomBtn';
 
 const screen = Dimensions.get('window');
 const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.04;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-let requestId = 'v';
+
 
 const Home = ({ navigation }) => {
     const mapRef = useRef()
     const markerRef = useRef()
-    
+    const route=useRoute();
+    const { Requestid } = route.params;
+    let requestId = Requestid;
+    console.log("requestId", requestId);
+   
+
     //const [requestId,setId] = useState('');
     const [state, setState] = useState({
         curLoc: {
@@ -28,7 +33,7 @@ const Home = ({ navigation }) => {
             longitude: 80.4982,
         },
         destinationCords: {},
-        isLoading: false,
+        isLoading: true,
         coordinate: new AnimatedRegion({
             latitude: 8.7542,
             longitude: 80.4982,
@@ -41,13 +46,15 @@ const Home = ({ navigation }) => {
         isReached: false,
 
     })
-
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
     const { curLoc, time, distance, destinationCords, isLoading, coordinate,heading, isReached } = state
     const updateState = (data) => setState((state) => ({ ...state, ...data }));
     const [circleRadius, setCircleRadius] = useState(0); // Initial radius of the circle
     const [modalVisible, setModalVisible] = useState(false);
-    
-    const handleSave = async (id, destination) => {
+    useEffect(() => {
+       onPressLocation();
+    }, []);
+    const handleSave = async (id,latitude,longitude) => {
         try {
           const trackingDb = collection(db, "tracking");
           const querySnapshot = await getDocs(trackingDb);
@@ -58,37 +65,35 @@ const Home = ({ navigation }) => {
           querySnapshot.forEach((doc) => {
             const requestId = doc.data().requestId;
             console.log("hu",requestId);
+            console.log("hu",destinationCords);
             if (requestId === id) {
               requestIdExists = true;
-              const latitude = destination.latitude;
-              const longitude = destination.longitude;
+              console.log("aa")
               updateCurrentLocationInDatabase(requestId,latitude, longitude);
             }
           });
       
           if (!requestIdExists) {
             // If requestId doesn't exist, add a new document
+            console.log("w",latitude,longitude)
             await addDoc(trackingDb, {
               requestId: id,
-              userLocation: destination,
+              userLocation: destinationCords,
               mehanicLocation: curLoc,
               heading:heading,
             });
       
             console.log({
-              type: 'success',
-              text1: 'Feedback Submitted',
-              text2: 'Thank you for your feedback!',
+              type: 'success'
             });
           } else {
             console.log('Request ID already exists, updating location.');
           }
         } catch (error) {
-          console.error('Failed to submit feedback:', error);
+          console.error('Failed to add:', error);
           console.log({
             type: 'error',
-            text1: 'Error',
-            text2: 'Failed to submit feedback. Please try again.',
+            
           });
         }
       };
@@ -175,28 +180,70 @@ const Home = ({ navigation }) => {
         }
       };
 
-    const onPressLocation = () => {
-        navigation.navigate('ChooseLocation', { getCordinates: fetchValue })
-    }
-    const fetchValue = (data) => {
-        console.log("this is data", data)
-        requestId=data.documentId;
-        const id = data.documentId;
-        const destination = data.destinationCords;
-        updateState({
-            destinationCords: {
-                latitude: data.destinationCords.latitude,
-                longitude: data.destinationCords.longitude,
+    const onPressLocation = async() => {
+       // navigation.navigate('ChooseLocation', { getCordinates: fetchValue })
+       
+        console.log("latitude1");
+        try {
+          console.log("latitude5");
+          const docRef = collection(db, "request");
+          const doc = await getDocs(docRef);
+      
+          let foundDocumentRef = null; // Initialize to null
+          console.log("did",doc);
+          doc.forEach((doc1) => {
+            console.log("id",id);
+            const id = doc1.id;
+            console.log("id",id);
+                    console.log("eid",requestId);
+            if (id === requestId) {
+              console.log("Document found:", id);
+              foundDocumentRef = doc1.ref; // Store the found DocumentReference
             }
-        });
-        handleSave(id,destination);
-    }
+          });
+      
+          if (foundDocumentRef) {
+            // Retrieve the data from the DocumentReference
+            const foundDocumentSnapshot = await getDoc(foundDocumentRef);
+            if (foundDocumentSnapshot.exists()) {
+              const { latitude, longitude } = foundDocumentSnapshot.data();
+             console.log("users", latitude, longitude );
+              await updateDoc(foundDocumentRef, { startStatus: "Started" });
+              updateState({
+                destinationCords: {
+                  latitude:parseFloat(latitude),
+                  longitude:parseFloat(longitude),
+                },
+                isLoading:false,
+              });
+              console.log("hhhr")
+              const id = requestId;
+             
+              handleSave(id,latitude,longitude);
+            } else {
+              console.log('Document not found'); // Handle if the document does not exist
+            }
+          } else {
+            console.log('Reference not found'); // Handle if the document does not exist
+          }
+      
+          console.log("latitude4");
+      
+          
+        } catch (error) {
+          console.error(error);
+          // Handle any errors that occur during fetching
+        }
+      
+      }
+
 console.log(requestId);
 const updateCurrentLocationInDatabase = async (requestId, latitude, longitude) => {
     const trackingDb = collection(db, "tracking");
-  
+    console.log("e")
     if (requestId) {
       try {
+        console.log("f")
         const querySnapshot = await getDocs(trackingDb);
         let docToUpdate = null;
   
@@ -205,20 +252,23 @@ const updateCurrentLocationInDatabase = async (requestId, latitude, longitude) =
           const docData = doc.data();
           if (docData.requestId === requestId) {
             docToUpdate = doc.ref;
+            console.log("g")
           }
         });
-  
+  console.log("ddd",destinationCords,curLoc)
         if (docToUpdate) {
           await updateDoc(docToUpdate, {
             mehanicLocation: {
               latitude,
               longitude,
             },
+            userLocation:destinationCords,
             heading:heading,
           });
           console.log('Current location updated in the database');
         } else {
-          //console.error(`No document found with requestId: ${requestId}`);
+          const id=requestId;
+          handleSave(id,latitude,longitude)
         }
       } catch (error) {
         console.error('Failed to update current location in the database', error);
@@ -240,6 +290,7 @@ const updateCurrentLocationInDatabase = async (requestId, latitude, longitude) =
            // animate(latitude, longitude);
           
             animate(latitude, longitude);
+            console.log("latitude", longitude);
             updateState({
                 heading: heading,
                 curLoc: { latitude, longitude },
@@ -251,7 +302,7 @@ const updateCurrentLocationInDatabase = async (requestId, latitude, longitude) =
                 })
             });
            
-            
+            console.log("latitude", "longitude");
             updateCurrentLocationInDatabase(requestId,latitude, longitude);
         }
     }
@@ -291,6 +342,9 @@ const updateCurrentLocationInDatabase = async (requestId, latitude, longitude) =
         })
     }
 
+console.log("curLocfinal",curLoc)
+console.log("desifinal",destinationCords)
+
     return (
         <View style={styles.container}>
  {modalVisible && ( // Display the pop-up modal when destination is reached
@@ -306,6 +360,11 @@ const updateCurrentLocationInDatabase = async (requestId, latitude, longitude) =
           </View>
         </Modal>
       )}
+
+{isLoading ? ( // Show loading until destinationCords is available
+        <Loader isLoading={isLoading} />
+      ) : (
+        <>
             {distance !== 0 && time !== 0 && (<View style={{ alignItems: 'center', marginVertical: 16 }}>
             <Text>
   Distance left: {distance < 1 ? `${(distance * 1000).toFixed(0)} m` : `${distance.toFixed(0)} km`}
@@ -364,8 +423,7 @@ const updateCurrentLocationInDatabase = async (requestId, latitude, longitude) =
                             console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
                         }}
                         onReady={result => {
-                            console.log(`Distance: ${result.distance*1000} km`)
-                            console.log(`Duration: ${result.duration} min.`)
+                         
                             fetchTime(result.distance, result.duration),
                             console.log("rc",result.coordinates)
                                 mapRef.current.fitToCoordinates(result.coordinates, {
@@ -396,15 +454,12 @@ const updateCurrentLocationInDatabase = async (requestId, latitude, longitude) =
                 </TouchableOpacity>
             </View>
             <View style={styles.bottomCard}>
-                <Text>Are you going to start your journey..?</Text>
-                <TouchableOpacity
-                    onPress={onPressLocation}
-                    style={styles.inpuStyle}
-                >
-                    <Text>Confirm your request</Text>
-                </TouchableOpacity>
+                <Text>Customer is waiting for your service.</Text>
+                
             </View>
             <Loader isLoading={isLoading} />
+            </>
+        )}
         </View>
     );
 };

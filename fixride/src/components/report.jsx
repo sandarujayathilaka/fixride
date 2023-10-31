@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { useRoute } from "@react-navigation/native";
 
 const Report = () => {
   const [name, setName] = useState('');
@@ -9,8 +10,11 @@ const Report = () => {
   const [contactNumber, setContactNumber] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [amount, setAmount] = useState('');
-  const [paymentStatus, setPaymentStatus] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('Unpaid');
   const [description, setDescription] = useState('');
+  const route = useRoute();
+  const {requestId } = route.params;
+  console.log(requestId);
 
   const handleSave = async () => {
     // Validation checks
@@ -57,6 +61,7 @@ const Report = () => {
         amount,
         paymentStatus,
         description,
+        requestId:requestId,
       });
 
       // Clear form fields
@@ -81,13 +86,18 @@ const Report = () => {
       Alert.alert('Error', 'Failed to submit report.');
     }
   };
+  const selectUnpaid = () => {
+    setPaymentStatus('Unpaid');
+  };
 
+  // Function to set payment status to Paid
+  const selectPaid = () => {
+    setPaymentStatus('Paid');
+  };
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.pageTitle}>Breakdown Report</Text>
-      <TouchableOpacity style={styles.backButton} onPress={() => { /* Handle back button press */ }}>
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
+      
       <Text style={styles.label}>Name</Text>
       <TextInput
         style={styles.input}
@@ -133,20 +143,19 @@ const Report = () => {
       <View style={styles.paymentStatusContainer}>
         <TouchableOpacity
           style={paymentStatus === 'Unpaid' ? styles.unpaidButton : styles.paidButton}
-          onPress={() => setPaymentStatus('Unpaid')}
+          onPress={selectUnpaid}
         >
-          <Text style={styles.buttonTextU}>Unpaid</Text>
+          <Text style={paymentStatus === 'Unpaid' ? styles.buttonText : styles.buttonTextU}>Unpaid</Text>
         </TouchableOpacity>
         {/* Add space between buttons */}
         <View style={{ width: 80 }} />
         <TouchableOpacity
-          style={paymentStatus === 'Paid' ? styles.paidButton : styles.unpaidButton}
-          onPress={() => setPaymentStatus('Paid')}
+          style={paymentStatus === 'Paid' ? styles.unpaidButton : styles.paidButton}
+          onPress={selectPaid}
         >
-          <Text style={styles.buttonText}>Paid</Text>
+          <Text style={paymentStatus === 'Paid' ? styles.buttonText : styles.buttonTextU}>Paid</Text>
         </TouchableOpacity>
       </View>
-
       <Text style={styles.label}>Description</Text>
       <TextInput
         style={styles.descriptionInput}
@@ -172,7 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     fontWeight: 'bold',
-    marginTop: 80,
+    marginTop: 20,
     marginBottom: 20,
   },
   backButton: {

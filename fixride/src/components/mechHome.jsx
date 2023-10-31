@@ -1,17 +1,45 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import React,{useState,useEffect} from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Modal,ScrollView, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 import img from '../../assets/WelcomeScreen.png';
-import { router } from "expo-router";
+import { firebase } from '../config/firebase'; 
 
 
 
 const MechHome = () => {
   const navigation = useNavigation();
+  const [name, setName] = useState('');
+ 
+
+  const changePassword =()=>{
+    firebase.auth().sendPasswordResetEmail(firebase.auth().currentUser.email)
+    .then(()=>{
+      alert("Password reset email sent")
+    }).catch((error)=>{
+      alert(error)
+    })
+  }
+  
+  
+
+useEffect(()=>{
+  firebase.firestore().collection('users')
+  .doc(firebase.auth().currentUser.uid).get()
+  .then((snapshot)=>{
+    if(snapshot.exists){
+      setName(snapshot.data())
+    }
+    else{
+      console.log('User does not exist');
+    }
+  }).catch((error)=>{
+    alert(error);
+  })
+},[])
+console.log(name.firstname);
   const handleAssignedJobPress = () => {
-    // Navigate to the Job component when the "Assigned Job" button is pressed
-  //  router.push(`/Job/Jobs/`);
-  navigation.navigate("Job");
+   
+  navigation.navigate("Job" ,{name:name.firstname});
   };
 
   return (
@@ -19,16 +47,31 @@ const MechHome = () => {
       <View style={styles.container}>
         <Image source={img} style={styles.image} />
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>Welcome</Text>
-          <Text style={styles.message}>We're here to support you every step of the way!</Text>
+          <Text style={styles.title}>Welcome {name.firstname}</Text>
+          <Text style={styles.message}>Check your assigned work and makes customer happy!</Text>
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.buttonf} onPress={handleAssignedJobPress}>
             <Text style={styles.buttonTextWhite}>Assigned Request</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttons} onPress={() => { /* Handle Log out button press */ }}>
+
+          <TouchableOpacity
+      onPress={() => {changePassword()}}
+      style={styles.buttonS}
+      >
+        <Text style={styles.buttonTextYellow}
+      >Change Password
+      </Text>
+      </TouchableOpacity>
+    
+
+          <TouchableOpacity
+      onPress={() => {firebase.auth().signOut()}}
+      style={styles.buttonS}
+      >
             <Text style={styles.buttonTextYellow}>Log out</Text>
           </TouchableOpacity>
+
         </View>
       </View>
     </ScrollView>
@@ -69,7 +112,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 20,
     paddingBottom: 20,
-    paddingTop:220,
+    paddingTop:20,
 
   },
   buttonf: {
@@ -80,7 +123,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%', // Make buttons take up the full width
   },
-  buttons: {
+  buttonS: {
     backgroundColor: '#FFFFF',
     borderColor: '#EDAE10',
     borderWidth: 1, // 1-pixel border width
@@ -107,7 +150,42 @@ const styles = StyleSheet.create({
     color: '#EDAE10',
     fontSize: 18,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
 
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: 300,
+  },
+
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  buttons:{
+    height:50,
+    width:250,
+    backgroundColor:'red',
+    alignItems:'center',
+    justifyContent:'center',
+    borderRadius:50,
+},
+buttonss:{
+  height:50,
+  width:250,
+  marginTop:10,
+  backgroundColor:'gray',
+  alignItems:'center',
+  justifyContent:'center',
+  borderRadius:50,
+},
 
 
   

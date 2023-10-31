@@ -11,39 +11,111 @@ import {
   Image,
 } from "react-native";
 import { RadioButton } from "react-native-paper";
-import { db } from "../config/firebase";
+import { db,firebase } from "../config/firebase";
 import { router } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library"; 
 import { Feather } from "@expo/vector-icons";// Add this line
+import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+
 
 
 const RequestForm = (props) => {
   const navigation = useNavigation();
   const garageId = props.garageId
+    const garageName = props.garageName;
   const userLatitude = props.userLatitude
   const userLongitude = props.userLongitude
+  const firstname= props.firstname
+  const phone= props.phone
   const [veheNum, setVeheNum] = useState("");
   const [model, setModel] = useState("");
   const [payment, setPayment] = useState("Cash");
   const [matter, setMatter] = useState("");
+  const [phoneNum, setPhone] = useState(phone);
   const [selectedItem, setSelectedItem] = useState("Hybrid");
   const [selectedImage, setSelectedImage] = useState(null);
   const [reqDate, setDateTime] = useState("");
   const [currentUser, setUser] = useState("");
+  const [location, setLocation] = useState("");
+   const [errorMessage, setErrorMessage] = useState("");
+   const [name, setName] = useState('');
+   const [validation, setValidation] = useState({
+     veheNum: true,
+     model: true,
+     matter: true,
+     location: true,
+   });
 
-  useEffect(() => {
-    // Get the current date and time when the component mounts
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString();
-    setDateTime(formattedDate);
-    setUser("Sandaru");
-  }, []); //
+   useEffect(()=>{
+    firebase.firestore().collection('users')
+    .doc(firebase.auth().currentUser.uid).get()
+    .then((snapshot)=>{
+      if(snapshot.exists){
+        setName(snapshot.data())
+      }
+      else{
+        console.log('User does not exist');
+      }
+    }).catch((error)=>{
+      alert(error);
+    })
+  },[])
+
+useEffect(() => {
+  // Get the current date and time when the component mounts
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString();
+  setDateTime(formattedDate);
+  setUser(firstname);
+
+  // Replace "YOUR_API_KEY" with your actual Google Maps Geocoding API key
+  const apiKey = "AIzaSyACdwaw1h6cATe6laoMWoayEniMemjgVkE";
+
+  // Perform reverse geocoding
+  reverseGeocode(userLatitude, userLongitude, apiKey)
+    .then((locationName) => {
+      setLocation(locationName);
+    })
+    .catch((error) => {
+      console.error("Error in reverse geocoding:", error);
+      setLocation("Location not found");
+    });
+}, []);
+
 
   const handleSave = async () => {
-    console.log("lll789")
+
+    const generateOrderId = () => {
+      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let result = "";
+      for (let i = 0; i < 10; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters.charAt(randomIndex);
+      }
+      return result;
+    };
+
+    const ReqId = generateOrderId();
+
+    const newValidation = {
+      veheNum: !!veheNum,
+      model: !!model,
+      matter: !!matter,
+      location: !!location,
+    };
+
+    setValidation(newValidation);
+
+      if (!veheNum || !model || !matter || !location) {
+        setErrorMessage("Please fill in all the required fields.");
+        return;
+      }
+
+        
+  
     const requestDb = collection(db, "request");
 
     // Check if an image is selected
@@ -55,7 +127,7 @@ const RequestForm = (props) => {
         const reader = new FileReader();
         reader.onload = async () => {
           const base64data = reader.result.split(",")[1]; // Extract the base64 string
-
+          console.log("c1",currentUser);
           // Add the data to Firestore
           await addDoc(requestDb, {
             vehicleNo: veheNum,
@@ -65,7 +137,7 @@ const RequestForm = (props) => {
             powerSource: selectedItem,
             imageUrl: `data:image/jpeg;base64,${base64data}`, // Store as base64 URL
             status: "Pending",
-            mainstatus: "Ongoing",
+            mainStatus: "Pending",
             dateTime: reqDate,
             username: currentUser,
             startStatus: "",
@@ -78,7 +150,12 @@ const RequestForm = (props) => {
             macName: "",
             garageId: garageId,
             latitude: userLatitude,
-            logitude:userLongitude
+            longitude: userLongitude,
+            location: location,
+            phone: phoneNum,
+            requestId: ReqId,
+            rate: "0",
+            comment:""
           });
           console.log(veheNum);
 
@@ -96,9 +173,9 @@ const RequestForm = (props) => {
         matter: matter,
         paymentMethod: payment,
         powerSource: selectedItem,
-        status: "Approved",
+        status: "Pending",
         dateTime: reqDate,
-        mainstatus: "Ongoing",
+        mainStatus: "Pending",
         username: currentUser,
         startStatus: "",
         reachStatus: "",
@@ -110,12 +187,20 @@ const RequestForm = (props) => {
         macName: "",
         garageId: garageId,
         latitude: userLatitude,
-        logitude: userLongitude,
+        longitude: userLongitude,
+        location: location,
+        phone: phoneNum,
+        requestId: ReqId,
+        rate: "0",
+        comment: "",
       });
       console.log(veheNum);
       handleItemPress(veheNum);
     }
+    setErrorMessage("");
   };
+
+
 
   // const handleImagePicker = async () => {
   //   const permissionResult =
@@ -140,6 +225,28 @@ const RequestForm = (props) => {
   //   }
   // };
 
+  const reverseGeocode = async (latitude, longitude, apiKey) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+      );
+
+      if (
+        response.data &&
+        response.data.results &&
+        response.data.results.length > 0
+      ) {
+        const locationName = response.data.results[0].formatted_address;
+        return locationName;
+      } else {
+        return "Location not found";
+      }
+    } catch (error) {
+      console.error("Error in reverse geocoding:", error);
+      return "Location not found";
+    }
+  };
+
   const handleCameraCapture = async () => {
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
 
@@ -163,8 +270,24 @@ const RequestForm = (props) => {
     }
   };
 
+  // const handleItemPress = (id) => {
+  //   router.push({
+  //     pathname: `/req_details/${id}`,
+  //     params: {
+  //       Id:id,
+  //       date: reqDate,
+  //       Num: veheNum,
+  //       vehemodel: model,
+  //       paymentmethod: payment,
+  //       vehematter: matter,
+  //       power: selectedItem,
+  //       user: currentUser,
+  //     },
+  //   }); //when need to pass multiple value with link use this method
+  //   console.log(`Clicked with form ${id}`);
+  // };
   const handleItemPress = (id) => {
-    
+    console.log("c2",currentUser);
     navigation.navigate("Req_details", { Requestid:id,
        Date: reqDate,
           Num: veheNum,
@@ -172,18 +295,19 @@ const RequestForm = (props) => {
           paymentmethod: payment,
           vehematter: matter,
           power: selectedItem,
-          Username: currentUser, });
+          Username: currentUser,
+        garageName: garageName, });
    
     console.log(`Clicked with form ${id}`);
   };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Request Form</Text>
-
       <Text style={styles.label}>Vehicle Number:</Text>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          !validation.veheNum && styles.inputError, // Apply red border for validation failure
+        ]}
         onChangeText={(text) => setVeheNum(text)}
         value={veheNum}
         placeholder="Enter your Vehicle Number"
@@ -191,15 +315,42 @@ const RequestForm = (props) => {
 
       <Text style={styles.label}>Vehicle Model:</Text>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          !validation.model && styles.inputError, // Apply red border for validation failure
+        ]}
         onChangeText={(text) => setModel(text)}
         value={model}
         placeholder="Enter Vehicle Model"
       />
 
+      <Text style={styles.label}>Location:</Text>
+      <TextInput
+        style={[
+          styles.input,
+          !validation.location && styles.inputError, // Apply red border for validation failure
+        ]}
+        onChangeText={(text) => setLocation(text)}
+        value={location}
+        placeholder="Enter Vehicle Location"
+      />
+      <Text style={styles.label}>Contact No:</Text>
+      <TextInput
+        style={[
+          styles.input,
+          !validation.location && styles.inputError, // Apply red border for validation failure
+        ]}
+        onChangeText={(text) => setPhone(text)}
+        value={phoneNum}
+        placeholder="Enter Phone Number"
+      />
+
       <Text style={styles.label}>Matter:</Text>
       <TextInput
-        style={styles.textArea}
+        style={[
+          styles.textArea,
+          !validation.matter && styles.inputError, // Apply red border for validation failure
+        ]}
         multiline={true}
         numberOfLines={4}
         onChangeText={(text) => setMatter(text)}
@@ -260,6 +411,10 @@ const RequestForm = (props) => {
           <Image source={{ uri: selectedImage }} style={styles.image} />
         )}
       </View>
+
+      {errorMessage ? (
+        <Text style={styles.errorText}>{errorMessage}</Text>
+      ) : null}
 
       <TouchableOpacity style={styles.customButton} onPress={handleSave}>
         <Text style={styles.buttonText}>Send Request</Text>
@@ -338,7 +493,6 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 7,
     margin: 10,
-    
   },
   imagePickerButton: {
     backgroundColor: "#007AFF",
@@ -365,6 +519,15 @@ const styles = StyleSheet.create({
   iconRow: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  inputError: {
+    borderColor: "red",
   },
 });
 export default RequestForm;

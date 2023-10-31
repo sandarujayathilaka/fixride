@@ -105,8 +105,8 @@ export default function ReqStatusGMside(props) {
           <Text style={styles.statusText}>Paid</Text>
         </View>
       </View>
-      <Text style={styles.statusText}>Payments</Text>
-      <Text style={styles.statusText}>{payment}</Text>
+      <Text style={styles.statusText}>Payments : {payment}</Text>
+
     </View>
   );
 }
@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     backgroundColor: "white",
+    height:'100%'
   },
   statusContainer: {
     flexDirection: "row",
@@ -129,7 +130,9 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 20,
-    fontWeight:"500"
+    fontWeight:"500",
+   alignSelf:'center',
+   marginBottom:40,
   },
   verticalLine: {
     width: 3,

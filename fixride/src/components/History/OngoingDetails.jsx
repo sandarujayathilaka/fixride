@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import React, { useEffect, useState } from 'react'
-import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
+import { collection, getDocs, onSnapshot,getDoc, query, where } from "firebase/firestore";
 import { db,doc } from "../../config/firebase";
 import { ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
@@ -31,8 +31,10 @@ export default function OngoingDetails(props) {
    const [RequestId, setRequestId] = useState("");
    const [cTime, setCorrectTime] = useState("");
    const [garageName, setGarageName] = useState("");
+   const [payment, setPayment] = useState("Unpaid");
    const [garageMobile, setGarageMobile] = useState("");
    const [cDate, setCorrectDate] = useState("");
+   const [errorModel, setErrorModel] = useState(false);
   const [showBusyMessage, setShowBusyMessage] = useState(false);
    const [messages, setMessages] = useState([
      "Waiting for approval ...",
@@ -70,6 +72,7 @@ export default function OngoingDetails(props) {
           const doc = snapshot.docs[0];
           setRequest(doc.data());
           setRequestId(doc.id);
+          setPayment(requestDetails.payment)
           const garageQuery = query(
               collection(db, "garage"),
               where("garageId", "==", doc.data().garageId)
@@ -163,10 +166,15 @@ const handleOKPress = async () => {
   const handlePayment = () => {
     if (RequestId) {
       console.log("hhhhh",RequestId)
-      console.log("hhhhh",requestDetails.payment)
-const pay = requestDetails.payment.toString();
-
-      navigation.navigate("Payment", { Requestid: RequestId, Payment:pay });
+      // router.push({
+      //   pathname: `/payment/${RequestId}`,
+      //   params: {
+      //     Id: RequestId,
+      //   },
+      // });
+      console.log(payment.toString())
+      const pay =payment.toString();
+      navigation.navigate("Payment", { Requestid: RequestId,Payment:pay });
     } else {
       console.error("Invalid or missing RequestId");
     }
@@ -199,11 +207,58 @@ const pay = requestDetails.payment.toString();
     }
   };
 
-  const handleItemPress = (id) => {
-      console.log("item",id)
-      navigation.navigate('TrackLive', { id });
- 
-   };
+  const handleItemPress = async(id) => {
+    try {
+      console.log("f", id);
+      const docRef = collection(db, "tracking");
+      const doc = await getDocs(docRef);
+      console.log("ddd", doc);
+      let foundDocumentRef = null;
+
+      doc.forEach((doc1) => {
+          const iid = doc1.data().requestId;
+          console.log("id", iid);
+          console.log("eid", id);
+          if (id === iid) {
+              console.log("Document found:", id);
+              foundDocumentRef = doc1.ref; // Store the found DocumentReference
+          }
+      });
+
+      if (foundDocumentRef) {
+          // Retrieve the data from the DocumentReference
+          const foundDocumentSnapshot = await getDoc(foundDocumentRef);
+          console.log(foundDocumentSnapshot);
+          navigation.navigate('TrackLive', { id });
+          if (foundDocumentSnapshot.exists()) {
+           // navigation.navigate('TrackLive', { id });
+          } else {
+           // setErrorModel(true);
+          }
+      } else {
+        
+        setErrorModel(true);
+      }
+  } catch (error) {
+      console.error(error);
+      // Handle any errors that occur during fetching
+  }
+    
+  
+  };
+  const errorcloseModal = () => {
+       
+    setErrorModel(false);
+  };
+
+  const confirm = async () => {
+    errorcloseModal(); // Close the pop-up modal
+    try {
+    
+    } catch (error) {
+      console.error('Failed to reach status:', error);
+    }
+  };
   
 
   return (
@@ -329,7 +384,20 @@ const pay = requestDetails.payment.toString();
                   <TouchableOpacity onPress={() => handleItemPress(RequestId)} style={styles.trackStatusButton}>
                     <Text style={styles.trackStatusButtonText}>Live Track</Text>
                   </TouchableOpacity>
-                  
+                  {errorModel && ( // Display the pop-up modal when destination is reached
+      <Modal transparent={true} visible={errorModel}>
+        <View style={styles.modalContainerr}>
+          <View style={styles.modalContentt}>
+            <Text style={styles.modalTextt}>Mechanic didn't start his journey.</Text>
+            <Text style={styles.modalTextt}>Please stay calm.</Text>
+            <View style={styles.modalButtonss}>
+              <Button title="Close" onPress={errorcloseModal} />
+              <Button title="Ok" onPress={confirm} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+    )}
                   <Text
                     style={{ fontSize: 25, marginTop: 10, fontWeight: "500" }}
                   >
@@ -419,12 +487,14 @@ const pay = requestDetails.payment.toString();
               </View>
             </View>
             <View>
+            { requestDetails.payment !== "Not Calculated" && (
               <TouchableOpacity
                 style={styles.payButton}
                 onPress={handlePayment}
               >
                 <Text>Card Payment</Text>
               </TouchableOpacity>
+            )}
             </View>
           </>
         )}
@@ -584,5 +654,34 @@ const styles = StyleSheet.create({
     height:60,
     marginTop:10,
     marginLeft:50
-  }
+  },
+  modalContainerr: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderWidth: 1,               // Add border
+    borderColor: 'black',       // Specify border color
+    marginLeft: 1,             // Add left margin
+    marginRight: 1,
+  },
+  modalContentt: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderWidth: 1,               // Add border
+    borderColor: 'black',       // Specify border color
+    marginLeft: 40,             // Add left margin
+    marginRight: 40,
+  },
+  modalTextt: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  modalButtonss: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
 });

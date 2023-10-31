@@ -34,7 +34,7 @@ const Ongoings = () => {
   useEffect(() => {
     const fetchData = async () => {
       const requestDb = collection(db, "request");
-      const statusQuery = query(requestDb, where("mainstatus", "==", "Ongoing"));
+      const statusQuery = query(requestDb, where("mainStatus", "==", "Ongoing"));
       const querySnapshot = await getDocs(statusQuery);
       const requestData = [];
       querySnapshot.forEach((doc) => {
@@ -73,7 +73,7 @@ const Ongoings = () => {
     <ScrollView style={styles.container}>
 
     <Text style={styles.text}>Ongoing Repairs</Text>
-      <Text style={styles.text2}>18 request found</Text>
+     
 
      
         {data.map((card) => (
@@ -81,7 +81,7 @@ const Ongoings = () => {
             <View style={styles.cardContent}>
               <View style={{ flexDirection: "column" }}>
                 <Text style={styles.cardText}>{card.username}</Text>
-                <Text style={{}}>Phone: {card.contact}</Text>
+                <Text style={{}}>{card.phone}</Text>
               </View>
 
               <View style={{ flexDirection: "column" }}>

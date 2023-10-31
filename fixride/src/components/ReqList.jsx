@@ -113,7 +113,7 @@ const ReqList = () => {
           <Text style={styles.buttonText2}>Ongoings</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.text2}>18 requests found</Text>
+      
 
       <View style={styles.cardContainer}>
         {data.map((item, index) => (

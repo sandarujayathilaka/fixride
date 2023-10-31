@@ -1,135 +1,114 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
-} from "react-native";
-import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { firebase } from "../../config/firebase";
+import { View, Text, ImageBackground ,TouchableOpacity,TextInput,StyleSheet,Image} from 'react-native'
+import React, {useState} from 'react'
+import { useNavigation } from '@react-navigation/native'
+import { firebase } from '../../config/firebase';
+
 
 const Login = () => {
-  const navigation = useNavigation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordVisible, setPasswordVisible] = useState(false);
+    const navigation = useNavigation()
+    const [email,setEmail] = useState('');
+    const [password,setPassword] = useState('');
+    const [passwordVisible, setPasswordVisible] = useState(false);
 
-  loginUser = async (email, password) => {
-    try {
-      await firebase.auth().signInWithEmailAndPassword(email, password);
-    } catch (error) {
-      alert(error.message);
+  loginUser = async(email,password)=>{
+    try{
+        await firebase.auth().signInWithEmailAndPassword(email,password)
+
+    }catch(error){
+        alert(error.message)
     }
-  };
+  }
 
-  const forgetPassword = () => {
-    firebase
-      .auth()
-      .sendPasswordResetEmail(email)
-      .then(() => {
-        alert("Password reset email sent");
-      })
-      .catch((error) => {
-        alert(error);
-      });
-  };
 
-  return (
+const forgetPassword = () => {
+    firebase.auth().sendPasswordResetEmail(email)
+    .then(() => {
+        alert("Password reset email sent")
+    }).catch((error) => {
+        alert(error)
+    })
+}
+
+return(
+  
     <View style={styles.container}>
-      <Text style={{ fontWeight: "bold", fontSize: 26, textAlign: "center" }}>
-        Login
-      </Text>
-      <View style={{ marginTop: 40, alignItems: "center" }}>
-        <TextInput
-          style={styles.textInput}
-          placeholder="Email"
-          onChangeText={(email) => setEmail(email)}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textPass}
-            placeholder="Password"
-            onChangeText={(password) => setPassword(password)}
-            autoCapitalize="none"
-            autoCorrect={false}
-            secureTextEntry={!passwordVisible}
-          />
-          <TouchableOpacity
-            style={styles.showButton}
-            onPress={() => setPasswordVisible(!passwordVisible)}
-          >
-            <Text style={{ fontWeight: "bold", color: "black" }}>
-              {passwordVisible ? "Hide" : "Show"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "flex-end",
-          marginRight: 10,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => forgetPassword()}
-          style={{ marginTop: 10 }}
-        >
-          <Text style={{ fontWeight: "bold", color: "red", fontSize: 16 }}>
-            Forget Password?
-          </Text>
-        </TouchableOpacity>
-      </View>
+       <Image
+        source={require('../../../assets/applogo.jpg')} // Replace with your image path
+        style={styles.logo}
+      />
+        <Text style={{fontWeight:'bold',fontSize:26,textAlign:'center'}}>Login</Text>
+<View style={{marginTop:40,alignItems:'center'}}>
+    <TextInput
+    style={styles.textInput}
+    placeholder='Email'
+    onChangeText={(email)=> setEmail(email)}
+    autoCapitalize='none'
+    autoCorrect={false}
+    />
+<View style={styles.inputContainer}>
+  <TextInput
+    style={styles.textPass}
+    placeholder='Password'
+    onChangeText={(password) => setPassword(password)}
+    autoCapitalize='none'
+    autoCorrect={false}
+    secureTextEntry={!passwordVisible}
+  />
+  <TouchableOpacity
+    style={styles.showButton}
+    onPress={() => setPasswordVisible(!passwordVisible)}
+  >
+    <Text style={{ fontWeight: 'bold', color: 'black' }}>
+      {passwordVisible ? 'Hide' : 'Show'}
+    </Text>
+  </TouchableOpacity>
+</View>
+</View>
+<View style={{ flexDirection: 'row', justifyContent: 'flex-end',marginRight:10 }}>
+  <TouchableOpacity onPress={() => forgetPassword()} style={{ marginTop: 10 }}>
+    <Text style={{ fontWeight: 'bold', color: 'red', fontSize: 16 }}>
+      Forget Password?
+    </Text>
+  </TouchableOpacity>
+</View>
 
-      <TouchableOpacity
-        onPress={() => loginUser(email, password)}
-        style={styles.button}
-      >
-        <Text style={{ fontWeight: "bold", fontSize: 22, color: "white" }}>
-          Login
-        </Text>
-      </TouchableOpacity>
+<TouchableOpacity 
+onPress={()=> loginUser(email,password)}
+style={styles.button}
+>
+<Text style={{fontWeight:'bold', fontSize:22,color: 'white'}}>Login</Text>
+</TouchableOpacity>
 
-      <Text
-        style={{
-          fontWeight: "bold",
-          fontSize: 16,
-          textAlign: "center",
-          marginTop: 20,
-        }}
-      >
-        Don't have an account?
-      </Text>
-      <TouchableOpacity onPress={() => navigation.navigate("Registration")}>
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 16,
-            color: "orange",
-            textAlign: "center",
-          }}
-        >
-          Register Now
-        </Text>
-      </TouchableOpacity>
+<Text style={{fontWeight:'bold', fontSize:16,textAlign:'center',marginTop:20}}>
+    Don't have an account?
+    </Text>
+<TouchableOpacity 
+onPress={()=> navigation.navigate('Registration')}
+>
+<Text style={{fontWeight:'bold', fontSize:16, color:'orange',textAlign:'center'}}>
+     Register Now
+    </Text>
+</TouchableOpacity>
+
+
+
+
     </View>
-  );
-};
+)
 
-export default Login;
+}
+
+export default Login
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 100,
+    marginTop: 20,
   },
   textInput: {
     paddingTop: 20,
     paddingBottom: 10,
-    width: 400,
+    width: "90%",
     fontSize: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#000",
@@ -143,7 +122,7 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 50,
     height: 50,
-    width: 400,
+    width: "90%",
     backgroundColor: "orange",
     alignItems: "center",
     justifyContent: "center",
@@ -160,7 +139,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     height: 60,
-    width: 400,
+    width: "90%",
   },
   textPass: {
     flex: 1,
@@ -172,5 +151,12 @@ const styles = StyleSheet.create({
   showButton: {
     position: "absolute",
     right: 15,
+  },
+  logo: {
+    width: 150, // Adjust the width and height as needed
+    height: 150,
+    marginBottom: 20,
+    alignSelf: "center",
+    borderRadius: 200,
   },
 });

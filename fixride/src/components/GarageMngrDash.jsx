@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React from "react";
+import React,{useState,useEffect} from "react";
 import { router } from "expo-router";  
 import {
   Image,
@@ -8,9 +8,17 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
 } from "react-native";
+import { firebase } from '../config/firebase'; 
+
 
 const cardData = [
+  {
+    id: "addGarage",
+    title: "Add New Garage",
+    imageSource: require("../../assets/garageimage.png"),
+  },
   {
     id: "addMechanic",
     title: "Add New Mechanics",
@@ -21,28 +29,122 @@ const cardData = [
     title: "New Requests",
     imageSource: require("../../assets/repReq.png"),
   },
+  {
+    id: "Change",
+    title: "Change Password",
+    imageSource: require("../../assets/change.png"),
+  },
+  {
+    id: "Delete",
+    title: "Delete Account",
+    imageSource: require("../../assets/deleteuser.jpg"),
+  },
+  {
+    id: "SignOut",
+    title: "Sign Out",
+    imageSource: require("../../assets/signout.png"),
+  },
 ];
 
 function GarageMngrDash() {
   const navigation = useNavigation();
+  const [name, setName] = useState('');
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
 
 
-  const handleCardClick = (id) => {
-    switch (id) {
-      case 'addMechanic':
-        //router.push(`/add-mechanic/add`);
-        navigation.navigate("AddMechanic");
-        break;
-      case 'ReqList':
-    // ReqList    router.push(`/req-list/reqlist`);
-    navigation.navigate("ReqList");
-        break;
-      default:
-        break;
-    }
+  const changePassword =()=>{
+    firebase.auth().sendPasswordResetEmail(firebase.auth().currentUser.email)
+    .then(()=>{
+      alert("Password reset email sent")
+    }).catch((error)=>{
+      alert(error)
+    })
+  }
+  
+  const handleDeleteAccount = () => {
+    setDeleteModalVisible(true);
+  };
+  
+  const confirmDeleteAccount = () => {
+    // Delete user data from Firestore
+    const userRef = firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid);
+    userRef
+      .delete()
+      .then(() => {
+        // Delete user from Firebase Authentication
+        const user = firebase.auth().currentUser;
+        user
+          .delete()
+          .then(() => {
+            // Sign out the user
+            firebase.auth().signOut();
+            alert('Account deleted successfully');
+          })
+          .catch((error) => {
+            alert(error);
+          });
+      })
+      .catch((error) => {
+        alert(error);
+      });
   };
 
+useEffect(()=>{
+  firebase.firestore().collection('users')
+  .doc(firebase.auth().currentUser.uid).get()
+  .then((snapshot)=>{
+    if(snapshot.exists){
+      setName(snapshot.data())
+    }
+    else{
+      console.log('User does not exist');
+    }
+  }).catch((error)=>{
+    alert(error);
+  })
+},[])
+
+const handleCardClick = (id) => {
+  switch (id) {
+    case 'addGarage':
+      // Check if a record with a matching email exists in the garage collection
+      firebase.firestore().collection('garage')
+        .where('email', '==', name.email)
+        .get()
+        .then((snapshot) => {
+          if (!snapshot.empty) {
+            alert('A garage with the same email already exists. You cannot add a new garage.');
+          } else {
+            navigation.navigate('AddGarage', { email: name.email });
+          }
+        })
+        .catch((error) => {
+          alert(error);
+        });
+      break;
+    case 'addMechanic':
+      navigation.navigate('AddMechanic');
+      break;
+    case 'ReqList':
+      navigation.navigate('ReqList');
+      break;
+    case 'Change':
+      changePassword();
+      break;
+    case 'Delete':
+      setDeleteModalVisible(true);
+      break;
+    case 'SignOut':
+      firebase.auth().signOut();
+      break;
+    default:
+      break;
+  }
+};
+
+
   return (
+    <ScrollView>
     <View style={styles.container}>
       <Image
         source={require("../../assets/grgMngrDash.png")}
@@ -61,12 +163,29 @@ function GarageMngrDash() {
             onPress={() => handleCardClick(item.id)}
             style={styles.gridItem}
           >
+
             <Image source={item.imageSource} style={styles.cardImage} />
             <Text style={styles.cardTitle}>{item.title}</Text>
           </TouchableOpacity>
+          
         ))}
+         <Modal animationType="slide" transparent={true} visible={isDeleteModalVisible}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Are you sure you want to delete your account?</Text>
+            <TouchableOpacity onPress={confirmDeleteAccount} style={styles.buttons}>
+        <Text style={{ fontSize: 15, fontWeight: 'bold', color: 'white' }}>Yes, Delete</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setDeleteModalVisible(false)} style={styles.buttonss}>
+        <Text style={{ fontSize: 15, fontWeight: 'bold', color: 'white' }}>Cancel</Text>
+      </TouchableOpacity>
+          
+          </View>
+        </View>
+      </Modal>
       </View>
     </View>
+    </ScrollView>
   );
 }
 
@@ -110,6 +229,8 @@ const styles = StyleSheet.create({
     marginLeft:45,
     alignItems: "center", 
     justifyContent: "center", 
+    height:50,
+    width:50,
   },
   cardTitle: {
     marginTop: 8,
@@ -133,6 +254,42 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop:7,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: 300,
+  },
+
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  buttons:{
+    height:50,
+    width:250,
+    backgroundColor:'red',
+    alignItems:'center',
+    justifyContent:'center',
+    borderRadius:50,
+},
+buttonss:{
+  height:50,
+  width:250,
+  marginTop:10,
+  backgroundColor:'gray',
+  alignItems:'center',
+  justifyContent:'center',
+  borderRadius:50,
+},
 });
 
 export default GarageMngrDash;

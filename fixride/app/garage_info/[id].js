@@ -19,20 +19,22 @@ import { useNavigation,useRoute } from "@react-navigation/native";
 
 
 const GarageInfo = () => {
-  const navigation = useNavigation();
   const [garageData, setGarageData] = useState(null);
   const [selectedButton, setSelectedButton] = useState("Services");
   const [isGarageClosed, setIsGarageClosed] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [garageClosingTime, setGarageClosingTime] = useState("");
-
+  const navigation = useNavigation();
 
   // const params = useGlobalSearchParams();
   // const Id = params.id;
+  // const userLatitude = params.userLatitude
+  // const userLongitude =params.userLongitude
   const route = useRoute();
-  const { iid } = route.params;
+  const { iid,categoryId,firstname,phone } = route.params;
   console.log("1", iid);
   let Id = iid;
+  const categoryid = categoryId
   console.log("2", Id);
 
   // const userLatitude = params.userLatitude
@@ -48,7 +50,7 @@ const GarageInfo = () => {
   console.log("1", userlongitude);
   let userLongitude = userlongitude;
   console.log("2", userLongitude);
-
+  console.log("called",Id)
   const imageSource = require("../../assets/logo.webp");
 
   const [loading, setLoading] = useState(true);
@@ -73,6 +75,7 @@ console.log(garageCollectionRef);
          const doc = querySnapshot.docs[0];
          const data = doc.data();
          setGarageData(data);
+         console.log(data.name)
          setLoading(false);
 
          // Check if the garage is closed
@@ -117,10 +120,23 @@ console.log(garageCollectionRef);
      // Show the modal if the garage is closed
      toggleModal();
    } else {
-
-    navigation.navigate("Form", { garageid: id,
-           userlatitude: userLatitude,
-           userlongitude: userLongitude, });
+    //  router.push({
+    //    pathname: `/form/${id}`,
+    //    params: {
+    //      Id: id,
+    //      userLatitude: userLatitude,
+    //      userLongitude: userLongitude,
+    //    },
+    //  });
+    navigation.navigate("Form", {
+      garageid: id,
+      userlatitude: userLatitude,
+      userlongitude: userLongitude,
+      cateId: categoryid,
+      garageName: garageData.name,
+      phone:phone,
+      firstname:firstname
+    });
    }
  };
 

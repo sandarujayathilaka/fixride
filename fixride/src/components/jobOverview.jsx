@@ -3,34 +3,35 @@ import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import img from '../../assets/job.png';
 import { db } from '../config/firebase'; 
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { router } from "expo-router";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,useRoute } from "@react-navigation/native";
 
 
 const JobOverview = ({ vehicleImage }) => {
   const navigation = useNavigation();
-
+  const route = useRoute();
+  const {name } = route.params;
   const handleUpdateStatusPress = () => {
-    // Navigate to the Job component when the "Assigned Job" button is pressed
-  //  router.push(`/UpdateStatus/JobStatusUpdaten/`);
-  navigation.navigate("JobStatusUpdate");
+    
+  navigation.navigate("JobStatusUpdate",{name:name});
   };
   const [data, setData] = useState({});
-
+  const [id,setId] = useState('');
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("jobover",name)
         const requestCollection = collection(db, "request"); 
         const q = query(
           requestCollection,
-          where("mainstatus", "==", "Ongoing"), 
-          where("macName", "==", "Mahinda Rajapaksa") 
+          where("mainStatus", "==", "Ongoing"), 
+          where("macName", "==", name) 
         );
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
           const doc = querySnapshot.docs[0];
           setData(doc.data());
+          setId(doc.id)
         }
       } catch (error) {
         console.error("Error retrieving documents: ", error);
@@ -39,39 +40,43 @@ const JobOverview = ({ vehicleImage }) => {
 
     fetchData();
   }, []);
+console.log(data);
+  const handlePress = () => {
+    console.log(id);
+    navigation.navigate("Home", { Requestid: id });
+
+};
 
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <Text style={styles.pageHeader}>Job Overview</Text>
       <View style={styles.container}>
         <View style={styles.subHeader}>
-          <Text style={styles.subHeaderText}>{data.username}</Text>
+          <Text style={styles.subHeaderText}>Username : {data.username}</Text>
         </View>
+       
         <View style={styles.subHeader}>
-          <Text style={styles.subHeaderText}>{data.vehicleNo}</Text>
-        </View>
-        <View style={styles.subHeader}>
-          <Text style={styles.boldText}>Location</Text>
+          <Text style={styles.boldText}>Location : {data.location}</Text>
         </View>
         <Image source={img} style={styles.image} />
         <Text style={styles.grayText}>Vehicle Information</Text>
         <View style={styles.compactBoxContainer}>
           <View style={styles.compactBox}>
-            <Text style={styles.centerText}>{data.vehicleModel}</Text>
-            <Text style={styles.centerText}>Model</Text>
+          <Text style={styles.centerText}>Number</Text>
+            <Text style={styles.centerText}>{data.vehicleNo}</Text>
+            
           </View>
           <View style={styles.compactBox}>
+          <Text style={styles.centerText}>Model</Text>
             <Text style={styles.centerText}>{data.vehicleModel}</Text>
-            <Text style={styles.centerText}>Year</Text>
+            
           </View>
           <View style={styles.compactBox}>
-            <Text style={styles.centerText}>{data.vehicleModel}</Text>
-            <Text style={styles.centerText}>Fuel Type</Text>
+          <Text style={styles.centerText}>Fuel Type</Text>
+            <Text style={styles.centerText}>{data.powerSource}</Text>
+            
           </View>
-          <View style={styles.compactBox}>
-            <Text style={styles.centerText}>{data.vehicleModel}</Text>
-            <Text style={styles.centerText}>Gear Type</Text>
-          </View>
+          
         </View>
         <Text style={styles.grayText}>Customer Information</Text>
         <View style={styles.boxContainer}>
@@ -79,17 +84,13 @@ const JobOverview = ({ vehicleImage }) => {
             <Text style={styles.justifyText}>{data.username}</Text>
           </View>
         </View>
-        <View style={styles.boxContainer}>
-          <View style={styles.largeBox}>
-            <Text style={styles.justifyText}>{data.username}</Text>
-          </View>
-        </View>
+        
         <Text style={styles.grayText}>Breakdown Description</Text>
         <View style={styles.bigBox}>
             <Text style={styles.justifyText}>{data.matter}</Text>
         </View>
         <View style={styles.buttonContainer}>
-          <Text style={styles.startRideButton}>Start Ride</Text>
+          <Text style={styles.startRideButton} onPress={handlePress}>Start Ride</Text>
           <Text style={styles.updateStatusButton} onPress={handleUpdateStatusPress}>Update Status</Text>
         </View>
       </View>
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
   },
   subHeader: {
     marginBottom: 10,

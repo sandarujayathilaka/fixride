@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { db } from "../../src/config/firebase";
+import { db,firebase } from "../../src/config/firebase";
 import {
   Image,
   ScrollView,
@@ -27,32 +27,31 @@ const cardData = [
   //   imageSource: require("../../assets/tuktuk.png"), // Replace with your image path
   // },
   {
-    id: "Bicycle",
-    title: "Bike",
+    id: "Motorcycles",
+    title: "Motorcycles",
     imageSource: require("../../assets/bike.png"), // Replace with your image path
   },
   {
-    id: "Truck",
-    title: "Truck",
-    imageSource: require("../../assets/truck.png"), // Replace with your image path
-  },
-  {
-    id: "Bus",
-    title: "Bus",
+    id: "Heavy",
+    title: "Heavy Vehicles",
     imageSource: require("../../assets/bus.png"), // Replace with your image path
   },
   {
+    id: "Standard",
+    title: "Light Vehicles",
+    imageSource: require("../../assets/RedCar.png"), // Replace with your image path
+  },
+  {
     id: "All",
-    title: "Any",
+    title: "All",
     imageSource: require("../../assets/All.png"), // Replace with your image path
   },
 ];
 
 function CateCard() {
-  const [userData, setUserData] = useState({});
   const [timeGreeting, setTimeGreeting] = useState("");
-  const userEmail = "deno@gmail.com"; // Replace with the user's email
-
+  
+  const [userdata, setUserData] = useState('');
   const navigation = useNavigation();
 
   const handleCardClick = (id) => {
@@ -60,36 +59,26 @@ function CateCard() {
 
     // Navigate to the "cat_list/[id]" screen with the cardId as a parameter
 
-    navigation.navigate("CatList", { cardid: id });
+    navigation.navigate("CatList", { cardid: id ,phone:userdata.phone,firstname:userdata.firstname });
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Create a Firestore query based on the provided conditions
-        const requestQuery = query(
-          collection(db, "users"),
-          where("email", "==", userEmail)
-        );
-
-        // Subscribe to real-time updates using onSnapshot
-        const unsubscribe = onSnapshot(requestQuery, (snapshot) => {
-          if (!snapshot.empty) {
-            // If there are documents in the result, update the component state
-            const doc = snapshot.docs[0];
-            setUserData(doc.data()); // Set userData with the document data
-            console.log(doc.data()); // Log the data for debugging
-          }
-        });
-
-        return () => unsubscribe(); // Unsubscribe when the component unmounts
-      } catch (error) {
-        console.error("Error retrieving documents: ", error);
+  useEffect(()=>{
+    firebase.firestore().collection('users')
+    .doc(firebase.auth().currentUser.uid).get()
+    .then((snapshot)=>{
+      if(snapshot.exists){
+        setUserData(snapshot.data())
+        console.log(userdata)
       }
-    };
+      else{
+        console.log('User does not exist');
+      }
+    }).catch((error)=>{
+      alert(error);
+    })
+  },[])
 
-    fetchData();
-  }, []); // Empty dependency array, as it's only supposed to run once
+
 
   const getTimeBasedGreeting = () => {
     const now = new Date();
@@ -114,7 +103,7 @@ function CateCard() {
     <ScrollView style={styles.container}>
       <View style={styles.imageContainer}>
         <Image source={homeLogo} style={styles.logocardImage} />
-        <Text style={styles.greetingText}>Hi, {userData.firstname}</Text>
+        <Text style={styles.greetingText}>Hi, {userdata.firstname}</Text>
         <Text style={styles.timeGreetingText}>{timeGreeting} ...</Text>
       </View>
       <View style={styles.gridContainer}>
@@ -203,11 +192,10 @@ const styles = StyleSheet.create({
   cardTitle: {
     marginTop: 8,
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#333333", // Dark text color
   },
 });
 
 export default CateCard;
-

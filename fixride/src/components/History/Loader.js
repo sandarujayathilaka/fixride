@@ -9,7 +9,7 @@ const Loader = ({ isLoading = false }) => {
                     position: 'absolute',
                     left: 0,
                     right: 0,
-                    top: 0,
+                    top: 55,
                     bottom: 0,
                     alignItems: 'center',
                     justifyContent: 'center',
