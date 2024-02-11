@@ -24,6 +24,7 @@ Visit: http://bit.ly/fixride
 * React Native
 * Google Map API
 * Firestore
+* Google Place API
 
 ## Preview
 ![alt text](https://github.com/offisystw/portfolio/blob/main/port_images/fix.png?raw=true)
